@@ -8,10 +8,10 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Estoque SPG">
-  <link rel="icon" id="siteFavicon" href="">
-  <link rel="apple-touch-icon" id="siteAppleTouchIcon" href="">
+  <link rel="icon" id="siteFavicon" href="icon.png">
+  <link rel="apple-touch-icon" id="siteAppleTouchIcon" href="icon.png">
   <link rel="manifest" id="siteManifest" href="">
-  <title>Estoque SPG em Caixas</title>
+  <title>Estoque SPG</title>
   <style>
     :root{
       color-scheme:light;
@@ -73,9 +73,9 @@
     .auth-form .field{margin-bottom:0}
     .auth-form .dialog-alert{margin:0}
     .auth-head{display:flex;flex-direction:column;align-items:center;text-align:center;gap:9px;margin-bottom:4px}
-    .auth-mark{width:64px;height:64px;flex:none;border-radius:18px;display:grid;place-items:center;color:#fff;
-      background:linear-gradient(145deg,var(--brand-light),var(--brand-dark));box-shadow:0 12px 28px rgba(8,122,74,.32)}
-    .auth-mark svg{width:32px;height:32px}
+    .auth-mark{width:64px;height:64px;flex:none;border-radius:18px;display:grid;place-items:center;
+      background:var(--surface);border:1px solid var(--line);box-shadow:0 12px 28px rgba(8,122,74,.18);overflow:hidden;padding:7px}
+    .auth-mark img{width:100%;height:100%;object-fit:contain}
     .auth-title{margin:2px 0 0;font-size:24px;font-weight:800;letter-spacing:-.01em;color:var(--ink)}
     .auth-subtitle{margin:0;font-size:11.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
     .auth-note{margin:0;padding:10px 14px;border-radius:12px;background:var(--brand-soft);color:var(--brand-dark);
@@ -105,9 +105,9 @@
       background:var(--surface-translucent);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
       border:1px solid var(--border);border-radius:22px;padding:14px 18px;margin-bottom:20px;box-shadow:var(--shadow-md)}
     .brand{display:flex;align-items:center;gap:14px;min-width:0}
-    .brand-mark{width:48px;height:48px;flex:none;border-radius:15px;background:linear-gradient(145deg,var(--brand-light),var(--brand-dark));
-      display:grid;place-items:center;color:#fff;box-shadow:0 8px 20px rgba(8,122,74,.3)}
-    .brand-mark svg{width:26px;height:26px}
+    .brand-mark{width:48px;height:48px;flex:none;border-radius:15px;background:var(--surface);border:1px solid var(--line);
+      display:grid;place-items:center;box-shadow:0 8px 20px rgba(8,122,74,.15);overflow:hidden;padding:5px}
+    .brand-mark img{width:100%;height:100%;object-fit:contain}
     .brand h1{font-size:21px;margin:0;font-weight:800;letter-spacing:-.02em;color:var(--ink)}
     .brand p{font-size:13px;margin:3px 0 0;color:var(--muted)}
     .actions{display:flex;gap:9px;flex-wrap:wrap;justify-content:flex-end}
@@ -126,6 +126,29 @@
       box-shadow:0 10px 24px rgba(207,59,59,.28)}
     .btn-danger:hover{filter:brightness(1.06);color:#fff}
     .btn-soft{background:var(--brand-soft);border-color:var(--brand-soft-strong);color:var(--brand-dark)}
+
+    /* ── Barra inferior mobile (estilo app — Twitter/X) ──────────── */
+    .bottom-nav{position:fixed;left:0;right:0;bottom:0;z-index:70;display:flex;align-items:stretch;
+      background:var(--surface-translucent);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+      border-top:1px solid var(--border);box-shadow:0 -8px 24px rgba(9,40,25,.08);
+      padding-bottom:env(safe-area-inset-bottom);transition:transform .25s ease}
+    .bottom-nav[hidden]{display:none}
+    .bottom-nav.bottom-nav-collapsed{transform:translateY(100%)}
+    .bottom-nav .btn{flex:1;min-height:58px;border:0;border-radius:0;box-shadow:none;background:transparent;
+      flex-direction:column;gap:2px;font-size:10px;color:var(--muted);padding:6px 4px}
+    .bottom-nav .btn:hover{transform:none;box-shadow:none}
+    .bottom-nav .btn svg{width:22px;height:22px}
+    .bottom-nav .btn span.btn-label{display:block!important;font-size:10px;font-weight:700}
+    .bottom-nav .btn-primary{background:transparent;color:var(--brand-dark);box-shadow:none}
+    .bottom-nav .btn-primary svg{color:var(--brand-dark)}
+    .bottom-nav-more{position:fixed;left:12px;right:12px;bottom:calc(58px + env(safe-area-inset-bottom) + 10px);z-index:71;
+      background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow-lg);
+      padding:8px;display:flex;flex-direction:column;gap:2px}
+    .bottom-nav-more[hidden]{display:none}
+    .bottom-nav-more .btn{width:100%;justify-content:flex-start;border:0;box-shadow:none;background:transparent;
+      border-radius:10px;min-height:46px}
+    .bottom-nav-more .btn:hover{background:var(--brand-soft);transform:none;box-shadow:none}
+    .bottom-nav-more .btn span.btn-label{display:inline!important;font-size:14px}
     .btn-soft:hover{border-color:var(--brand);color:var(--brand-dark)}
     .btn-cloud{background:var(--cloud-soft);border-color:var(--cloud-soft-strong);color:var(--cloud)}
     .btn-cloud:hover{border-color:var(--cloud)}
@@ -191,6 +214,27 @@
     .table-legend .lg-note{margin-left:auto;font-size:12px;color:var(--muted)}
     .stock-scroll{margin-top:10px;background:var(--surface);border:1px solid var(--line);border-radius:20px;
       box-shadow:var(--shadow-md);overflow:auto;scrollbar-color:var(--brand-soft-strong) transparent}
+
+    /* ── Girar tabela (modo paisagem) — só faz sentido em telas estreitas ── */
+    .rotate-view-btn{display:none}
+    @media(max-width:900px){
+      .rotate-view-btn{display:inline-flex;align-items:center;gap:7px;margin:10px 0 0;height:38px;padding:0 14px;
+        border:1px solid var(--line);border-radius:11px;background:var(--surface);color:var(--ink-2);
+        font-size:12.5px;font-weight:700;cursor:pointer;box-shadow:var(--shadow-sm)}
+      .rotate-view-btn svg{width:16px;height:16px;flex:none}
+      .rotate-view-btn:hover{border-color:var(--brand);color:var(--ink)}
+      .rotate-view-btn[hidden]{display:none}
+    }
+    body.table-rotated{overflow:hidden}
+    body.table-rotated #rotateViewBtn{position:fixed;top:12px;right:12px;z-index:201;background:var(--brand-dark);
+      color:#fff;border-color:transparent;box-shadow:var(--shadow-lg)}
+    body.table-rotated #stockScroll{position:fixed;top:0;left:0;width:100vh;height:100vw;
+      transform-origin:top left;transform:rotate(90deg) translateY(-100%);
+      margin:0;border-radius:0;z-index:200;-webkit-overflow-scrolling:touch}
+    /* Pinça pra zoom na própria tabela: o wrap ganha largura/altura explícitas
+       (em px) do tamanho natural × escala, e o transform:scale cuida do visual —
+       assim o container com scroll sabe o quanto precisa rolar pra ver tudo. */
+    .stock-zoom-wrap{display:inline-block;transform-origin:top left;touch-action:pan-x pan-y}
     .geral-culture-block{padding:18px 18px 4px}
     .geral-culture-block:first-child{padding-top:20px}
     .geral-culture-block:last-child{padding-bottom:20px}
@@ -662,11 +706,9 @@
     }
     @media(max-width:620px){
       .topbar{flex-wrap:wrap}
-      .actions{display:grid;grid-template-columns:1fr 1fr;width:100%;justify-content:stretch;order:3}
-      .actions .btn{width:100%;min-width:0;font-size:12px;padding:8px 6px}
-      .actions .btn span.btn-label{display:none}
-      .actions .btn-primary{grid-column:1/-1}
-      .actions .btn-primary span.btn-label{display:inline}
+      .actions{display:none} /* botões viram a barra inferior fixa (#bottomNav), via JS */
+      .management-bar{display:none} /* "Gerenciar sistema" vira item do menu "Mais" da barra inferior */
+      .shell{padding-bottom:calc(72px + env(safe-area-inset-bottom))}
       .report-title h2{font-size:18px}
       .report-title p{font-size:12px}
       .stock-table .partner-col{width:160px}
@@ -736,7 +778,7 @@
   <main class="shell">
     <header class="topbar">
       <div class="brand">
-        <div class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 21V10M12 13C8 13 5 10.5 5 7c4 0 7 1.5 7 6ZM12 17c4 0 7-2.5 7-6-4 0-7 1.5-7 6Z"/><path d="M8 21h8"/></svg></div>
+        <div class="brand-mark" aria-hidden="true"><img src="icon.png" alt=""></div>
         <div><h1>Resumo de Estoque Diário</h1><p>SPG • controle de caixas, processamento e pedidos</p></div>
       </div>
       <div class="actions">
@@ -759,7 +801,7 @@
     </section>
     <section class="report" aria-label="Relatório de estoque">
       <div class="report-title">
-        <div class="report-title-copy"><h2>Estoque SPG em Caixas</h2><p>Visão consolidada de disponibilidade, processamento e separação</p></div>
+        <div class="report-title-copy"><h2>Estoque SPG</h2><p>Visão consolidada de disponibilidade, processamento e separação</p></div>
         <div class="title-stats">
           <div class="cloud-badge" id="cloudBadge"><span class="dot"></span><span id="cloudText">Somente neste dispositivo</span></div>
           <div class="title-chip"><span class="title-dot"></span><span class="save-state" id="saveState">Salvo automaticamente</span></div>
@@ -767,7 +809,8 @@
       </div>
       <div class="produce-tabs" id="produceTabs" role="tablist" aria-label="Selecionar vegetal"></div>
       <div class="table-legend" id="tableLegend"></div>
-      <div class="stock-scroll">
+      <button type="button" class="rotate-view-btn" id="rotateViewBtn" title="Girar a tabela para melhor leitura"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 0 1 14.5-4.7M20 12a8 8 0 0 1-14.5 4.7"/><path d="M18.5 3v4.3h-4.3M5.5 21v-4.3h4.3"/></svg><span>Girar tabela</span></button>
+      <div class="stock-scroll" id="stockScroll">
         <table class="stock-table" id="stockTable"></table>
       </div>
       <div class="lower">
@@ -796,6 +839,11 @@
       </div>
     </section>
   </main>
+
+  <nav class="bottom-nav" id="bottomNav" hidden>
+    <button type="button" class="btn" id="bottomNavMoreBtn" aria-haspopup="true" aria-expanded="false" title="Mais opções"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg><span class="btn-label">Mais</span></button>
+  </nav>
+  <div class="bottom-nav-more" id="bottomNavMore" hidden></div>
 
   <section class="print-report" id="printReport" aria-hidden="true"></section>
 
@@ -899,7 +947,7 @@
   <dialog id="authDialog" class="auth-dialog">
     <form method="dialog" id="authForm" class="auth-form">
       <div class="auth-head">
-        <div class="auth-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 21V10M12 13C8 13 5 10.5 5 7c4 0 7 1.5 7 6ZM12 17c4 0 7-2.5 7-6-4 0-7 1.5-7 6Z"/><path d="M8 21h8"/></svg></div>
+        <div class="auth-mark" aria-hidden="true"><img src="icon.png" alt=""></div>
         <h3 class="auth-title">SPG</h3>
         <p class="auth-subtitle" id="authDialogDesc">Estoque diário</p>
       </div>
@@ -1066,54 +1114,32 @@
   <div class="toast-modern" id="modernToast"></div>
 
   <script>
-    // ── PWA: ícone, favicon e manifest gerados na hora (sem depender de
-    // arquivos externos hospedados) — permite "Adicionar à tela inicial"
-    // no celular. Reaproveita o mesmo ícone de broto usado na marca do app.
-    const BRAND_LOGO_SVG=`
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <rect width="512" height="512" rx="112" fill="#065c38"/>
-  <rect width="512" height="512" rx="112" fill="url(#g)"/>
-  <defs><linearGradient id="g" x1="0" y1="0" x2="512" y2="512">
-    <stop offset="0" stop-color="#12a565"/><stop offset="1" stop-color="#065c38"/>
-  </linearGradient></defs>
-  <g transform="translate(256 246)" fill="none" stroke="#ffffff" stroke-width="17" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M0 108V-24"/>
-    <path d="M0 6C-84 6-148-51-148-135c84 0 148 32 148 141Z"/>
-    <path d="M0 62c84 0 148-53 148-135-84 0-148 32-148 135Z"/>
-  </g>
-</svg>`.trim();
-    function getBrandLogoDataUri(){
-      return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(BRAND_LOGO_SVG)}`;
-    }
+    // ── PWA: favicon/apple-touch-icon apontam pro arquivo icon.png (ao lado
+    // do index.html); só o manifest continua sendo montado na hora, porque
+    // precisa de start_url/scope absolutos (calculados a partir da página).
     function applyBrandAssets(){
-      const logoUri=getBrandLogoDataUri();
-      const favicon=document.getElementById('siteFavicon');
-      const appleTouchIcon=document.getElementById('siteAppleTouchIcon');
       const manifestLink=document.getElementById('siteManifest');
-      if(favicon)favicon.href=logoUri;
-      if(appleTouchIcon)appleTouchIcon.href=logoUri;
-      if(manifestLink){
-        // start_url/scope precisam ser absolutos: como o manifest é servido
-        // como data URI (sem URL própria), um valor relativo como "." não tem
-        // base confiável pra ser resolvido contra — isso quebra a instalação
-        // em alguns navegadores. location.href já vem absoluto e correto.
-        const here=location.href.split('#')[0];
-        const scope=here.slice(0,here.lastIndexOf('/')+1)||here;
-        const manifest={
-          name:'Resumo de Estoque Diário SPG',
-          short_name:'Estoque SPG',
-          start_url:here,
-          scope:scope,
-          display:'standalone',
-          background_color:'#f3f6f4',
-          theme_color:'#087a4a',
-          icons:[
-            {src:logoUri,sizes:'192x192',type:'image/svg+xml'},
-            {src:logoUri,sizes:'512x512',type:'image/svg+xml'}
-          ]
-        };
-        manifestLink.href=`data:application/manifest+json,${encodeURIComponent(JSON.stringify(manifest))}`;
-      }
+      if(!manifestLink)return;
+      // start_url/scope/ícone precisam ser absolutos: como o manifest é servido
+      // como data URI (sem URL própria), um valor relativo não tem base
+      // confiável pra ser resolvido contra — isso quebra a instalação em
+      // alguns navegadores. new URL(...,location.href) resolve isso.
+      const here=location.href.split('#')[0];
+      const scope=here.slice(0,here.lastIndexOf('/')+1)||here;
+      const iconUrl=new URL('icon.png',here).href;
+      const manifest={
+        name:'Resumo de Estoque Diário SPG',
+        short_name:'Estoque SPG',
+        start_url:here,
+        scope:scope,
+        display:'standalone',
+        background_color:'#f3f6f4',
+        theme_color:'#087a4a',
+        icons:[
+          {src:iconUrl,sizes:'512x512',type:'image/png'}
+        ]
+      };
+      manifestLink.href=`data:application/manifest+json,${encodeURIComponent(JSON.stringify(manifest))}`;
     }
     applyBrandAssets();
     // Service worker: só funciona servido via HTTP(S) (GitHub Pages, Netlify
@@ -1138,6 +1164,109 @@
     window.addEventListener('appinstalled',()=>{
       const btn=document.getElementById('installAppBtn');if(btn)btn.hidden=true;
     });
+    // ── Barra inferior no celular (estilo app) ────────────────────────
+    // Move os MESMOS botões de ação (não duplica) entre a barra do topo
+    // (desktop) e a barra fixa inferior + menu "Mais" (celular), conforme
+    // a largura da tela — mantém eventos, estado de habilitado/desabilitado
+    // e o texto/ícone de cada botão intactos, só muda onde eles moram.
+    const BOTTOM_NAV_ESSENTIAL=['themeBtn','printBtn','imgBtn'];
+    const BOTTOM_NAV_MORE=['syncBtn','systemBtn','userBtn','csvBtn','installAppBtn'];
+    const DESKTOP_ACTIONS_ORDER=['installAppBtn','userBtn','themeBtn','csvBtn','imgBtn','printBtn','syncBtn'];
+    const mobileNavQuery=window.matchMedia('(max-width:620px)');
+    function closeBottomNavMore(){
+      const more=document.getElementById('bottomNavMore'),btn=document.getElementById('bottomNavMoreBtn');
+      more.hidden=true;btn.setAttribute('aria-expanded','false');
+    }
+    function layoutActionsForViewport(){
+      const actions=document.querySelector('.actions'),managementActions=document.querySelector('.management-actions'),
+        bottomNav=document.getElementById('bottomNav'),moreBtn=document.getElementById('bottomNavMoreBtn'),more=document.getElementById('bottomNavMore');
+      if(mobileNavQuery.matches){
+        bottomNav.hidden=false;
+        BOTTOM_NAV_ESSENTIAL.forEach(id=>{const el=document.getElementById(id);if(el)bottomNav.insertBefore(el,moreBtn)});
+        BOTTOM_NAV_MORE.forEach(id=>{const el=document.getElementById(id);if(el)more.appendChild(el)});
+      }else{
+        bottomNav.hidden=true;
+        closeBottomNavMore();
+        DESKTOP_ACTIONS_ORDER.forEach(id=>{const el=document.getElementById(id);if(el)actions.appendChild(el)});
+        const sysBtn=document.getElementById('systemBtn');if(sysBtn&&managementActions)managementActions.appendChild(sysBtn);
+      }
+    }
+    mobileNavQuery.addEventListener('change',layoutActionsForViewport);
+    document.getElementById('bottomNavMoreBtn').onclick=()=>{
+      const more=document.getElementById('bottomNavMore'),btn=document.getElementById('bottomNavMoreBtn');
+      const willOpen=more.hidden;
+      more.hidden=!willOpen;
+      btn.setAttribute('aria-expanded',String(willOpen));
+    };
+    document.addEventListener('click',e=>{
+      const more=document.getElementById('bottomNavMore');
+      if(more.hidden)return;
+      if(more.contains(e.target)||e.target.closest('#bottomNavMoreBtn'))return;
+      closeBottomNavMore();
+    });
+    document.getElementById('bottomNavMore').addEventListener('click',e=>{
+      if(e.target.closest('.btn'))closeBottomNavMore();
+    });
+    layoutActionsForViewport();
+    // Esconde a barra inferior de ícones (celular) ao rolar pra baixo, mostra
+    // de volta ao rolar pra cima (padrão comum em apps de celular).
+    (function(){
+      const bottomNav=document.getElementById('bottomNav');
+      let lastY=window.scrollY,ticking=false;
+      function onScroll(){
+        const y=Math.max(0,window.scrollY);
+        if(y>lastY&&y>80){bottomNav.classList.add('bottom-nav-collapsed');closeBottomNavMore()}
+        else if(y<lastY)bottomNav.classList.remove('bottom-nav-collapsed');
+        lastY=y;ticking=false;
+      }
+      window.addEventListener('scroll',()=>{
+        if(!ticking){requestAnimationFrame(onScroll);ticking=true}
+      },{passive:true});
+    })();
+    // Girar a tabela (modo paisagem) — vira a tabela de lado dentro da tela
+    // do celular, sem precisar deitar o aparelho de verdade.
+    document.getElementById('rotateViewBtn').onclick=()=>{
+      const on=document.body.classList.toggle('table-rotated');
+      const btn=document.getElementById('rotateViewBtn');
+      btn.innerHTML=on
+        ?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg><span>Sair do modo paisagem</span>'
+        :'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 0 1 14.5-4.7M20 12a8 8 0 0 1-14.5 4.7"/><path d="M18.5 3v4.3h-4.3M5.5 21v-4.3h4.3"/></svg><span>Girar tabela</span>';
+    };
+    // Pinça pra dar zoom direto na tabela (independente do zoom nativo da
+    // página), já que dentro de um container com scroll o gesto de pinça do
+    // navegador nem sempre é reconhecido direito.
+    let tableZoomScale=1,tableZoomBaseW=0,tableZoomBaseH=0;
+    function resetTableZoom(){
+      tableZoomScale=1;tableZoomBaseW=0;tableZoomBaseH=0;
+      const wrap=document.getElementById('stockZoomWrap');
+      if(wrap){wrap.style.transform='';wrap.style.width='';wrap.style.height=''}
+    }
+    function applyTableZoom(scale){
+      const wrap=document.getElementById('stockZoomWrap');if(!wrap)return;
+      tableZoomScale=Math.min(2.5,Math.max(.6,scale));
+      if(!tableZoomBaseW){
+        wrap.style.transform='none';
+        tableZoomBaseW=wrap.scrollWidth;tableZoomBaseH=wrap.scrollHeight;
+      }
+      wrap.style.width=tableZoomBaseW+'px';
+      wrap.style.height=tableZoomBaseH+'px';
+      wrap.style.transform=`scale(${tableZoomScale})`;
+    }
+    (function(){
+      const scrollEl=document.getElementById('stockScroll');
+      let pinchStartDist=0,pinchStartScale=1;
+      const dist=touches=>Math.hypot(touches[0].clientX-touches[1].clientX,touches[0].clientY-touches[1].clientY);
+      scrollEl.addEventListener('touchstart',e=>{
+        if(e.touches.length===2){pinchStartDist=dist(e.touches);pinchStartScale=tableZoomScale}
+      },{passive:true});
+      scrollEl.addEventListener('touchmove',e=>{
+        if(e.touches.length===2&&pinchStartDist>0){
+          e.preventDefault();
+          applyTableZoom(pinchStartScale*(dist(e.touches)/pinchStartDist));
+        }
+      },{passive:false});
+      scrollEl.addEventListener('touchend',e=>{if(e.touches.length<2)pinchStartDist=0});
+    })();
     const STORAGE_KEY='spg_estoque_diario_v2', GAS_KEY='spg_estoque_gas_url', THEME_KEY='spg_estoque_theme', TOKEN_KEY='spg_estoque_token', SIM_STORAGE_KEY='spg_estoque_simulacao_v1';
     const BASE_PRODUCE=[{id:'geral',label:'Geral',color:'#4a5568'},{id:'brocolis',label:'Brócolis',color:'#2e9e46'},{id:'tomate',label:'Tomate',color:'#e05252'},{id:'couveflor',label:'Couve-flor',color:'#8a6bd8'},{id:'pepino',label:'Pepino',color:'#1e9c86'}];
     // Culturas personalizadas ficam em state.cultures e entram nas listas
@@ -1697,24 +1826,35 @@
       const applyFilter=scroll.querySelector('#dashPartnerApply');
       if(applyFilter)applyFilter.onclick=()=>{const selected=filterBoxes.filter(box=>box.checked).map(box=>box.value);if(!selected.length){toast('Selecione pelo menos um parceiro.',true);return}geralPartnerFilters=selected.length===filterBoxes.length?new Set():new Set(selected);renderTable()};
     }
+    function updateRotateButtonVisibility(produce){
+      const btn=document.getElementById('rotateViewBtn');
+      const isTable=produce!=='geral';
+      btn.hidden=!isTable;
+      if(!isTable&&document.body.classList.contains('table-rotated')){
+        document.body.classList.remove('table-rotated');
+        btn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 0 1 14.5-4.7M20 12a8 8 0 0 1-14.5 4.7"/><path d="M18.5 3v4.3h-4.3M5.5 21v-4.3h4.3"/></svg><span>Girar tabela</span>';
+      }
+    }
     function renderTable(){
       const scroll=document.querySelector('.stock-scroll');
       const produce=activeProduce();
+      updateRotateButtonVisibility(produce);
+      resetTableZoom();
       if(produce==='geral'){renderGeralTables(scroll);return}
       scroll.classList.remove('as-dash');
       document.getElementById('tableLegend').innerHTML=produce==='tomate'
         ?`<span class="lg"><i style="background:${TOMATE_META[0].color}"></i>CG</span><span class="lg"><i style="background:${TOMATE_META[1].color}"></i>M</span><span class="lg"><i style="background:${TOMATE_META[2].color}"></i>P</span><span class="lg-note">Cumbuca 180g • toque em um número para editar</span>`
         :cultureLegendHtml({id:produce});
       const days=daysForProduce(produce);
-      if(!days.length){scroll.innerHTML='<div style="padding:45px;color:var(--muted)">Adicione ou reative uma data para começar o controle.</div>';return}
+      if(!days.length){scroll.innerHTML='<div class="stock-zoom-wrap" id="stockZoomWrap"><div style="padding:45px;color:var(--muted)">Adicione ou reative uma data para começar o controle.</div></div>';return}
       const hoje=todayIso();
       if(produce==='tomate'){
-        scroll.innerHTML=tomateBlockHtml(days,hoje);
+        scroll.innerHTML=`<div class="stock-zoom-wrap" id="stockZoomWrap">${tomateBlockHtml(days,hoje)}</div>`;
         scroll.querySelectorAll('input.cell').forEach(input=>{input.addEventListener('input',onCellInput);input.addEventListener('change',onCellChange)});
         wireClearDateButtons(scroll);
         return;
       }
-      scroll.innerHTML='<table class="stock-table" id="stockTable"></table>';
+      scroll.innerHTML='<div class="stock-zoom-wrap" id="stockZoomWrap"><table class="stock-table" id="stockTable"></table></div>';
       const table=document.getElementById('stockTable');
       table.innerHTML=cultureTableHtml(days,hoje,{id:produce,label:produceLabel(produce)});
       table.style.minWidth=Math.max(900,210+days.length*typeMetaForCulture(produce).length*58)+'px';
