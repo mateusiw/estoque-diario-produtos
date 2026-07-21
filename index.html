@@ -334,6 +334,9 @@
     .culture-split-col .status-row b{font-size:12.5px}
     @media(max-width:1100px){.culture-split-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
     @media(max-width:620px){.culture-split-grid{grid-template-columns:1fr}}
+    .ra-grid{display:flex;flex-direction:column;gap:16px;margin-top:16px;min-width:0}
+    .ra-col{display:flex;flex-direction:column;gap:16px;min-width:0}
+    .ra-table-scroll{overflow-x:auto;max-width:100%;border-radius:14px}
     .geral-table{border-radius:14px;overflow:hidden;border:1px solid var(--line)}
     .tomate-grid-label{margin:18px 2px 8px;font-size:12.5px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
     .tomate-grid-label:first-of-type{margin-top:2px}
@@ -430,20 +433,35 @@
     .order-id{min-width:0}
     .order-id strong{display:block;font-size:14px;font-weight:800;color:var(--ink);line-height:1.25;overflow-wrap:break-word}
     .order-id span{display:block;margin-top:1px;font-size:11.5px;color:var(--muted)}
-    .order-row{display:grid;grid-template-columns:1fr auto auto 92px;min-height:42px;border-bottom:1px solid var(--line);align-items:center}
+    .order-row{border-bottom:1px solid var(--line)}
     .order-row:last-child{border-bottom:0}
-    .order-row label{font-size:13.5px;font-weight:650;padding-left:14px;color:var(--ink-2);overflow-wrap:anywhere}
+    .order-row-top{display:grid;grid-template-columns:1fr auto auto 92px;min-height:42px;align-items:center}
+    .order-row-top label{font-size:13.5px;font-weight:650;padding-left:14px;color:var(--ink-2);overflow-wrap:anywhere}
     .order-link{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:999px;font-size:10.5px;font-weight:800;background:var(--c);color:#fff;opacity:.85;vertical-align:middle}
-    .order-row .mini-edit{width:24px;height:24px;margin:0 2px;flex:none}
+    .order-row-top .mini-edit{width:24px;height:24px;margin:0 2px;flex:none}
     .order-del{border:0;background:transparent;color:var(--muted);width:24px;height:24px;border-radius:8px;cursor:pointer;font-size:15px;line-height:1;margin:0 4px;flex:none}
     .order-del:hover{background:var(--critical-soft);color:var(--critical)}
     .order-card header .mini-add{margin-left:auto}
     #clientProducts{display:flex;flex-direction:column;gap:8px;margin-bottom:10px}
-    .order-row input{height:41px;width:100%;border:0;border-left:1px solid var(--line);background:transparent;
+    .order-row-top input{height:41px;width:100%;border:0;border-left:1px solid var(--line);background:transparent;
       text-align:center;font-weight:800;font-size:15px;color:var(--ink);outline:none;font-variant-numeric:tabular-nums;
       transition:background .15s,box-shadow .15s}
-    .order-row input:hover{background:var(--brand-soft)}
-    .order-row input:focus{background:var(--brand-soft);box-shadow:inset 0 0 0 2px var(--brand)}
+    .order-row-top input:hover{background:var(--brand-soft)}
+    .order-row-top input:focus{background:var(--brand-soft);box-shadow:inset 0 0 0 2px var(--brand)}
+    /* Linha de "já separado" (baixa de estoque) + barra de progresso */
+    .order-row-progress{display:flex;align-items:center;gap:9px;padding:6px 14px 9px;background:var(--surface-2)}
+    .order-row-progress input{width:80px;height:29px;flex:none;border:1px solid var(--line);border-radius:8px;
+      background:var(--surface);text-align:center;font-weight:700;font-size:12.5px;color:var(--ink);outline:none;
+      font-variant-numeric:tabular-nums;transition:border-color .15s,box-shadow .15s}
+    .order-row-progress input:hover{border-color:var(--brand)}
+    .order-row-progress input:focus{border-color:var(--brand);box-shadow:0 0 0 2px var(--brand-soft)}
+    .order-progress-track{flex:1;min-width:32px;height:6px;border-radius:999px;background:var(--line);overflow:hidden}
+    .order-progress-fill{height:100%;border-radius:999px;background:var(--brand);transition:width .2s}
+    .order-progress-fill.done{background:var(--good)}
+    .order-progress-pct{flex:none;font-size:11px;font-weight:700;color:var(--muted);white-space:nowrap}
+    .order-summary{display:flex;align-items:center;gap:9px;padding:9px 14px;border-bottom:1px solid var(--line);background:var(--surface)}
+    .order-summary .order-progress-track{height:7px}
+    .order-summary-text{flex:none;font-size:11.5px;font-weight:750;color:var(--muted);white-space:nowrap}
 
     /* Simulador de disponibilidade (pedidos x estoque) */
     #simAvailability{display:flex;flex-direction:column;gap:8px;margin-top:16px}
@@ -719,11 +737,15 @@
     }
     /* ── Telas pequenas: empilha os controles em vez de cortar texto ──── */
     @media(max-width:640px){
-      .order-row{grid-template-columns:1fr auto auto;grid-template-areas:"label edit del" "input input input";row-gap:6px;padding:8px 0}
-      .order-row label{grid-area:label;padding-left:10px}
-      .order-row .mini-edit{grid-area:edit}
-      .order-row .order-del{grid-area:del}
-      .order-row input{grid-area:input;border-left:1px solid var(--line);border-radius:8px}
+      .order-row-top{grid-template-columns:1fr auto auto;grid-template-areas:"label edit del" "input input input";row-gap:6px;padding:8px 0}
+      .order-row-top label{grid-area:label;padding-left:10px}
+      .order-row-top .mini-edit{grid-area:edit}
+      .order-row-top .order-del{grid-area:del}
+      .order-row-top input{grid-area:input;border-left:1px solid var(--line);border-radius:8px}
+      .order-row-progress{flex-wrap:wrap}
+      .order-row-progress input{width:100%;order:1}
+      .order-progress-track{order:2}
+      .order-progress-pct{order:3}
       .catalog-row,.sim-row{grid-template-columns:1fr;gap:6px}
       .catalog-row select,.catalog-row input,.sim-row select,.sim-row input{width:100%}
       .catalog-row .mini-remove,.sim-row .mini-remove{justify-self:end}
@@ -765,7 +787,7 @@
       .pr-table td.num{text-align:right;font-variant-numeric:tabular-nums;font-weight:700}.pr-table td.center{text-align:center}
       .pr-table tbody tr:nth-child(even){background:#f5f7f6}.pr-table tr{break-inside:avoid}
       .pr-table tfoot td{background:#edf2ef;font-weight:800}.pr-empty{text-align:center!important;color:#66736c;padding:3mm!important;font-style:italic}
-      .pr-orders th:first-child{width:27%}.pr-orders th:nth-child(2){width:53%}.pr-orders th:last-child{width:20%}
+      .pr-orders th:nth-child(1){width:24%}.pr-orders th:nth-child(2){width:32%}.pr-orders th:nth-child(3){width:11%}.pr-orders th:nth-child(4){width:12%}.pr-orders th:nth-child(5){width:11%}.pr-orders th:nth-child(6){width:10%}
       .pr-notes{margin-top:2.5mm;border-top:1px solid #839087;padding-top:1.5mm;font-size:6.3pt;color:#4d5952}
       .pr-notes div+div{margin-top:.6mm}
       /* O Chrome repete elementos fixed em cada folha e pode posicioná-los
@@ -1268,16 +1290,20 @@
       scrollEl.addEventListener('touchend',e=>{if(e.touches.length<2)pinchStartDist=0});
     })();
     const STORAGE_KEY='spg_estoque_diario_v2', GAS_KEY='spg_estoque_gas_url', THEME_KEY='spg_estoque_theme', TOKEN_KEY='spg_estoque_token', SIM_STORAGE_KEY='spg_estoque_simulacao_v1';
-    const BASE_PRODUCE=[{id:'geral',label:'Geral',color:'#4a5568'},{id:'brocolis',label:'Brócolis',color:'#2e9e46'},{id:'tomate',label:'Tomate',color:'#e05252'},{id:'couveflor',label:'Couve-flor',color:'#8a6bd8'},{id:'pepino',label:'Pepino',color:'#1e9c86'}];
+    const BASE_PRODUCE=[{id:'geral',label:'Geral',color:'#4a5568'},{id:'resumoantigo',label:'Resumo Antigo',color:'#6b7c93'},{id:'brocolis',label:'Brócolis',color:'#2e9e46'},{id:'tomate',label:'Tomate',color:'#e05252'},{id:'couveflor',label:'Couve-flor',color:'#8a6bd8'},{id:'pepino',label:'Pepino',color:'#1e9c86'}];
+    // "geral" e "resumoantigo" são abas especiais (painéis calculados), não
+    // culturas de verdade — não entram em CULTURES para não aparecerem nas
+    // telas de cadastro de parceiro/data/cliente nem no seletor de impressão.
+    const NON_CULTURE_TABS=new Set(['geral','resumoantigo']);
     // Culturas personalizadas ficam em state.cultures e entram nas listas
     // abaixo via rebuildCultures() (chamado a cada renderAll).
-    let PRODUCE=BASE_PRODUCE.slice(),CULTURES=BASE_PRODUCE.filter(p=>p.id!=='geral');
+    let PRODUCE=BASE_PRODUCE.slice(),CULTURES=BASE_PRODUCE.filter(p=>!NON_CULTURE_TABS.has(p.id));
     function customCultures(){return (state.cultures||[]).filter(isActive)}
     function customCulture(id){return (state.cultures||[]).find(c=>c.id===id)}
     function rebuildCultures(){
       const custom=customCultures().map(c=>({id:c.id,label:c.label,color:c.color||'#5b8a66',unit:c.unit==='kg'?'kg':'caixas'}));
       PRODUCE=[...BASE_PRODUCE,...custom];
-      CULTURES=PRODUCE.filter(p=>p.id!=='geral');
+      CULTURES=PRODUCE.filter(p=>!NON_CULTURE_TABS.has(p.id));
     }
     const DEFAULT_CLIENTS=['PERRONI','MSL Brocolitos by Trielo - CE','DOCE MEL','TRIELO-CE'];
     const PRODUCTS=['Brócolis 300g','Brócolis 200g','Tomatinhos 180g','Brócolis 500g','Pepino 280g'];
@@ -1368,7 +1394,7 @@
     function uid(prefix){return prefix+'_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,7)}
     function activeProduce(){return state.activeProduce||PRODUCE[0].id}
     function produceLabel(id){return (PRODUCE.find(p=>p.id===id)||{}).label||id}
-    function freshState(){return {version:2,factorRulesVersion:1,partners:DEFAULT_PARTNERS.map((name,i)=>({id:'p'+i,name,produce:'brocolis'})),days:DEFAULT_DATES.map(iso=>({id:'d_'+iso,iso,produce:'brocolis'})),clients:DEFAULT_CLIENTS.map((name,i)=>({id:'c'+i,name})),activeProduce:'geral',cells:{},processar:{},orders:{'c0-0':3600,'c3-0':1455},factors:{},factorConfig:{},dashboardLabels:{},generalHiddenCultures:{},cultures:[],log:[],updatedAt:new Date().toISOString()}}
+    function freshState(){return {version:2,factorRulesVersion:1,partners:DEFAULT_PARTNERS.map((name,i)=>({id:'p'+i,name,produce:'brocolis'})),days:DEFAULT_DATES.map(iso=>({id:'d_'+iso,iso,produce:'brocolis'})),clients:DEFAULT_CLIENTS.map((name,i)=>({id:'c'+i,name})),activeProduce:'geral',cells:{},processar:{},orders:{'c0-0':3600,'c3-0':1455},separado:{},factors:{},factorConfig:{},dashboardLabels:{},generalHiddenCultures:{},cultures:[],log:[],updatedAt:new Date().toISOString()}}
     function migrateFactorRules(target){
       if(!target||Number(target.factorRulesVersion||0)>=1)return target;
       target.factors=target.factors||{};
@@ -1403,6 +1429,7 @@
           saved.days=(saved.days||[]).map(d=>d.produce?d:{...d,produce:'brocolis'});
           saved.activeProduce=saved.activeProduce||'brocolis';
           saved.processar=saved.processar||{};
+          saved.separado=saved.separado||{};
           saved.factors=saved.factors||{};
           saved.factorConfig=saved.factorConfig||{};
           saved.dashboardLabels=saved.dashboardLabels||{};
@@ -1664,44 +1691,30 @@
         return d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric'})+' às '+d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
       }catch(e){return '—'}
     }
-    function renderGeralTables(scroll){
-      scroll.classList.add('as-dash');
-      document.getElementById('tableLegend').innerHTML='';
-      const hoje=todayIso();
-      const partnerKey=name=>String(name||'').trim().toLocaleUpperCase('pt-BR');
-      const visibleGeralCultures=CULTURES.filter(c=>!isCultureHiddenGeneral(c.id));
-      const partnerNames=[...new Map(visibleGeralCultures.flatMap(c=>partnersForProduce(c.id)).map(p=>[partnerKey(p.name),p.name])).entries()].sort((a,b)=>a[1].localeCompare(b[1],'pt-BR'));
-      const validPartnerKeys=new Set(partnerNames.map(([key])=>key));
-      geralPartnerFilters=new Set([...geralPartnerFilters].filter(key=>validPartnerKeys.has(key)));
-      const geralPartnersFor=id=>partnersForProduce(id).filter(p=>!geralPartnerFilters.size||geralPartnerFilters.has(partnerKey(p.name)));
-      const geralDayType=(dayId,type,id)=>geralPartnersFor(id).reduce((sum,p)=>sum+num(state.cells[cellKey(p.id,dayId,type,id)]),0);
-      const geralTypeTotal=(type,id)=>daysForProduce(id).reduce((sum,d)=>sum+geralDayType(d.id,type,id),0);
-      const geralDayProcessar=(dayId,type,id)=>geralPartnersFor(id).reduce((sum,p)=>sum+num(state.processar[cellKey(p.id,dayId,type,id)]),0);
-      const geralProcessarTotal=(type,id)=>daysForProduce(id).reduce((sum,d)=>sum+geralDayProcessar(d.id,type,id),0);
-      const geralUnitTotal=id=>[0,1,2].reduce((sum,t)=>sum+geralTypeTotal(t,id),0);
-      const geralKgTotal=id=>id==='tomate'?geralUnitTotal(id)*factorNum('tomateCumbucaKg')+[0,1,2].reduce((s,t)=>s+geralProcessarTotal(t,id),0):[0,1,2].reduce((s,t)=>s+geralTypeTotal(t,id)*kgFactorForType(id,t),0);
-      const geralDayKg=(id,iso)=>{const day=daysForProduce(id).find(d=>d.iso===iso);if(!day)return 0;return id==='tomate'?[0,1,2].reduce((s,t)=>s+geralDayType(day.id,t,id),0)*factorNum('tomateCumbucaKg')+[0,1,2].reduce((s,t)=>s+geralDayProcessar(day.id,t,id),0):[0,1,2].reduce((s,t)=>s+geralDayType(day.id,t,id)*kgFactorForType(id,t),0)};
-      const geralCultures=visibleGeralCultures.filter(c=>!geralPartnerFilters.size||geralPartnersFor(c.id).length);
+    // Totais "gerais" (filtrados pelo seletor de parceiro da aba Geral, em
+    // geralPartnerFilters) — ficam no escopo do módulo porque tanto
+    // renderGeralTables quanto estoqueProdutoPanelHtml (reaproveitado no
+    // Resumo Antigo) precisam deles.
+    function partnerFilterKey(name){return String(name||'').trim().toLocaleUpperCase('pt-BR')}
+    function geralPartnersFor(id){return partnersForProduce(id).filter(p=>!geralPartnerFilters.size||geralPartnerFilters.has(partnerFilterKey(p.name)))}
+    function geralDayType(dayId,type,id){return geralPartnersFor(id).reduce((sum,p)=>sum+num(state.cells[cellKey(p.id,dayId,type,id)]),0)}
+    function geralTypeTotal(type,id){return daysForProduce(id).reduce((sum,d)=>sum+geralDayType(d.id,type,id),0)}
+    function geralDayProcessar(dayId,type,id){return geralPartnersFor(id).reduce((sum,p)=>sum+num(state.processar[cellKey(p.id,dayId,type,id)]),0)}
+    function geralProcessarTotal(type,id){return daysForProduce(id).reduce((sum,d)=>sum+geralDayProcessar(d.id,type,id),0)}
+    function geralUnitTotal(id){return [0,1,2].reduce((sum,t)=>sum+geralTypeTotal(t,id),0)}
+    function geralKgTotal(id){return id==='tomate'?geralUnitTotal(id)*factorNum('tomateCumbucaKg')+[0,1,2].reduce((s,t)=>s+geralProcessarTotal(t,id),0):[0,1,2].reduce((s,t)=>s+geralTypeTotal(t,id)*kgFactorForType(id,t),0)}
+    function geralDayKg(id,iso){const day=daysForProduce(id).find(d=>d.iso===iso);if(!day)return 0;return id==='tomate'?[0,1,2].reduce((s,t)=>s+geralDayType(day.id,t,id),0)*factorNum('tomateCumbucaKg')+[0,1,2].reduce((s,t)=>s+geralDayProcessar(day.id,t,id),0):[0,1,2].reduce((s,t)=>s+geralDayType(day.id,t,id)*kgFactorForType(id,t),0)}
+    function geralVisibleCultures(){return CULTURES.filter(c=>!isCultureHiddenGeneral(c.id))}
+    function geralActiveCultures(){return geralVisibleCultures().filter(c=>!geralPartnerFilters.size||geralPartnersFor(c.id).length)}
+    // Painel "Estoque por Produto" — usado na aba Geral e reaproveitado tal
+    // e qual (mesmos nomes, mesmos cálculos) na aba Resumo Antigo, para as
+    // duas nunca ficarem dessincronizadas.
+    function estoqueProdutoPanelHtml(){
+      const geralCultures=geralActiveCultures();
       const porCultura=geralCultures.map(c=>({c,un:geralUnitTotal(c.id),kg:geralKgTotal(c.id)}));
       const totalKg=porCultura.reduce((s,x)=>s+x.kg,0);
       const granel=[0,1,2].reduce((s,t)=>s+geralProcessarTotal(t,'tomate'),0);
-      const dates=[...new Set(geralCultures.flatMap(c=>daysForProduce(c.id).map(d=>d.iso)))].sort();
       const fmtUn=x=>isDirectKgCulture(x.c.id)?fmtDec(x.un):fmt(x.un);
-      const filterAll=!geralPartnerFilters.size,filterLabel=filterAll?'Todos os parceiros':geralPartnerFilters.size===1?(partnerNames.find(([key])=>geralPartnerFilters.has(key))?.[1]||'1 parceiro'):`${geralPartnerFilters.size} parceiros`;
-      const partnerOptions=partnerNames.map(([key,name])=>`<label class="partner-filter-option" data-partner-option data-search-name="${esc(partnerKey(name))}"><input type="checkbox" value="${esc(key)}" ${filterAll||geralPartnerFilters.has(key)?'checked':''}><span>${esc(name)}</span></label>`).join('');
-
-      const dayKg={};dates.forEach(iso=>dayKg[iso]=geralCultures.reduce((s,c)=>s+geralDayKg(c.id,iso),0));
-      const maiorDia=dates.reduce((best,iso)=>dayKg[iso]>(best?dayKg[best]:-1)?iso:best,null);
-      const maiorCultura=porCultura.reduce((best,x)=>x.kg>(best?best.kg:-1)?x:best,null);
-      const parceirosComEstoque=geralCultures.reduce((s,c)=>s+geralPartnersFor(c.id).filter(p=>daysForProduce(c.id).some(d=>geralDayTotal(p,d,c.id)>0)).length,0);
-      const kpis=[
-        {ico:'🤝',tint:'var(--cloud-soft)',label:geralPartnerFilters.size?'Culturas com estoque':'Parceiros com estoque',val:String(parceirosComEstoque),sub:geralPartnerFilters.size?'dos parceiros selecionados':'somando todas as culturas'},
-        {ico:'⚖️',tint:'rgba(245,169,19,.16)',label:'Peso total',val:`${fmt(totalKg)} kg`,sub:'estimado pelas conversões'},
-        {ico:'🏆',tint:'var(--brand-soft)',label:'Maior estoque',val:maiorCultura&&maiorCultura.kg>0?maiorCultura.c.label:'—',sub:maiorCultura&&maiorCultura.kg>0?`${fmt(maiorCultura.kg)} kg`:'sem lançamentos'},
-        {ico:'📅',tint:'rgba(138,107,216,.16)',label:'Dia com mais estoque',val:maiorDia?formatDate(maiorDia):'—',sub:maiorDia?`${fmt(dayKg[maiorDia])} kg no dia`:'sem lançamentos'}
-      ];
-      const kpiHtml=kpis.map(k=>`<div class="kpi"><span class="kpi-icon" style="--tint:${k.tint}">${k.ico}</span><div class="kpi-copy"><span>${k.label}</span><strong>${k.val}</strong><em>${k.sub}</em></div></div>`).join('');
-
       const packRows=id=>{const kgTot=geralKgTotal(id);return packsForCulture(id).map(p=>[esc(p.name),fmt(Math.round(kgTot/Number(p.kg)))])};
       const cardDetails=id=>{
         let rows=[];
@@ -1732,6 +1745,34 @@
         const det=detailRows.map(r=>`<span class="dr ${r[2]||''}">${r[3]?dashboardLabelText(r[3],r[0]):r[0]}<b>${r[1]}</b></span>`).join('');
         return `<div class="pcard" style="--c:${x.c.color}"><span class="pic">${CULTURE_EMOJI[x.c.id]||genericCultureSvg(x.c.color)}</span><b><i></i>${esc(x.c.label)}</b><span class="val">${fmtUn(x)} ${cultureUnitLabel(x.c.id)}</span><span class="kg">≈ ${fmt(x.kg)} kg</span><div class="pbar"><i style="width:${pct}%"></i></div><span class="pct">${pct}% do peso total</span><div class="pdet">${det}</div></div>`;
       }).join('');
+      return `<section class="dash-panel" style="grid-column:1/-1"><h4>Estoque por Produto<small>unidades e peso estimado • nomes definidos nas configurações</small></h4><div class="produce-cards">${cardsHtml}</div></section>`;
+    }
+    function renderGeralTables(scroll){
+      scroll.classList.add('as-dash');
+      document.getElementById('tableLegend').innerHTML='';
+      const hoje=todayIso();
+      const visibleGeralCultures=geralVisibleCultures();
+      const partnerNames=[...new Map(visibleGeralCultures.flatMap(c=>partnersForProduce(c.id)).map(p=>[partnerFilterKey(p.name),p.name])).entries()].sort((a,b)=>a[1].localeCompare(b[1],'pt-BR'));
+      const validPartnerKeys=new Set(partnerNames.map(([key])=>key));
+      geralPartnerFilters=new Set([...geralPartnerFilters].filter(key=>validPartnerKeys.has(key)));
+      const geralCultures=geralActiveCultures();
+      const porCultura=geralCultures.map(c=>({c,un:geralUnitTotal(c.id),kg:geralKgTotal(c.id)}));
+      const totalKg=porCultura.reduce((s,x)=>s+x.kg,0);
+      const dates=[...new Set(geralCultures.flatMap(c=>daysForProduce(c.id).map(d=>d.iso)))].sort();
+      const filterAll=!geralPartnerFilters.size,filterLabel=filterAll?'Todos os parceiros':geralPartnerFilters.size===1?(partnerNames.find(([key])=>geralPartnerFilters.has(key))?.[1]||'1 parceiro'):`${geralPartnerFilters.size} parceiros`;
+      const partnerOptions=partnerNames.map(([key,name])=>`<label class="partner-filter-option" data-partner-option data-search-name="${esc(partnerFilterKey(name))}"><input type="checkbox" value="${esc(key)}" ${filterAll||geralPartnerFilters.has(key)?'checked':''}><span>${esc(name)}</span></label>`).join('');
+
+      const dayKg={};dates.forEach(iso=>dayKg[iso]=geralCultures.reduce((s,c)=>s+geralDayKg(c.id,iso),0));
+      const maiorDia=dates.reduce((best,iso)=>dayKg[iso]>(best?dayKg[best]:-1)?iso:best,null);
+      const maiorCultura=porCultura.reduce((best,x)=>x.kg>(best?best.kg:-1)?x:best,null);
+      const parceirosComEstoque=geralCultures.reduce((s,c)=>s+geralPartnersFor(c.id).filter(p=>daysForProduce(c.id).some(d=>geralDayTotal(p,d,c.id)>0)).length,0);
+      const kpis=[
+        {ico:'🤝',tint:'var(--cloud-soft)',label:geralPartnerFilters.size?'Culturas com estoque':'Parceiros com estoque',val:String(parceirosComEstoque),sub:geralPartnerFilters.size?'dos parceiros selecionados':'somando todas as culturas'},
+        {ico:'⚖️',tint:'rgba(245,169,19,.16)',label:'Peso total',val:`${fmt(totalKg)} kg`,sub:'estimado pelas conversões'},
+        {ico:'🏆',tint:'var(--brand-soft)',label:'Maior estoque',val:maiorCultura&&maiorCultura.kg>0?maiorCultura.c.label:'—',sub:maiorCultura&&maiorCultura.kg>0?`${fmt(maiorCultura.kg)} kg`:'sem lançamentos'},
+        {ico:'📅',tint:'rgba(138,107,216,.16)',label:'Dia com mais estoque',val:maiorDia?formatDate(maiorDia):'—',sub:maiorDia?`${fmt(dayKg[maiorDia])} kg no dia`:'sem lançamentos'}
+      ];
+      const kpiHtml=kpis.map(k=>`<div class="kpi"><span class="kpi-icon" style="--tint:${k.tint}">${k.ico}</span><div class="kpi-copy"><span>${k.label}</span><strong>${k.val}</strong><em>${k.sub}</em></div></div>`).join('');
 
       const hojeDate=(()=>{const [y,m,d]=hoje.split('-').map(Number);return new Date(y,m-1,d)})();
       const ageDays=iso=>{const [y,m,d]=iso.split('-').map(Number);return Math.round((hojeDate-new Date(y,m-1,d))/86400000)};
@@ -1776,6 +1817,10 @@
           }else{
             x.types.forEach((v,t)=>{if(v>0)details.push([meta[t]?.label||('Tipo '+(t+1)),`${fmt(v)} ${cultureUnitLabel(c.id)}`,meta[t]?.color])});
           }
+          // Pacotes personalizados (criados em "Editar cálculos" > Pacotes)
+          // estimam pelo kg total do parceiro na cultura — mesmo cálculo do
+          // card agregado "Estoque por Produto" (packRows), só que por parceiro.
+          if(x.kg>0)packsForCulture(c.id).forEach(p=>details.push([p.name,`${fmt(Math.round(x.kg/Number(p.kg)))} pct`,c.color,'rank-est']));
           details.sort((a,b)=>String(a[0]).localeCompare(String(b[0]),'pt-BR',{sensitivity:'base'}));
           const detailHtml=details.length?`<div class="rank-detail">${details.map(d=>`<span class="${d[3]||''}" style="--dot:${d[2]||c.color}"><i></i>${esc(d[0])}<b>${esc(d[1])}</b></span>`).join('')}</div>`:'';
           return `<div class="rank-row"><div class="rank-head"><b>${esc(x.name)}</b><em>${unLabel} ${cultureUnitLabel(c.id)}</em></div>${detailHtml}<div class="pbar"><i style="width:${pct}%;background:${c.color}"></i></div></div>`;
@@ -1806,7 +1851,7 @@
         </div>
         <div class="kpi-row">${kpiHtml}</div>
         <div class="dash-grid">
-          <section class="dash-panel" style="grid-column:1/-1"><h4>Estoque por Produto<small>unidades e peso estimado • nomes definidos nas configurações</small></h4><div class="produce-cards">${cardsHtml}</div></section>
+          ${estoqueProdutoPanelHtml()}
           <section class="dash-panel" style="grid-column:1/-1"><h4>Maiores Estoques por Parceiro<small>composição por tipo • pacotes são estimativas</small></h4><div class="culture-split-grid">${rankSplitHtml}</div></section>
           <section class="dash-panel" style="grid-column:1/-1"><h4>Idade do Estoque<small>por cultura • o que ainda resta de cada data</small></h4><div class="culture-split-grid">${ageSplitHtml}</div></section>
         </div>
@@ -1820,15 +1865,55 @@
       syncAllBox();
       if(filterAllBox)filterAllBox.onchange=()=>{filterBoxes.forEach(box=>box.checked=filterAllBox.checked);filterAllBox.indeterminate=false};
       const search=scroll.querySelector('#dashPartnerSearch');
-      if(search)search.oninput=()=>{const query=partnerKey(search.value);scroll.querySelectorAll('[data-partner-option]').forEach(option=>option.hidden=!!query&&!option.dataset.searchName.includes(query))};
+      if(search)search.oninput=()=>{const query=partnerFilterKey(search.value);scroll.querySelectorAll('[data-partner-option]').forEach(option=>option.hidden=!!query&&!option.dataset.searchName.includes(query))};
       const clearFilter=scroll.querySelector('#dashPartnerClear');
       if(clearFilter)clearFilter.onclick=()=>{geralPartnerFilters=new Set();renderTable()};
       const applyFilter=scroll.querySelector('#dashPartnerApply');
       if(applyFilter)applyFilter.onclick=()=>{const selected=filterBoxes.filter(box=>box.checked).map(box=>box.value);if(!selected.length){toast('Selecione pelo menos um parceiro.',true);return}geralPartnerFilters=selected.length===filterBoxes.length?new Set():new Set(selected);renderTable()};
     }
+    // ── Resumo Antigo ──────────────────────────────────────────────────
+    // Espelha o formato da planilha antiga: a grade de Brócolis, os
+    // quadros de estimativa por cultura e a separação de pedidos por
+    // cliente — tudo calculado ao vivo a partir dos dados já lançados
+    // (sem nenhum campo digitável à parte). Reaproveita o mesmíssimo painel
+    // "Estoque por Produto" da aba Geral (estoqueProdutoPanelHtml), em vez
+    // de recalcular/renomear tudo de novo — assim as duas abas nunca ficam
+    // com nomes ou números diferentes para a mesma coisa.
+    function renderResumoAntigo(scroll){
+      scroll.classList.add('as-dash');
+      document.getElementById('tableLegend').innerHTML=cultureLegendHtml({id:'brocolis'});
+      const hoje=todayIso();
+      const days=daysForProduce('brocolis');
+      const tableHtml=days.length
+        ?'<div class="ra-table-scroll"><table class="stock-table" id="stockTable"></table></div>'
+        :'<div style="padding:24px;color:var(--muted);text-align:center">Nenhuma data cadastrada para Brócolis. Use "Adicionar data" na aba Brócolis.</div>';
+      scroll.innerHTML=`<div class="dash">
+        <div class="dash-head"><div><h3>Resumo Antigo</h3><p>Formato de planilha antigo — tabela do Brócolis, estimativas e separação por cliente, calculados a partir dos dados atuais</p></div></div>
+        <div class="ra-grid">
+          <div class="ra-col">
+            ${tableHtml}
+            <div class="dash-grid" id="raEstimateGrid">${estoqueProdutoPanelHtml()}</div>
+          </div>
+          <div class="ra-col"><section class="orders-panel"><div class="panel-heading"><h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7h12l1.5 13.5h-15L6 7Z"/><path d="M9 10V6a3 3 0 0 1 6 0v4"/></svg>Separação por cliente</h3><span>quantidades em unidades</span></div><div class="orders-grid" id="raOrdersGrid">${clientOrderCardsHtml()}</div></section></div>
+        </div>
+      </div>`;
+      const table=scroll.querySelector('#stockTable');
+      if(table){
+        table.innerHTML=cultureTableHtml(days,hoje,{id:'brocolis',label:'Brócolis'});
+        table.style.minWidth=Math.max(900,210+days.length*typeMetaForCulture('brocolis').length*58)+'px';
+        table.querySelectorAll('input.cell').forEach(input=>{input.addEventListener('input',onCellInput);input.addEventListener('change',onCellChange)});
+        wireClearDateButtons(table);
+      }
+      wireOrderCardEvents(scroll.querySelector('#raOrdersGrid'));
+    }
+    function patchResumoAntigoEstimates(){
+      const grid=document.getElementById('raEstimateGrid');
+      if(!grid)return;
+      grid.innerHTML=estoqueProdutoPanelHtml();
+    }
     function updateRotateButtonVisibility(produce){
       const btn=document.getElementById('rotateViewBtn');
-      const isTable=produce!=='geral';
+      const isTable=produce!=='geral'&&produce!=='resumoantigo';
       btn.hidden=!isTable;
       if(!isTable&&document.body.classList.contains('table-rotated')){
         document.body.classList.remove('table-rotated');
@@ -1841,6 +1926,7 @@
       updateRotateButtonVisibility(produce);
       resetTableZoom();
       if(produce==='geral'){renderGeralTables(scroll);return}
+      if(produce==='resumoantigo'){renderResumoAntigo(scroll);return}
       scroll.classList.remove('as-dash');
       document.getElementById('tableLegend').innerHTML=produce==='tomate'
         ?`<span class="lg"><i style="background:${TOMATE_META[0].color}"></i>CG</span><span class="lg"><i style="background:${TOMATE_META[1].color}"></i>M</span><span class="lg"><i style="background:${TOMATE_META[2].color}"></i>P</span><span class="lg-note">Cumbuca 180g • toque em um número para editar</span>`
@@ -1894,6 +1980,15 @@
       el.defaultValue=el.value;
       saveState();
     }
+    function onSeparatedChange(e){
+      const el=e.target,oldV=String(el.defaultValue??'').trim(),newV=String(el.value??'').trim();
+      if(oldV===newV)return;
+      const key=el.dataset.separated,i=key.indexOf('-'),client=state.clients.find(c=>c.id===key.slice(0,i));
+      const prod=client?clientProducts(client).find(p=>p.id===key.slice(i+1)):null;
+      addLog(`alterou a separação de ${client?client.name:'?'} — ${prod?resolveProduct(prod).name:'?'}: ${oldV===''?'vazio':oldV} → ${newV===''?'vazio':newV}`);
+      el.defaultValue=el.value;
+      saveState();
+    }
     function patchCultureTotals(c){
       const directKg=isDirectKgCulture(c.id);
       daysForProduce(c.id).forEach(day=>typeMetaForCulture(c.id).forEach((_,t)=>{
@@ -1913,6 +2008,11 @@
       }
       if(produce==='tomate'){
         refreshTomateTotals();
+        return;
+      }
+      if(produce==='resumoantigo'){
+        patchCultureTotals({id:'brocolis'});
+        patchResumoAntigoEstimates();
         return;
       }
       patchCultureTotals({id:produce});
@@ -1962,30 +2062,111 @@
       }
       return{name:prod.name||'',cultureId:prod.cultureId||'',kgPerUn:Number(prod.kgPerUn)||0};
     }
-    function renderOrders(){
+    // ── Progresso de separação (pedido x já separado) ─────────────────
+    // "separado" é o total acumulado já processado/entregue para aquele
+    // produto do cliente. A baixa de estoque e a reversão (cliente desistiu
+    // ou reduziu) são automáticas: é só uma subtração ao vivo (produção
+    // total − tudo que já foi separado), nunca um valor "congelado" que
+    // precise ser restaurado manualmente.
+    function orderKey(clientId,prodId){return `${clientId}-${prodId}`}
+    function separatedQty(clientId,prodId){return num(state.separado[orderKey(clientId,prodId)])}
+    function orderedQty(clientId,prodId){return num(state.orders[orderKey(clientId,prodId)])}
+    function productProgress(client,prod){
+      const pedido=orderedQty(client.id,prod.id),separado=separatedQty(client.id,prod.id);
+      const pct=pedido>0?Math.min(100,Math.round(separado/pedido*100)):(separado>0?100:0);
+      return{pedido,separado,pct,restante:Math.max(pedido-separado,0)};
+    }
+    function clientProgress(client){
+      let pedido=0,separado=0;
+      clientProducts(client).forEach(prod=>{pedido+=orderedQty(client.id,prod.id);separado+=separatedQty(client.id,prod.id)});
+      const pct=pedido>0?Math.min(100,Math.round(separado/pedido*100)):(separado>0?100:0);
+      return{pedido,separado,pct,restante:Math.max(pedido-separado,0)};
+    }
+    function progressText(p,{clientLevel=false}={}){
+      if(!(p.pedido>0))return p.separado>0?'Sem pedido lançado (há quantidade separada)':'Sem pedido lançado';
+      if(p.pct>=100)return clientLevel?'100% concluído':'100%';
+      return clientLevel?`${p.pct}% concluído • faltam ${fmt(p.restante)} un (${100-p.pct}%)`:`${p.pct}% • faltam ${fmt(p.restante)}`;
+    }
+    // Quanto (em kg) já foi separado/entregue para clientes numa cultura —
+    // é o valor que "dá baixa" no estoque disponível mostrado no simulador.
+    function cultureSeparatedKg(cultureId){
+      let total=0;
+      visibleClients().forEach(client=>clientProducts(client).forEach(prod=>{
+        const info=resolveProduct(prod);
+        if(info.cultureId!==cultureId||!(info.kgPerUn>0))return;
+        total+=separatedQty(client.id,prod.id)*info.kgPerUn;
+      }));
+      return total;
+    }
+    // Refresca ao vivo a barra/percentual de um produto e o resumo do
+    // cliente, sem re-renderizar o card inteiro (evita perder o foco/cursor
+    // do campo em edição a cada tecla digitada).
+    // Estas telas podem existir em duplicidade no DOM ao mesmo tempo (o
+    // painel fixo "Separação por cliente" e a mesma grade reaproveitada
+    // dentro do Resumo Antigo) — por isso tudo aqui usa querySelectorAll
+    // (todas as cópias) em vez de querySelector (só a primeira), para as
+    // duas ficarem sempre em sincronia.
+    function refreshOrderProgress(clientId,prodId){
+      const client=state.clients.find(c=>c.id===clientId);if(!client)return;
+      const prod=clientProducts(client).find(p=>p.id===prodId);if(!prod)return;
+      const p=productProgress(client,prod);
+      document.querySelectorAll(`[data-progress-fill="${orderKey(clientId,prodId)}"]`).forEach(fill=>{fill.style.width=Math.min(100,p.pct)+'%';fill.classList.toggle('done',p.pct>=100&&p.pedido>0)});
+      document.querySelectorAll(`[data-progress-pct="${orderKey(clientId,prodId)}"]`).forEach(pctEl=>pctEl.textContent=progressText(p));
+      const cp=clientProgress(client);
+      document.querySelectorAll(`[data-summary-fill="${clientId}"]`).forEach(sfill=>{sfill.style.width=Math.min(100,cp.pct)+'%';sfill.classList.toggle('done',cp.pct>=100&&cp.pedido>0)});
+      document.querySelectorAll(`[data-summary-text="${clientId}"]`).forEach(stext=>stext.textContent=progressText(cp,{clientLevel:true}));
+      renderSimulationAvailability();
+    }
+    // Quando um campo Pedido/Separado é editado, replica o valor digitado
+    // nas outras cópias do mesmo input (mesma chave cliente-produto) que
+    // possam estar visíveis em outro lugar do painel.
+    function syncDuplicateOrderInputs(el,attr){
+      const key=el.dataset[attr];
+      document.querySelectorAll(`[data-${attr}="${key}"]`).forEach(other=>{if(other!==el)other.value=el.value});
+    }
+    function clientOrderCardHtml(client){
+      const products=clientProducts(client);
+      const rows=products.length?products.map(prod=>{
+        const info=resolveProduct(prod),linked=info.cultureId&&info.kgPerUn>0,c=linked?CULTURES.find(x=>x.id===info.cultureId):null;
+        const key=orderKey(client.id,prod.id),p=productProgress(client,prod);
+        return `<div class="order-row">`+
+          `<div class="order-row-top"><label>${esc(info.name)}${c?`<span class="order-link" style="--c:${c.color}" title="Vinculado a ${esc(c.label)} • ${String(info.kgPerUn).replace('.',',')} kg/un.">${esc(c.label)}</span>`:''}</label><button type="button" class="mini-edit" data-edit-product="${client.id}|${prod.id}" title="Configurar produto" aria-label="Configurar ${esc(info.name)}">${ICON_EDIT}</button><button type="button" class="order-del" data-del-product="${client.id}|${prod.id}" title="Remover produto" aria-label="Remover ${esc(info.name)} de ${esc(client.name)}">×</button><input inputmode="numeric" data-order="${key}" value="${state.orders[key]||''}" aria-label="Pedido de ${esc(info.name)} para ${esc(client.name)}" placeholder="Pedido"></div>`+
+          `<div class="order-row-progress"><input inputmode="numeric" data-separated="${key}" value="${state.separado[key]||''}" aria-label="Já separado de ${esc(info.name)} para ${esc(client.name)}" placeholder="Separado" title="Quantidade já separada/processada deste produto para este cliente"><div class="order-progress-track"><div class="order-progress-fill${p.pct>=100&&p.pedido>0?' done':''}" data-progress-fill="${key}" style="width:${Math.min(100,p.pct)}%"></div></div><span class="order-progress-pct" data-progress-pct="${key}">${esc(progressText(p))}</span></div>`+
+        `</div>`;
+      }).join(''):'<div class="field-help" style="padding:10px 14px">Nenhum produto cadastrado — use o botão + acima.</div>';
+      const cp=clientProgress(client);
+      const summary=products.length?`<div class="order-summary"><div class="order-progress-track"><div class="order-progress-fill${cp.pct>=100&&cp.pedido>0?' done':''}" data-summary-fill="${client.id}" style="width:${Math.min(100,cp.pct)}%"></div></div><span class="order-summary-text" data-summary-text="${client.id}">${esc(progressText(cp,{clientLevel:true}))}</span></div>`:'';
+      return `<article class="order-card"><header><span class="order-avatar">${initials(client.name)}</span><div class="order-id"><strong>${esc(client.name)}</strong><span>Pedido em unidades</span></div><button type="button" class="mini-add" data-add-product="${client.id}" title="Adicionar produto" aria-label="Adicionar produto para ${esc(client.name)}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button></header>${summary}${rows}</article>`;
+    }
+    function clientOrderCardsHtml(){
       const clients=visibleClients();
-      document.getElementById('ordersGrid').innerHTML=clients.length?clients.map(client=>{
-        const products=clientProducts(client);
-        const rows=products.length?products.map(prod=>{
-          const info=resolveProduct(prod),linked=info.cultureId&&info.kgPerUn>0,c=linked?CULTURES.find(x=>x.id===info.cultureId):null;
-          return `<div class="order-row"><label>${esc(info.name)}${c?`<span class="order-link" style="--c:${c.color}" title="Vinculado a ${esc(c.label)} • ${String(info.kgPerUn).replace('.',',')} kg/un.">${esc(c.label)}</span>`:''}</label><button type="button" class="mini-edit" data-edit-product="${client.id}|${prod.id}" title="Configurar produto" aria-label="Configurar ${esc(info.name)}">${ICON_EDIT}</button><button type="button" class="order-del" data-del-product="${client.id}|${prod.id}" title="Remover produto" aria-label="Remover ${esc(info.name)} de ${esc(client.name)}">×</button><input inputmode="numeric" data-order="${client.id}-${prod.id}" value="${state.orders[`${client.id}-${prod.id}`]||''}" aria-label="${esc(client.name)}, ${esc(info.name)}" placeholder="—"></div>`;
-        }).join(''):'<div class="field-help" style="padding:10px 14px">Nenhum produto cadastrado — use o botão + acima.</div>';
-        return `<article class="order-card"><header><span class="order-avatar">${initials(client.name)}</span><div class="order-id"><strong>${esc(client.name)}</strong><span>Pedido em unidades</span></div><button type="button" class="mini-add" data-add-product="${client.id}" title="Adicionar produto" aria-label="Adicionar produto para ${esc(client.name)}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button></header>${rows}</article>`;
-      }).join(''):'<div class="field-help" style="padding:6px 4px">Nenhum cliente cadastrado ou visível. Use “Adicionar cliente” ou reative um cliente oculto.</div>';
-      document.querySelectorAll('[data-order]').forEach(input=>{input.addEventListener('input',e=>{const value=num(e.target.value);if(value)state.orders[e.target.dataset.order]=value;else delete state.orders[e.target.dataset.order];recordOp('orders',e.target.dataset.order,value||null);saveState();renderSimulationAvailability()});input.addEventListener('change',onOrderChange)});
-      document.querySelectorAll('[data-add-product]').forEach(btn=>btn.onclick=()=>openProductDialog(btn.dataset.addProduct));
-      document.querySelectorAll('[data-del-product]').forEach(btn=>btn.onclick=()=>{const parts=btn.dataset.delProduct.split('|');removeClientProduct(parts[0],parts[1])});
-      document.querySelectorAll('[data-edit-product]').forEach(btn=>btn.onclick=()=>{const parts=btn.dataset.editProduct.split('|');openProductDialog(parts[0],parts[1])});
+      return clients.length?clients.map(clientOrderCardHtml).join(''):'<div class="field-help" style="padding:6px 4px">Nenhum cliente cadastrado ou visível. Use “Adicionar cliente” ou reative um cliente oculto.</div>';
+    }
+    function wireOrderCardEvents(container){
+      container.querySelectorAll('[data-order]').forEach(input=>{input.addEventListener('input',e=>{const value=num(e.target.value);if(value)state.orders[e.target.dataset.order]=value;else delete state.orders[e.target.dataset.order];recordOp('orders',e.target.dataset.order,value||null);syncDuplicateOrderInputs(e.target,'order');saveState();const i=e.target.dataset.order.indexOf('-');refreshOrderProgress(e.target.dataset.order.slice(0,i),e.target.dataset.order.slice(i+1))});input.addEventListener('change',onOrderChange)});
+      container.querySelectorAll('[data-separated]').forEach(input=>{input.addEventListener('input',e=>{const value=num(e.target.value);if(value)state.separado[e.target.dataset.separated]=value;else delete state.separado[e.target.dataset.separated];recordOp('separado',e.target.dataset.separated,value||null);syncDuplicateOrderInputs(e.target,'separated');saveState();const i=e.target.dataset.separated.indexOf('-');refreshOrderProgress(e.target.dataset.separated.slice(0,i),e.target.dataset.separated.slice(i+1))});input.addEventListener('change',onSeparatedChange)});
+      container.querySelectorAll('[data-add-product]').forEach(btn=>btn.onclick=()=>openProductDialog(btn.dataset.addProduct));
+      container.querySelectorAll('[data-del-product]').forEach(btn=>btn.onclick=()=>{const parts=btn.dataset.delProduct.split('|');removeClientProduct(parts[0],parts[1])});
+      container.querySelectorAll('[data-edit-product]').forEach(btn=>btn.onclick=()=>{const parts=btn.dataset.editProduct.split('|');openProductDialog(parts[0],parts[1])});
+    }
+    function renderOrders(){
+      const grid=document.getElementById('ordersGrid');
+      grid.innerHTML=clientOrderCardsHtml();
+      wireOrderCardEvents(grid);
       renderSimulationPanel();
     }
+    // Demanda que AINDA falta separar (pedido − já separado), por cultura,
+    // em kg. O que já foi separado não pesa mais aqui — ele já saiu do
+    // estoque (ver cultureSeparatedKg), então não teria sentido pedir de
+    // novo por algo que já foi entregue.
     function orderCultureDemand(){
       const demand={};
       visibleClients().forEach(client=>clientProducts(client).forEach(prod=>{
         const info=resolveProduct(prod);
         if(!info.cultureId||!(info.kgPerUn>0))return;
-        const qty=num(state.orders[`${client.id}-${prod.id}`]);
-        if(qty<=0)return;
-        demand[info.cultureId]=(demand[info.cultureId]||0)+qty*info.kgPerUn;
+        const restante=productProgress(client,prod).restante;
+        if(restante<=0)return;
+        demand[info.cultureId]=(demand[info.cultureId]||0)+restante*info.kgPerUn;
       }));
       return demand;
     }
@@ -2137,13 +2318,13 @@
     function renderSimulationAvailability(){
       const el=document.getElementById('simAvailability');if(!el)return;
       const real=orderCultureDemand(),sim=simulationDemand();
-      const cids=new Set([...Object.keys(real),...Object.keys(sim)]);
+      const cids=new Set([...Object.keys(real),...Object.keys(sim),...CULTURES.filter(c=>cultureSeparatedKg(c.id)>0).map(c=>c.id)]);
       const rows=[...cids].map(cid=>{
         const c=CULTURES.find(x=>x.id===cid);if(!c)return null;
-        const realKg=real[cid]||0,simKg=sim[cid]||0,necessario=realKg+simKg,disponivel=cultureKgTotal(cid),saldo=disponivel-necessario;
-        return {c,realKg,simKg,necessario,disponivel,saldo};
+        const realKg=real[cid]||0,simKg=sim[cid]||0,necessario=realKg+simKg,jaSeparado=cultureSeparatedKg(cid),disponivel=cultureKgTotal(cid)-jaSeparado,saldo=disponivel-necessario;
+        return {c,realKg,simKg,necessario,jaSeparado,disponivel,saldo};
       }).filter(Boolean).sort((a,b)=>a.saldo-b.saldo);
-      el.innerHTML=rows.length?rows.map(r=>`<div class="avail-row ${r.saldo<0?'avail-bad':''}"><span class="avail-name" style="--c:${r.c.color}"><i></i>${esc(r.c.label)}</span><span class="avail-num">Pedidos reais <b>${fmt(r.realKg)} kg</b></span><span class="avail-num">Simulação (todos os cartões) <b>${fmt(r.simKg)} kg</b></span><span class="avail-num">Necessário total <b>${fmt(r.necessario)} kg</b></span><span class="avail-num">Disponível <b>${fmt(r.disponivel)} kg</b></span><span class="avail-badge">${r.saldo<0?`Faltam ${fmt(Math.abs(r.saldo))} kg`:`Atende • sobram ${fmt(r.saldo)} kg`}</span></div>`).join(''):'<div class="field-help" style="padding:2px 4px 10px">Adicione produtos nos pedidos simulados acima (ou lance pedidos reais em Separação por cliente) para comparar com o estoque.</div>';
+      el.innerHTML=rows.length?rows.map(r=>`<div class="avail-row ${r.saldo<0?'avail-bad':''}"><span class="avail-name" style="--c:${r.c.color}"><i></i>${esc(r.c.label)}</span><span class="avail-num">Pedidos pendentes (não separados) <b>${fmt(r.realKg)} kg</b></span><span class="avail-num">Simulação (todos os cartões) <b>${fmt(r.simKg)} kg</b></span><span class="avail-num">Necessário total <b>${fmt(r.necessario)} kg</b></span><span class="avail-num">Já separado (baixa) <b>${fmt(r.jaSeparado)} kg</b></span><span class="avail-num">Disponível (após baixa) <b>${fmt(r.disponivel)} kg</b></span><span class="avail-badge">${r.saldo<0?`Faltam ${fmt(Math.abs(r.saldo))} kg`:`Atende • sobram ${fmt(r.saldo)} kg`}</span></div>`).join(''):'<div class="field-help" style="padding:2px 4px 10px">Adicione produtos nos pedidos simulados acima (ou lance pedidos reais em Separação por cliente) para comparar com o estoque.</div>';
     }
     function refreshSimulationResults(){
       renderSimulationAvailability();
@@ -2158,7 +2339,7 @@
       const missing=[];
       touched.forEach(cid=>{
         const c=CULTURES.find(x=>x.id===cid);if(!c)return;
-        const necessario=(real[cid]||0)+(sim[cid]||0),disponivel=cultureKgTotal(cid),saldo=disponivel-necessario;
+        const necessario=(real[cid]||0)+(sim[cid]||0),disponivel=cultureKgTotal(cid)-cultureSeparatedKg(cid),saldo=disponivel-necessario;
         if(saldo<0)missing.push(`${c.label} (faltam ${fmt(Math.abs(saldo))} kg)`);
       });
       const names=simOrders.map(o=>o.name.trim()).filter(Boolean);
@@ -2315,6 +2496,8 @@
       client.products=clientProducts(client).filter(p=>p.id!==prodId);
       delete state.orders[`${clientId}-${prodId}`];
       recordOp('orders',`${clientId}-${prodId}`,null);
+      delete state.separado[`${clientId}-${prodId}`];
+      recordOp('separado',`${clientId}-${prodId}`,null);
       addLog(`removeu o produto ${prodName} de ${client.name}`);
       pendingStructural=true;saveState();renderAll();toast('Produto removido.');
     }
@@ -2443,7 +2626,7 @@
     async function removeClient(id){
       const client=state.clients.find(c=>c.id===id);if(!client)return;
       const ok=await confirmModern(`Remover ${client.name} e todos os pedidos deste cliente?`,{title:'Remover cliente'});if(!ok)return;
-      state.clients=state.clients.filter(c=>c.id!==id);Object.keys(state.orders).filter(k=>k.startsWith(id+'-')).forEach(k=>delete state.orders[k]);addLog(`removeu o cliente ${client.name}`);pendingStructural=true;saveState();renderAll();toast('Cliente removido.')
+      state.clients=state.clients.filter(c=>c.id!==id);Object.keys(state.orders).filter(k=>k.startsWith(id+'-')).forEach(k=>delete state.orders[k]);Object.keys(state.separado).filter(k=>k.startsWith(id+'-')).forEach(k=>delete state.separado[k]);addLog(`removeu o cliente ${client.name}`);pendingStructural=true;saveState();renderAll();toast('Cliente removido.')
     }
     async function removeDate(id){
       const day=state.days.find(d=>d.id===id);if(!day)return;
@@ -2809,6 +2992,7 @@
         if(remote?.version===2&&remote.partners&&remote.days&&remote.updatedAt!==state.updatedAt){
           const aba=activeProduce(),foco=captureFocus();
           state=migrateFactorRules(remote);state.activeProduce=aba;
+          state.separado=state.separado||{};
           applyPendingLogs(state);
           if(Object.keys(pendingOps).length){applyOps(state,pendingOps);saveState(false)}
           else localStorage.setItem(STORAGE_KEY,JSON.stringify(state));
@@ -2854,6 +3038,7 @@
           const abaAtual=activeProduce(),foco=captureFocus();
           state=migrateFactorRules(incoming);
           state.activeProduce=abaAtual; // cada aba do navegador mantém a própria cultura selecionada
+          state.separado=state.separado||{};
           applyOps(state,pendingOps);
           applyPendingLogs(state);
           renderAll();restoreFocus(foco);
@@ -2992,11 +3177,14 @@
       visibleClients().forEach(client=>clientProducts(client).forEach(product=>{
         const quantity=num(state.orders[`${client.id}-${product.id}`]);
         const key=client.id+'|'+product.id;
-        if(options.includeOrders&&options.orderKeys.has(key)&&quantity>0)orderRows.push({client:client.name,product:resolveProduct(product).name,quantity});
+        if(options.includeOrders&&options.orderKeys.has(key)&&quantity>0){
+          const p=productProgress(client,product);
+          orderRows.push({client:client.name,product:resolveProduct(product).name,quantity,separado:p.separado,restante:p.restante,pct:p.pct});
+        }
       }));
-      const ordersHtml=orderRows.length?orderRows.map(row=>`<tr><td>${esc(row.client)}</td><td>${esc(row.product)}</td><td class="num">${fmt(row.quantity)}</td></tr>`).join('')
-        :'<tr><td class="pr-empty" colspan="3">Nenhuma separação pendente registrada.</td></tr>';
-      const ordersSection=options.includeOrders?`<section class="pr-section"><div class="pr-section-title">4. Separação por cliente</div><table class="pr-table pr-orders"><thead><tr><th>Cliente</th><th>Produto</th><th>Quantidade</th></tr></thead><tbody>${ordersHtml}</tbody><tfoot><tr><td colspan="2">TOTAL DE UNIDADES PARA SEPARAÇÃO</td><td class="num">${fmt(orderRows.reduce((sum,row)=>sum+row.quantity,0))}</td></tr></tfoot></table></section>`:'';
+      const ordersHtml=orderRows.length?orderRows.map(row=>`<tr><td>${esc(row.client)}</td><td>${esc(row.product)}</td><td class="num">${fmt(row.quantity)}</td><td class="num">${fmt(row.separado)}</td><td class="num">${fmt(row.restante)}</td><td class="num">${row.pct}%</td></tr>`).join('')
+        :'<tr><td class="pr-empty" colspan="6">Nenhuma separação pendente registrada.</td></tr>';
+      const ordersSection=options.includeOrders?`<section class="pr-section"><div class="pr-section-title">4. Separação por cliente</div><table class="pr-table pr-orders"><thead><tr><th>Cliente</th><th>Produto</th><th>Pedido</th><th>Já separado</th><th>Restante</th><th>% concluído</th></tr></thead><tbody>${ordersHtml}</tbody><tfoot><tr><td colspan="2">TOTAL</td><td class="num">${fmt(orderRows.reduce((sum,row)=>sum+row.quantity,0))}</td><td class="num">${fmt(orderRows.reduce((sum,row)=>sum+row.separado,0))}</td><td class="num">${fmt(orderRows.reduce((sum,row)=>sum+row.restante,0))}</td><td></td></tr></tfoot></table></section>`:'';
       const logo='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="10"/><path d="M12 19V9M12 12c-3.4 0-5.8-2-5.8-4.8 3.4 0 5.8 1.3 5.8 4.8Zm0 3.2c3.4 0 5.8-2 5.8-4.8-3.4 0-5.8 1.3-5.8 4.8Z"/></svg>';
       document.getElementById('printReport').innerHTML=`
         <header class="pr-header"><div class="pr-logo">${logo}</div><div class="pr-title"><strong>RELATÓRIO GERENCIAL DE ESTOQUE</strong><span>Disponibilidade, processamento e separação por cliente</span></div><div class="pr-issued"><div><b>Data de emissão</b><span>${issued}</span></div><div><b>Identificação</b><span>${reportId}</span></div></div></header>
