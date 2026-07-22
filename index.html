@@ -62,6 +62,15 @@
     body.auth-locked{background:linear-gradient(135deg,#eef1fb 0%,#eafaf3 100%)}
     :root[data-theme="dark"] body.auth-locked{background:linear-gradient(135deg,#11161c,#0d1913)}
     @media(prefers-color-scheme:dark){:root:where(:not([data-theme="light"])) body.auth-locked{background:linear-gradient(135deg,#11161c,#0d1913)}}
+    /* Enquanto verifica a sessão salva (chamada à Planilha Google, pode
+     * demorar alguns segundos), mostra um indicador em vez de tela vazia. */
+    .boot-loading{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;z-index:5}
+    .boot-loading[hidden]{display:none}
+    .boot-spinner{width:38px;height:38px;border-radius:50%;border:3px solid var(--brand-soft-strong);border-top-color:var(--brand);animation:boot-spin .8s linear infinite}
+    .boot-loading p{margin:0;font-size:13.5px;font-weight:700;color:var(--brand-dark)}
+    :root[data-theme="dark"] .boot-loading p{color:var(--brand-light)}
+    @media(prefers-color-scheme:dark){:root:where(:not([data-theme="light"])) .boot-loading p{color:var(--brand-light)}}
+    @keyframes boot-spin{to{transform:rotate(360deg)}}
     /* O backdrop padrão do <dialog> escurece+borra a página inteira — bonito
      * sobre conteúdo real, mas aqui a página É o gradiente; sem isso ele
      * ficava acinzentado por trás do cartão de login. */
@@ -208,7 +217,9 @@
     :root{--t0:#12a565;--t1:#e09112;--t2:#8a6bd8}
     :root[data-theme="dark"]{--t0:#4fd68c;--t1:#fbbf24;--t2:#a78bfa}
     @media(prefers-color-scheme:dark){:root:where(:not([data-theme="light"])){--t0:#4fd68c;--t1:#fbbf24;--t2:#a78bfa}}
-    .table-legend{display:flex;flex-wrap:wrap;align-items:center;gap:8px 20px;margin-top:16px;padding:0 6px}
+    .table-toolbar{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap}
+    .table-toolbar .panel-heading-add{flex:none;margin-top:16px}
+    .table-legend{display:flex;flex-wrap:wrap;align-items:center;gap:8px 20px;margin-top:16px;padding:0 6px;flex:1}
     .table-legend .lg{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:650;color:var(--ink-2)}
     .table-legend .lg i{width:10px;height:10px;border-radius:3.5px;flex:none}
     .table-legend .lg-note{margin-left:auto;font-size:12px;color:var(--muted)}
@@ -291,6 +302,8 @@
     .pcard .pct{font-size:11px;color:var(--muted);font-weight:700}
     .pdet{margin-top:8px;border-top:1px solid var(--line);padding-top:8px;display:flex;flex-direction:column;gap:4.5px}
     .pdet .dr{display:flex;align-items:baseline;justify-content:space-between;gap:8px;font-size:11.5px;color:var(--muted)}
+    .pdet .dr[title]{cursor:help;border-bottom:1px dashed transparent}
+    .pdet .dr[title]:hover{border-bottom-color:var(--muted)}
     .pdet .dr b{font-weight:800;color:var(--ink);font-variant-numeric:tabular-nums;white-space:nowrap}
     .pdet .dr.danger,.pdet .dr.danger b{color:var(--critical)}
     .status-list{display:flex;flex-direction:column}
@@ -309,6 +322,7 @@
     .rank-head em{margin-left:auto;font-style:normal;font-weight:800;font-size:12.5px;color:var(--ink);font-variant-numeric:tabular-nums;white-space:nowrap}
     .rank-detail{display:flex;flex-wrap:wrap;gap:4px 6px;margin-top:1px}
     .rank-detail span{display:inline-flex;align-items:center;gap:4px;min-width:0;padding:3px 6px;border:1px solid var(--line);border-radius:7px;background:var(--surface);font-size:10.5px;color:var(--muted);line-height:1.2}
+    .rank-detail span[title]{cursor:help}
     .rank-detail span i{width:6px;height:6px;border-radius:50%;background:var(--dot,var(--c));flex:none}
     .rank-detail span b{font-size:10.5px;color:var(--ink);font-variant-numeric:tabular-nums;white-space:nowrap}
     .rank-detail .rank-est{border-style:dashed}
@@ -374,6 +388,12 @@
     .date-clear-btn svg{width:9px;height:9px}
     .date-clear-btn:hover{background:var(--critical-soft);color:var(--critical);box-shadow:0 0 0 1px var(--critical-soft)}
     @media print{.date-clear-btn{display:none}}
+    .date-remove-btn{display:inline-flex;align-items:center;justify-content:center;width:17px;height:17px;margin-left:4px;
+      border:0;border-radius:50%;background:var(--critical-soft);color:var(--critical);cursor:pointer;vertical-align:2px;
+      box-shadow:0 0 0 1px var(--critical-soft);flex:none}
+    .date-remove-btn svg{width:9px;height:9px}
+    .date-remove-btn:hover{filter:brightness(.95)}
+    @media print{.date-remove-btn{display:none}}
     .stock-table .subhead th{height:52px;background:var(--surface-2);padding:5px 4px;vertical-align:middle}
     .type-chip{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:11px;
       font-weight:750;color:var(--ink-2);white-space:nowrap;line-height:1}
@@ -395,6 +415,7 @@
       height:46px;font-size:15.5px;border-color:var(--brand);text-shadow:0 1px 1px rgba(0,0,0,.1);box-shadow:none}
     .stock-table .kg-row td,.stock-table .kg-row .partner-col{background:var(--critical-soft)!important;
       color:var(--critical);font-weight:700;font-size:14px;height:42px;box-shadow:none}
+    .stock-table .kg-row td[title]{cursor:help}
 
     /* ── Painéis inferiores ─────────────────────────────── */
     .lower{display:grid;grid-template-columns:1fr;gap:18px;margin-top:18px}
@@ -405,6 +426,12 @@
     .panel-heading h3{display:flex;align-items:center;gap:9px;font-size:16px;color:var(--ink);margin:0;font-weight:800;letter-spacing:-.01em}
     .panel-heading h3 svg{width:19px;height:19px;color:var(--brand);flex:none}
     .panel-heading span{font-size:12px;color:var(--muted)}
+    .panel-heading-actions{display:flex;align-items:center;gap:12px}
+    .panel-heading-add{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--brand-soft-strong);background:var(--brand-soft);color:var(--brand-dark);border-radius:10px;min-height:34px;padding:0 12px;font-size:12.5px;font-weight:700;cursor:pointer;white-space:nowrap}
+    .panel-heading-add svg{width:14px;height:14px;flex:none}
+    .panel-heading-add:hover{filter:brightness(.97);transform:translateY(-1px)}
+    :root[data-theme="dark"] .panel-heading-add{color:var(--brand-light)}
+    @media(prefers-color-scheme:dark){:root:where(:not([data-theme="light"])) .panel-heading-add{color:var(--brand-light)}}
 
     /* Cards de resumo agrupados por produto */
     .summary-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:12px}
@@ -428,8 +455,12 @@
       box-shadow:var(--shadow-sm);transition:transform .15s,box-shadow .15s}
     .order-card:hover{transform:translateY(-1px);box-shadow:var(--shadow-md)}
     .order-card header{display:flex;align-items:center;gap:11px;padding:13px 14px;background:var(--surface-2);border-bottom:1px solid var(--line)}
-    .order-avatar{width:38px;height:38px;flex:none;border-radius:12px;display:grid;place-items:center;
+    .order-avatar{width:64px;height:40px;flex:none;border-radius:10px;display:grid;place-items:center;position:relative;overflow:hidden;
       background:linear-gradient(145deg,var(--brand-light),var(--brand-dark));color:#fff;font-size:13.5px;font-weight:800;letter-spacing:.02em}
+    .order-avatar img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;padding:3px;box-sizing:border-box;background:var(--surface);cursor:pointer}
+    .logo-preview-dialog{width:min(560px,calc(100% - 28px))}
+    .logo-preview-body{display:flex;align-items:center;justify-content:center;padding:28px}
+    .logo-preview-body img{max-width:100%;max-height:60vh;border-radius:12px;display:block}
     .order-id{min-width:0}
     .order-id strong{display:block;font-size:14px;font-weight:800;color:var(--ink);line-height:1.25;overflow-wrap:break-word}
     .order-id span{display:block;margin-top:1px;font-size:11.5px;color:var(--muted)}
@@ -441,6 +472,9 @@
     .order-row-top .mini-edit{width:24px;height:24px;margin:0 2px;flex:none}
     .order-del{border:0;background:transparent;color:var(--muted);width:24px;height:24px;border-radius:8px;cursor:pointer;font-size:15px;line-height:1;margin:0 4px;flex:none}
     .order-del:hover{background:var(--critical-soft);color:var(--critical)}
+    .order-hide{border:0;background:transparent;color:var(--muted);width:24px;height:24px;border-radius:8px;cursor:pointer;margin:0 4px;flex:none;display:inline-flex;align-items:center;justify-content:center}
+    .order-hide svg{width:15px;height:15px}
+    .order-hide:hover{background:var(--brand-soft);color:var(--brand-dark)}
     .order-card header .mini-add{margin-left:auto}
     #clientProducts{display:flex;flex-direction:column;gap:8px;margin-bottom:10px}
     .order-row-top input{height:41px;width:100%;border:0;border-left:1px solid var(--line);background:transparent;
@@ -572,9 +606,10 @@
       transition:opacity .15s,box-shadow .15s,border-color .15s,transform .15s}
     .list-item:hover{border-color:var(--line-strong);box-shadow:var(--shadow-sm);transform:translateY(-1px)}
     .list-item.inactive{opacity:.5}
-    .list-item-avatar{width:34px;height:34px;flex:none;border-radius:11px;display:grid;place-items:center;
+    .list-item-avatar{width:34px;height:34px;flex:none;border-radius:11px;display:grid;place-items:center;position:relative;overflow:hidden;
       background:linear-gradient(145deg,var(--brand-light),var(--brand-dark));color:#fff;
       font-size:12px;font-weight:800;letter-spacing:.02em}
+    .list-item-avatar img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:var(--surface);cursor:pointer}
     .list-item-avatar.client{background:linear-gradient(145deg,var(--cloud),var(--brand-dark))}
     .list-item>div{min-width:0;flex:1}
     .list-item strong{display:block;font-size:13.5px;overflow-wrap:break-word}
@@ -612,6 +647,16 @@
       #manageDialog .list-manager{max-height:280px}
     }
     #confirmMessage{margin:0;font-size:15px;color:var(--ink-2);line-height:1.6}
+
+    /* ── Ajuda: como ler os cards e gráficos ────────────── */
+    #helpDialog{width:min(720px,calc(100% - 28px))}
+    #helpDialog .dialog-body{max-height:min(72vh,700px);overflow:auto}
+    .help-section{margin-bottom:20px}
+    .help-section:last-child{margin-bottom:0}
+    .help-section h4{margin:0 0 8px;font-size:14px;font-weight:800;color:var(--ink);padding-bottom:8px;border-bottom:1px solid var(--line)}
+    .help-section ul{margin:0;padding-left:19px;display:flex;flex-direction:column;gap:7px}
+    .help-section li{font-size:13.5px;line-height:1.55;color:var(--ink-2)}
+    .help-section li b{color:var(--ink);font-weight:800}
 
     /* ── Editor de cálculos ─────────────────────────────── */
     #factorsDialog{width:min(780px,calc(100% - 28px))}
@@ -797,6 +842,10 @@
   </style>
 </head>
 <body class="auth-locked">
+  <div class="boot-loading" id="bootLoading" hidden aria-hidden="true">
+    <div class="boot-spinner"></div>
+    <p>Conectando à planilha…</p>
+  </div>
   <main class="shell">
     <header class="topbar">
       <div class="brand">
@@ -807,6 +856,7 @@
         <button class="btn btn-soft" id="installAppBtn" hidden title="Instalar o painel como aplicativo neste dispositivo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11m0 0-3.5-3.5M12 15l3.5-3.5"/><rect x="4" y="16" width="16" height="4.5" rx="1.2"/></svg><span class="btn-label">Instalar app</span></button>
         <button class="btn" id="userBtn" title="Usuário deste dispositivo — toque para trocar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="8.2" r="3.6"/><path d="M5 20c.8-3.8 3.6-6 7-6s6.2 2.2 7 6"/></svg><span class="btn-label" id="userBtnName">Entrar</span></button>
         <button class="btn btn-icon-only" id="themeBtn" aria-label="Alternar tema" title="Alternar tema claro/escuro"></button>
+        <button class="btn" id="helpBtn" title="Como ler os cards e gráficos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.3 9a2.7 2.7 0 0 1 5.3.8c0 1.8-2.6 2.1-2.6 3.9"/><path d="M12 17.2h.01"/></svg><span class="btn-label">Ajuda</span></button>
         <button class="btn" id="csvBtn" title="Exportar CSV"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11m0 0-3.5-3.5M12 15l3.5-3.5"/><path d="M5 16v3a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3"/></svg><span class="btn-label">Exportar CSV</span></button>
         <button class="btn" id="imgBtn" title="Capturar imagem do painel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8.5A2.5 2.5 0 0 1 6.5 6h1.2l1.1-1.8A1.5 1.5 0 0 1 10.1 3.5h3.8a1.5 1.5 0 0 1 1.3.7L16.3 6h1.2A2.5 2.5 0 0 1 20 8.5v8A2.5 2.5 0 0 1 17.5 19h-11A2.5 2.5 0 0 1 4 16.5v-8Z"/><circle cx="12" cy="12.5" r="3.4"/></svg><span class="btn-label">Capturar imagem</span></button>
         <button class="btn btn-soft" id="printBtn" title="Gerar relatório profissional em A4"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3.5h7l3 3V10"/><path d="M14 3.5v3h3"/><path d="M7 14h10v6.5H7z"/><path d="M7 8.5V4H5.5A1.5 1.5 0 0 0 4 5.5v9A1.5 1.5 0 0 0 5.5 16H7M17 16h1.5a1.5 1.5 0 0 0 1.5-1.5v-4A1.5 1.5 0 0 0 18.5 9H7"/></svg><span class="btn-label">Relatório A4</span></button>
@@ -830,7 +880,10 @@
         </div>
       </div>
       <div class="produce-tabs" id="produceTabs" role="tablist" aria-label="Selecionar vegetal"></div>
-      <div class="table-legend" id="tableLegend"></div>
+      <div class="table-toolbar">
+        <div class="table-legend" id="tableLegend"></div>
+        <button type="button" class="panel-heading-add" id="quickAddDateBtn" title="Adicionar data" aria-label="Adicionar data"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Data</button>
+      </div>
       <button type="button" class="rotate-view-btn" id="rotateViewBtn" title="Girar a tabela para melhor leitura"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 0 1 14.5-4.7M20 12a8 8 0 0 1-14.5 4.7"/><path d="M18.5 3v4.3h-4.3M5.5 21v-4.3h4.3"/></svg><span>Girar tabela</span></button>
       <div class="stock-scroll" id="stockScroll">
         <table class="stock-table" id="stockTable"></table>
@@ -843,7 +896,10 @@
         <section class="orders-panel" data-lower-panel="orders">
           <div class="panel-heading">
             <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7h12l1.5 13.5h-15L6 7Z"/><path d="M9 10V6a3 3 0 0 1 6 0v4"/></svg>Separação por cliente</h3>
-            <span>quantidades em unidades</span>
+            <div class="panel-heading-actions">
+              <button type="button" class="panel-heading-add" id="quickAddClientBtn" title="Adicionar cliente" aria-label="Adicionar cliente"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Cliente</button>
+              <span>quantidades em unidades</span>
+            </div>
           </div>
           <div class="orders-grid" id="ordersGrid"></div>
         </section>
@@ -883,6 +939,7 @@
     <form method="dialog" id="clientForm">
       <div class="dialog-head"><div><h3>Novo cliente</h3><p>O cliente será incluído como um novo cartão em “Separação por cliente”.</p></div><button type="button" class="dialog-close" onclick="backOrCloseDialog('clientDialog')" aria-label="Fechar">×</button></div>
       <div class="dialog-body"><p class="dialog-alert" id="clientAlert" hidden></p><div class="field"><label for="clientName">Nome do cliente</label><input id="clientName" name="clientName" maxlength="80" placeholder="Ex.: MERCADO CENTRAL" autocomplete="off" required></div>
+        <div class="field"><label for="clientLogoUrl">URL do logo (opcional)</label><input id="clientLogoUrl" type="url" placeholder="https://exemplo.com/logo.png" autocomplete="off"><div class="field-help">Cole o link direto de uma imagem (PNG/JPG/SVG). Sem logo, o cartão mostra as iniciais do nome.</div></div>
         <div class="field"><label>Produtos que esse cliente pediu</label>
           <div id="clientProducts"></div>
           <button type="button" class="btn btn-soft" id="addClientProductRow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg> Mais um produto</button>
@@ -891,6 +948,12 @@
       </div>
       <div class="dialog-foot"><button type="button" class="btn" onclick="backOrCloseDialog('clientDialog')">Cancelar</button><button type="submit" class="btn btn-primary" value="default" id="clientSave">Adicionar</button></div>
     </form>
+  </dialog>
+
+  <dialog id="pickClientDialog">
+    <div class="dialog-head"><div><h3>Adicionar cliente ao painel</h3><p>Escolha um cliente já cadastrado (oculto no momento) para reativá-lo em “Separação por cliente”. Depois é só lançar os produtos manualmente no cartão.</p></div><button type="button" class="dialog-close" onclick="this.closest('dialog').close()" aria-label="Fechar">×</button></div>
+    <div class="dialog-body"><div class="list-manager" id="pickClientList"></div></div>
+    <div class="dialog-foot"><button type="button" class="btn btn-soft" id="pickClientNewBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg> Cadastrar novo cliente</button><button type="button" class="btn btn-primary" onclick="this.closest('dialog').close()">Fechar</button></div>
   </dialog>
 
   <dialog id="productDialog">
@@ -953,9 +1016,16 @@
   <dialog id="renameDialog">
     <form method="dialog" id="renameForm">
       <div class="dialog-head"><div><h3 id="renameDialogTitle">Renomear</h3><p>O nome muda, mas todo o histórico de dados já lançados continua igual.</p></div><button type="button" class="dialog-close" onclick="this.closest('dialog').close()" aria-label="Fechar">×</button></div>
-      <div class="dialog-body"><p class="dialog-alert" id="renameAlert" hidden></p><div class="field"><label for="renameName">Novo nome</label><input id="renameName" maxlength="80" autocomplete="off" required></div></div>
+      <div class="dialog-body"><p class="dialog-alert" id="renameAlert" hidden></p><div class="field"><label for="renameName">Novo nome</label><input id="renameName" maxlength="80" autocomplete="off" required></div>
+        <div class="field" id="renameLogoField"><label for="renameLogoUrl">URL do logo (opcional)</label><input id="renameLogoUrl" type="url" placeholder="https://exemplo.com/logo.png" autocomplete="off"><div class="field-help">Cole o link direto de uma imagem. Deixe em branco para usar as iniciais do nome.</div></div>
+      </div>
       <div class="dialog-foot"><button type="button" class="btn" onclick="this.closest('dialog').close()">Cancelar</button><button type="submit" class="btn btn-primary" value="default" id="renameSave">Salvar</button></div>
     </form>
+  </dialog>
+
+  <dialog id="logoPreviewDialog" class="logo-preview-dialog">
+    <div class="dialog-head"><div><h3 id="logoPreviewTitle">Logo</h3></div><button type="button" class="dialog-close" onclick="this.closest('dialog').close()" aria-label="Fechar">×</button></div>
+    <div class="dialog-body logo-preview-body"><img id="logoPreviewImg" src="" alt=""></div>
   </dialog>
 
   <dialog id="loginDialog">
@@ -1035,7 +1105,7 @@
       <div class="sys-section" id="sysCadastroSection">Cadastros</div>
       <div class="sys-grid" id="sysCadastroGrid">
         <button type="button" class="sys-item" id="sysPartner"><span class="sys-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 8v8M8 12h8"/></svg></span><span class="sys-txt"><strong>Adicionar parceiro</strong><span>Nova linha de fornecedor em uma ou mais culturas.</span></span></button>
-        <button type="button" class="sys-item" id="sysClient"><span class="sys-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7h12l1.5 13.5h-15L6 7Z"/><path d="M9 10V6a3 3 0 0 1 6 0v4"/></svg></span><span class="sys-txt"><strong>Adicionar cliente</strong><span>Novo cartão em “Separação por cliente”.</span></span></button>
+        <button type="button" class="sys-item" id="sysClient"><span class="sys-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7h12l1.5 13.5h-15L6 7Z"/><path d="M9 10V6a3 3 0 0 1 6 0v4"/></svg></span><span class="sys-txt"><strong>Adicionar cliente</strong><span>Reative um cliente já cadastrado em “Separação por cliente” (ou cadastre um novo).</span></span></button>
         <button type="button" class="sys-item" id="sysProductCatalog"><span class="sys-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2.5"/><path d="M8 9h8M8 13h5"/></svg></span><span class="sys-txt"><strong>Catálogo de produtos</strong><span>Cadastre nome, cultura e kg/unidade uma vez, para usar em todos os clientes.</span></span></button>
         <button type="button" class="sys-item" id="sysDate"><span class="sys-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5.5" width="16" height="15" rx="2"/><path d="M4 10h16M8 3v4.5M16 3v4.5"/><path d="M12 13.5v5M9.5 16h5"/></svg></span><span class="sys-txt"><strong>Adicionar data</strong><span id="sysDateDesc">Nova coluna de dia na cultura selecionada.</span></span></button>
         <button type="button" class="sys-item" id="sysManage"><span class="sys-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.3" cy="6" r="1.2"/><circle cx="4.3" cy="12" r="1.2"/><circle cx="4.3" cy="18" r="1.2"/></svg></span><span class="sys-txt"><strong>Gerenciar cadastros</strong><span>Renomear, ocultar ou remover parceiros, clientes e datas.</span></span></button>
@@ -1128,6 +1198,69 @@
     </form>
   </dialog>
 
+  <dialog id="helpDialog">
+    <div class="dialog-head"><div><h3>Como ler os cards e gráficos</h3><p>Guia rápido de cada painel, card e coluna calculada do sistema.</p></div><button type="button" class="dialog-close" onclick="this.closest('dialog').close()" aria-label="Fechar">×</button></div>
+    <div class="dialog-body">
+      <div class="help-section">
+        <h4>KPIs da aba Geral (os 4 cartões do topo)</h4>
+        <ul>
+          <li><b>Parceiros com estoque</b> — quantos parceiros têm pelo menos uma caixa lançada, somando todas as culturas (vira "Culturas com estoque" se você filtrar por um parceiro específico).</li>
+          <li><b>Peso total</b> — soma do peso estimado (kg) de tudo que está em estoque, em todas as culturas.</li>
+          <li><b>Maior estoque</b> — qual cultura pesa mais no momento, e quantos kg ela tem.</li>
+          <li><b>Dia com mais estoque</b> — a data (entre as cadastradas) que concentra o maior peso lançado.</li>
+        </ul>
+      </div>
+      <div class="help-section">
+        <h4>Cards "Estoque por Produto" (um por cultura)</h4>
+        <ul>
+          <li><b>Valor grande</b> (ex.: "1.234 caixas") — total de unidades lançadas nessa cultura.</li>
+          <li><b>"≈ X kg"</b> — esse mesmo total já convertido para peso, usando os fatores de conversão.</li>
+          <li><b>Barra + %</b> — qual fatia do peso total do estoque (somando todas as culturas) essa cultura representa.</li>
+          <li><b>Linhas de detalhe</b> (Filetado, Pacotes 200g, Cumbucas CG...) — a composição interna da cultura. Passe o mouse em qualquer uma para ver a conta exata (ex.: "120 caixas × 10 kg/caixa = 1.200 kg"). Linhas com borda tracejada são <b>estimativas</b> (peso ÷ peso-por-unidade), não uma contagem real.</li>
+        </ul>
+      </div>
+      <div class="help-section">
+        <h4>"Maiores Estoques por Parceiro"</h4>
+        <ul>
+          <li>Uma coluna por cultura, com os parceiros ordenados do que tem mais estoque para o que tem menos.</li>
+          <li><b>Chips de detalhe</b> abaixo do nome — mesma lógica dos cards de produto, calculada por parceiro. Passe o mouse para ver a conta.</li>
+          <li><b>Barra colorida</b> — tamanho relativo ao parceiro que mais tem estoque naquela cultura (comparativo dentro da própria cultura, não percentual do total geral).</li>
+        </ul>
+      </div>
+      <div class="help-section">
+        <h4>"Idade do Estoque"</h4>
+        <ul>
+          <li>Uma coluna por cultura, listando as datas que ainda têm estoque (da mais recente para a mais antiga), com o peso (kg) de cada dia.</li>
+          <li><b>Selo colorido</b>: verde ("Hoje"/"1 dia") = estoque novo; amarelo (2-3 dias) = atenção; vermelho (mais de 3 dias) = estoque envelhecendo, prioridade para escoar.</li>
+        </ul>
+      </div>
+      <div class="help-section">
+        <h4>Tabela de cada cultura (abas Brócolis, Couve-flor, Pepino, Tomate)</h4>
+        <ul>
+          <li><b>Cabeçalho DATA</b> — uma coluna por dia cadastrado. O × cinza limpa os números daquele dia; a lixeira vermelha exclui a coluna inteira.</li>
+          <li><b>Linhas de parceiro</b> — o que cada um lançou, por tipo (Filetado/Não proc./Proc., ou CG/M/P no Tomate).</li>
+          <li><b>Linha TOTAL</b> (verde) — soma de todos os parceiros naquele dia/tipo.</li>
+          <li><b>Linha KG</b> (vermelha) — o total acima convertido para peso. Passe o mouse para ver "quantidade × fator = kg".</li>
+        </ul>
+      </div>
+      <div class="help-section">
+        <h4>Tomate (caixas específicas)</h4>
+        <ul>
+          <li><b>"Total cumbucas"</b> — quantas cumbucas prontas de cada tamanho (CG/M/P) e o % que cada uma representa do total.</li>
+          <li><b>"Total em kg a granel"</b> — o que ainda está sem processar, em kg (ainda não virou cumbuca).</li>
+        </ul>
+      </div>
+      <div class="help-section">
+        <h4>Separação por cliente e Simulação</h4>
+        <ul>
+          <li>Cada cartão é um cliente; a barra de progresso e o "% concluído" mostram quanto do pedido já foi separado (separado ÷ pedido).</li>
+          <li>A aba <b>Simulação</b> testa pedidos hipotéticos contra o estoque atual, sem mexer nos pedidos reais — o "Disponível (após baixa)" já desconta o que já foi separado para clientes de verdade.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="dialog-foot"><button type="button" class="btn btn-primary" onclick="this.closest('dialog').close()">Entendi</button></div>
+  </dialog>
+
   <dialog id="confirmDialog">
     <div class="dialog-head"><div><h3 id="confirmTitle">Confirmar ação</h3></div><button type="button" class="dialog-close" id="confirmCloseBtn" aria-label="Fechar">×</button></div>
     <div class="dialog-body"><p id="confirmMessage"></p></div>
@@ -1192,8 +1325,8 @@
     // a largura da tela — mantém eventos, estado de habilitado/desabilitado
     // e o texto/ícone de cada botão intactos, só muda onde eles moram.
     const BOTTOM_NAV_ESSENTIAL=['themeBtn','printBtn','imgBtn'];
-    const BOTTOM_NAV_MORE=['syncBtn','systemBtn','userBtn','csvBtn','installAppBtn'];
-    const DESKTOP_ACTIONS_ORDER=['installAppBtn','userBtn','themeBtn','csvBtn','imgBtn','printBtn','syncBtn'];
+    const BOTTOM_NAV_MORE=['syncBtn','systemBtn','userBtn','csvBtn','helpBtn','installAppBtn'];
+    const DESKTOP_ACTIONS_ORDER=['installAppBtn','userBtn','themeBtn','helpBtn','csvBtn','imgBtn','printBtn','syncBtn'];
     const mobileNavQuery=window.matchMedia('(max-width:620px)');
     function closeBottomNavMore(){
       const more=document.getElementById('bottomNavMore'),btn=document.getElementById('bottomNavMoreBtn');
@@ -1290,7 +1423,7 @@
       scrollEl.addEventListener('touchend',e=>{if(e.touches.length<2)pinchStartDist=0});
     })();
     const STORAGE_KEY='spg_estoque_diario_v2', GAS_KEY='spg_estoque_gas_url', THEME_KEY='spg_estoque_theme', TOKEN_KEY='spg_estoque_token', SIM_STORAGE_KEY='spg_estoque_simulacao_v1';
-    const BASE_PRODUCE=[{id:'geral',label:'Geral',color:'#4a5568'},{id:'resumoantigo',label:'Resumo Antigo',color:'#6b7c93'},{id:'brocolis',label:'Brócolis',color:'#2e9e46'},{id:'tomate',label:'Tomate',color:'#e05252'},{id:'couveflor',label:'Couve-flor',color:'#8a6bd8'},{id:'pepino',label:'Pepino',color:'#1e9c86'}];
+    const BASE_PRODUCE=[{id:'geral',label:'Geral',color:'#4a5568'},{id:'resumoantigo',label:'Resumo Simplificado',color:'#6b7c93'},{id:'brocolis',label:'Brócolis',color:'#2e9e46'},{id:'tomate',label:'Tomate',color:'#e05252'},{id:'couveflor',label:'Couve-flor',color:'#8a6bd8'},{id:'pepino',label:'Pepino',color:'#1e9c86'}];
     // "geral" e "resumoantigo" são abas especiais (painéis calculados), não
     // culturas de verdade — não entram em CULTURES para não aparecerem nas
     // telas de cadastro de parceiro/data/cliente nem no seletor de impressão.
@@ -1506,9 +1639,11 @@
     };
     function todayIso(){const t=new Date();return `${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}-${String(t.getDate()).padStart(2,'0')}`}
     const ICON_CLEAR_SMALL='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>';
+    const ICON_TRASH_TINY='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M9 7V4.5A1.5 1.5 0 0 1 10.5 3h3A1.5 1.5 0 0 1 15 4.5V7"/><path d="M6 7l1 12.5A2 2 0 0 0 9 21h6a2 2 0 0 0 2-1.5L18 7"/></svg>';
     function dateHeaderHtml(day,hoje,colspan,showClear){
       const clearBtn=showClear?`<button type="button" class="date-clear-btn" data-clear-date="${day.id}" title="Limpar dados desta data" aria-label="Limpar dados de ${formatDate(day.iso)}">${ICON_CLEAR_SMALL}</button>`:'';
-      return `<th colspan="${colspan}" class="day-start${day.iso===hoje?' today':''}"><span class="dow">${weekDay(day.iso)}</span><strong>${formatDate(day.iso)}</strong>${clearBtn}${day.iso===hoje?'<span class="today-badge">HOJE</span>':''}</th>`;
+      const removeBtn=showClear?`<button type="button" class="date-remove-btn" data-remove-date-col="${day.id}" title="Excluir esta data" aria-label="Excluir a data ${formatDate(day.iso)}">${ICON_TRASH_TINY}</button>`:'';
+      return `<th colspan="${colspan}" class="day-start${day.iso===hoje?' today':''}"><span class="dow">${weekDay(day.iso)}</span><strong>${formatDate(day.iso)}</strong>${clearBtn}${removeBtn}${day.iso===hoje?'<span class="today-badge">HOJE</span>':''}</th>`;
     }
     function cultureTableHtml(days,hoje,culture){
       if(!days.length)return `<tbody><tr><td style="padding:24px;color:var(--muted);text-align:center">Nenhuma data cadastrada para ${esc(culture.label)}. Use “Adicionar data” nesta aba.</td></tr></tbody>`;
@@ -1524,7 +1659,11 @@
       }else{
         partners.forEach(partner=>{html+=`<tr><td class="partner-col">${esc(partner.name)}</td>`;days.forEach(day=>meta.forEach((m,t)=>{const key=cellKey(partner.id,day.id,t,culture.id),raw=state.cells[key],value=raw==null||raw===''?'':(directKg?String(raw).replace('.',','):raw);html+=`<td class="${t===0?'day-start ':''}${cellCls(day)}"><input class="cell" inputmode="${directKg?'decimal':'numeric'}" aria-label="${esc(partner.name)}, ${formatDate(day.iso)}, ${m.label}, ${culture.label}" data-key="${key}" value="${value}"></td>`}));html+='</tr>'});
         html+='<tr class="total-row"><td class="partner-col">TOTAL</td>';days.forEach(day=>meta.forEach((_,t)=>{const total=totalDayType(day.id,t,culture.id);html+=`<td${t===0?' class="day-start"':''} data-total="${day.id}|${t}|${culture.id}">${directKg?fmtDec(total):fmt(total)}</td>`}));
-        html+='</tr><tr class="kg-row"><td class="partner-col">KG</td>';days.forEach(day=>meta.forEach((_,t)=>html+=`<td${t===0?' class="day-start"':''} data-kg="${day.id}|${t}|${culture.id}">${fmt(totalDayType(day.id,t,culture.id)*kgFactorForType(culture.id,t))}</td>`));html+='</tr>';
+        html+='</tr><tr class="kg-row"><td class="partner-col">KG</td>';days.forEach(day=>meta.forEach((_,t)=>{
+          const totalQty=totalDayType(day.id,t,culture.id),fator=kgFactorForType(culture.id,t),kgVal=totalQty*fator;
+          const formula=`${directKg?fmtDec(totalQty):fmt(totalQty)} ${directKg?'':'caixas '}× ${String(fator).replace('.',',')} kg${directKg?'':'/caixa'} = ${fmt(kgVal)} kg`;
+          html+=`<td${t===0?' class="day-start"':''} data-kg="${day.id}|${t}|${culture.id}" title="${esc(formula)}">${fmt(kgVal)}</td>`;
+        }));html+='</tr>';
       }
       return html+'</tbody>';
     }
@@ -1602,6 +1741,7 @@
     }
     function wireClearDateButtons(container){
       container.querySelectorAll('[data-clear-date]').forEach(btn=>btn.onclick=()=>clearDateData(btn.dataset.clearDate));
+      container.querySelectorAll('[data-remove-date-col]').forEach(btn=>btn.onclick=requireAccess('gerenciar_cadastros',()=>removeDate(btn.dataset.removeDateCol)));
     }
     function cultureLegendHtml(culture){
       const meta=typeMetaForCulture(culture.id);
@@ -1715,21 +1855,54 @@
       const totalKg=porCultura.reduce((s,x)=>s+x.kg,0);
       const granel=[0,1,2].reduce((s,t)=>s+geralProcessarTotal(t,'tomate'),0);
       const fmtUn=x=>isDirectKgCulture(x.c.id)?fmtDec(x.un):fmt(x.un);
-      const packRows=id=>{const kgTot=geralKgTotal(id);return packsForCulture(id).map(p=>[esc(p.name),fmt(Math.round(kgTot/Number(p.kg)))])};
+      const factorTxt=v=>String(v).replace('.',',');
+      const packRows=id=>{const kgTot=geralKgTotal(id);return packsForCulture(id).map(p=>[esc(p.name),fmt(Math.round(kgTot/Number(p.kg))),'','','',`${fmt(kgTot)} kg ÷ ${factorTxt(p.kg)} kg/un. = ${fmt(Math.round(kgTot/Number(p.kg)))} un. (estimativa)`])};
       const cardDetails=id=>{
         let rows=[];
         if(id==='brocolis'){
-          const fil=geralTypeTotal(0,'brocolis')*kgFactorForType('brocolis',0),cabNp=geralTypeTotal(1,'brocolis')*kgFactorForType('brocolis',1),cabPr=geralTypeTotal(2,'brocolis')*kgFactorForType('brocolis',2),cab=cabNp+cabPr;
-          rows=[['Filetado',fmt(fil)+' kg','','brocolisFiletado','kg|brocolis|0'],['Pacotes 200 g',fmt(Math.round(fil/factorNum('brocolisPacote200Kg'))),'','brocolisPacotes200','brocolisPacote200Kg'],['Cabeça não processada',fmt(cabNp)+' kg','','brocolisCabecaNaoProc','kg|brocolis|1'],['Cabeça processada',fmt(cabPr)+' kg','','brocolisCabecaProc','kg|brocolis|2'],['Pacotes cabeça 300 g',fmt(Math.round(cab/factorNum('brocolisPacote300Kg'))),'','brocolisPacotesCabeca300','brocolisPacote300Kg']];
+          const filCx=geralTypeTotal(0,'brocolis'),cabNpCx=geralTypeTotal(1,'brocolis'),cabPrCx=geralTypeTotal(2,'brocolis');
+          const filFac=kgFactorForType('brocolis',0),cabNpFac=kgFactorForType('brocolis',1),cabPrFac=kgFactorForType('brocolis',2);
+          const fil=filCx*filFac,cabNp=cabNpCx*cabNpFac,cabPr=cabPrCx*cabPrFac,cab=cabNp+cabPr;
+          const pacote200=factorNum('brocolisPacote200Kg'),pacote300=factorNum('brocolisPacote300Kg');
+          rows=[
+            ['Filetado',fmt(fil)+' kg','','brocolisFiletado','kg|brocolis|0',`${fmt(filCx)} caixas × ${factorTxt(filFac)} kg/caixa = ${fmt(fil)} kg`],
+            ['Pacotes 200 g',fmt(Math.round(fil/pacote200)),'','brocolisPacotes200','brocolisPacote200Kg',`${fmt(fil)} kg ÷ ${factorTxt(pacote200)} kg/pacote = ${fmt(Math.round(fil/pacote200))} pacotes (estimativa)`],
+            ['Cabeça não processada',fmt(cabNp)+' kg','','brocolisCabecaNaoProc','kg|brocolis|1',`${fmt(cabNpCx)} caixas × ${factorTxt(cabNpFac)} kg/caixa = ${fmt(cabNp)} kg`],
+            ['Cabeça processada',fmt(cabPr)+' kg','','brocolisCabecaProc','kg|brocolis|2',`${fmt(cabPrCx)} caixas × ${factorTxt(cabPrFac)} kg/caixa = ${fmt(cabPr)} kg`],
+            ['Pacotes cabeça 300 g',fmt(Math.round(cab/pacote300)),'','brocolisPacotesCabeca300','brocolisPacote300Kg',`(${fmt(cabNp)} + ${fmt(cabPr)}) kg ÷ ${factorTxt(pacote300)} kg/pacote = ${fmt(Math.round(cab/pacote300))} pacotes (estimativa)`]
+          ];
         }else if(id==='tomate'){
           const cg=geralTypeTotal(0,'tomate'),m=geralTypeTotal(1,'tomate'),p=geralTypeTotal(2,'tomate');
-          rows=[['Cumbucas CG',fmt(cg),'','tomateCumbucasCG','label|tomate|cg'],['Cumbucas M',fmt(m),'','tomateCumbucasM','label|tomate|m'],['Cumbucas P',fmt(p),'','tomateCumbucasP','label|tomate|p'],['A granel (processar)',fmt(granel)+' kg',granel>0?'danger':'','tomateGranelProcessar','label|tomate|granel'],['Estimativa cumbucas do granel',fmt(Math.round(granel/factorNum('tomateGranelCumbucaKg'))),'','tomateEstimativaGranel','tomateGranelCumbucaKg']];
+          const granelFac=factorNum('tomateGranelCumbucaKg');
+          rows=[
+            ['Cumbucas CG',fmt(cg),'','tomateCumbucasCG','label|tomate|cg',`Soma das cumbucas CG lançadas em todos os parceiros e datas`],
+            ['Cumbucas M',fmt(m),'','tomateCumbucasM','label|tomate|m',`Soma das cumbucas M lançadas em todos os parceiros e datas`],
+            ['Cumbucas P',fmt(p),'','tomateCumbucasP','label|tomate|p',`Soma das cumbucas P lançadas em todos os parceiros e datas`],
+            ['A granel (processar)',fmt(granel)+' kg',granel>0?'danger':'','tomateGranelProcessar','label|tomate|granel',`Soma dos kg a processar lançados em todos os parceiros e datas`],
+            ['Estimativa cumbucas do granel',fmt(Math.round(granel/granelFac)),'','tomateEstimativaGranel','tomateGranelCumbucaKg',`${fmt(granel)} kg ÷ ${factorTxt(granelFac)} kg/cumbuca = ${fmt(Math.round(granel/granelFac))} cumbucas (estimativa)`]
+          ];
         }else if(id==='couveflor'){
-          const fil=geralTypeTotal(0,'couveflor')*kgFactorForType('couveflor',0),cabNp=geralTypeTotal(1,'couveflor')*kgFactorForType('couveflor',1),cabPr=geralTypeTotal(2,'couveflor')*kgFactorForType('couveflor',2),cab=cabNp+cabPr;
-          rows=[['Filetado',fmt(fil)+' kg','','couveflorFiletado','kg|couveflor|0'],['Cabeça não processada',fmt(cabNp)+' kg','','couveflorCabecaNaoProc','kg|couveflor|1'],['Cabeça processada',fmt(cabPr)+' kg','','couveflorCabecaProc','kg|couveflor|2'],['Pacotes 300 g',fmt(Math.round((fil+cab)/factorNum('couveflorPacoteKg'))),'','couveflorPacotes300','couveflorPacoteKg']];
+          const filCx=geralTypeTotal(0,'couveflor'),cabNpCx=geralTypeTotal(1,'couveflor'),cabPrCx=geralTypeTotal(2,'couveflor');
+          const filFac=kgFactorForType('couveflor',0),cabNpFac=kgFactorForType('couveflor',1),cabPrFac=kgFactorForType('couveflor',2);
+          const fil=filCx*filFac,cabNp=cabNpCx*cabNpFac,cabPr=cabPrCx*cabPrFac,cab=cabNp+cabPr;
+          const pacoteFac=factorNum('couveflorPacoteKg');
+          rows=[
+            ['Filetado',fmt(fil)+' kg','','couveflorFiletado','kg|couveflor|0',`${fmt(filCx)} caixas × ${factorTxt(filFac)} kg/caixa = ${fmt(fil)} kg`],
+            ['Cabeça não processada',fmt(cabNp)+' kg','','couveflorCabecaNaoProc','kg|couveflor|1',`${fmt(cabNpCx)} caixas × ${factorTxt(cabNpFac)} kg/caixa = ${fmt(cabNp)} kg`],
+            ['Cabeça processada',fmt(cabPr)+' kg','','couveflorCabecaProc','kg|couveflor|2',`${fmt(cabPrCx)} caixas × ${factorTxt(cabPrFac)} kg/caixa = ${fmt(cabPr)} kg`],
+            ['Pacotes 300 g',fmt(Math.round((fil+cab)/pacoteFac)),'','couveflorPacotes300','couveflorPacoteKg',`(${fmt(fil)} + ${fmt(cab)}) kg ÷ ${factorTxt(pacoteFac)} kg/pacote = ${fmt(Math.round((fil+cab)/pacoteFac))} pacotes (estimativa)`]
+          ];
         }else if(id==='pepino'){
-          const np=geralTypeTotal(0,'pepino')*kgFactorForType('pepino',0),pr=geralTypeTotal(1,'pepino')*kgFactorForType('pepino',1);
-          rows=[['Não processado',fmt(np)+' kg','','pepinoNaoProcessado','kg|pepino|0'],['Processado',fmt(pr)+' kg','','pepinoProcessado','kg|pepino|1'],['Estimativa pacotes 280 g',fmt(Math.round((np+pr)/factorNum('pepinoPacoteKg'))),'','pepinoEstimativaPacotes280','pepinoPacoteKg'],['Pacotes 280 g (processado)',fmt(Math.round(pr/factorNum('pepinoPacoteProcessadoKg'))),'','pepinoPacotes280Processado','pepinoPacoteProcessadoKg']];
+          const npCx=geralTypeTotal(0,'pepino'),prCx=geralTypeTotal(1,'pepino');
+          const npFac=kgFactorForType('pepino',0),prFac=kgFactorForType('pepino',1);
+          const np=npCx*npFac,pr=prCx*prFac;
+          const pacoteFac=factorNum('pepinoPacoteKg'),pacoteProcFac=factorNum('pepinoPacoteProcessadoKg');
+          rows=[
+            ['Não processado',fmt(np)+' kg','','pepinoNaoProcessado','kg|pepino|0',`${fmtDec(npCx)} × ${factorTxt(npFac)} kg = ${fmt(np)} kg`],
+            ['Processado',fmt(pr)+' kg','','pepinoProcessado','kg|pepino|1',`${fmtDec(prCx)} × ${factorTxt(prFac)} kg = ${fmt(pr)} kg`],
+            ['Estimativa pacotes 280 g',fmt(Math.round((np+pr)/pacoteFac)),'','pepinoEstimativaPacotes280','pepinoPacoteKg',`(${fmt(np)} + ${fmt(pr)}) kg ÷ ${factorTxt(pacoteFac)} kg/pacote = ${fmt(Math.round((np+pr)/pacoteFac))} pacotes (estimativa)`],
+            ['Pacotes 280 g (processado)',fmt(Math.round(pr/pacoteProcFac)),'','pepinoPacotes280Processado','pepinoPacoteProcessadoKg',`${fmt(pr)} kg ÷ ${factorTxt(pacoteProcFac)} kg/pacote = ${fmt(Math.round(pr/pacoteProcFac))} pacotes (estimativa)`]
+          ];
         }
         return rows.filter(r=>!r[4]||!isFactorHidden(r[4])).map(r=>{
           if(r[4]&&factorConfigFor(r[4]).label)r[0]=factorDisplayLabel(r[4],r[0]);
@@ -1742,7 +1915,7 @@
           const labelA=a[3]?dashboardLabelValue(a[3],a[0]):a[0],labelB=b[3]?dashboardLabelValue(b[3],b[0]):b[0];
           return String(labelA).localeCompare(String(labelB),'pt-BR',{sensitivity:'base'});
         });
-        const det=detailRows.map(r=>`<span class="dr ${r[2]||''}">${r[3]?dashboardLabelText(r[3],r[0]):r[0]}<b>${r[1]}</b></span>`).join('');
+        const det=detailRows.map(r=>`<span class="dr ${r[2]||''}"${r[5]?` title="${esc(r[5])}"`:''}>${r[3]?dashboardLabelText(r[3],r[0]):r[0]}<b>${r[1]}</b></span>`).join('');
         return `<div class="pcard" style="--c:${x.c.color}"><span class="pic">${CULTURE_EMOJI[x.c.id]||genericCultureSvg(x.c.color)}</span><b><i></i>${esc(x.c.label)}</b><span class="val">${fmtUn(x)} ${cultureUnitLabel(x.c.id)}</span><span class="kg">≈ ${fmt(x.kg)} kg</span><div class="pbar"><i style="width:${pct}%"></i></div><span class="pct">${pct}% do peso total</span><div class="pdet">${det}</div></div>`;
       }).join('');
       return `<section class="dash-panel" style="grid-column:1/-1"><h4>Estoque por Produto<small>unidades e peso estimado • nomes definidos nas configurações</small></h4><div class="produce-cards">${cardsHtml}</div></section>`;
@@ -1793,36 +1966,39 @@
           const unLabel=isDirectKgCulture(c.id)?fmtDec(x.un):fmt(x.un);
           const meta=typeMetaForCulture(c.id);
           let details=[];
+          const ft=v=>String(v).replace('.',',');
           if(c.id==='brocolis'){
-            const filKg=x.types[0]*kgFactorForType(c.id,0),cabKg=x.types[1]*kgFactorForType(c.id,1)+x.types[2]*kgFactorForType(c.id,2);
-            if(x.types[0]>0)details.push([dashboardLabelValue('brocolisFiletado','Filetado'),`${fmt(x.types[0])} cx · ${fmt(filKg)} kg`,meta[0]?.color]);
-            if(filKg>0)details.push([dashboardLabelValue('brocolisPacotes200','Pacotes 200 g'),`${fmt(Math.round(filKg/factorNum('brocolisPacote200Kg')))} pct`,meta[0]?.color,'rank-est']);
-            if(x.types[1]>0)details.push([dashboardLabelValue('brocolisCabecaNaoProc','Cabeça não processada'),`${fmt(x.types[1])} cx · ${fmt(x.types[1]*kgFactorForType(c.id,1))} kg`,meta[1]?.color]);
-            if(x.types[2]>0)details.push([dashboardLabelValue('brocolisCabecaProc','Cabeça processada'),`${fmt(x.types[2])} cx · ${fmt(x.types[2]*kgFactorForType(c.id,2))} kg`,meta[2]?.color]);
-            if(cabKg>0)details.push([dashboardLabelValue('brocolisPacotesCabeca300','Pacotes cabeça 300 g'),`${fmt(Math.round(cabKg/factorNum('brocolisPacote300Kg')))} pct`,meta[1]?.color,'rank-est']);
+            const fil0=kgFactorForType(c.id,0),fil1=kgFactorForType(c.id,1),fil2=kgFactorForType(c.id,2);
+            const filKg=x.types[0]*fil0,cabKg=x.types[1]*fil1+x.types[2]*fil2,pacote200=factorNum('brocolisPacote200Kg'),pacote300=factorNum('brocolisPacote300Kg');
+            if(x.types[0]>0)details.push([dashboardLabelValue('brocolisFiletado','Filetado'),`${fmt(x.types[0])} cx · ${fmt(filKg)} kg`,meta[0]?.color,'',`${fmt(x.types[0])} caixas × ${ft(fil0)} kg/caixa = ${fmt(filKg)} kg`]);
+            if(filKg>0)details.push([dashboardLabelValue('brocolisPacotes200','Pacotes 200 g'),`${fmt(Math.round(filKg/pacote200))} pct`,meta[0]?.color,'rank-est',`${fmt(filKg)} kg ÷ ${ft(pacote200)} kg/pacote = ${fmt(Math.round(filKg/pacote200))} pacotes (estimativa)`]);
+            if(x.types[1]>0)details.push([dashboardLabelValue('brocolisCabecaNaoProc','Cabeça não processada'),`${fmt(x.types[1])} cx · ${fmt(x.types[1]*fil1)} kg`,meta[1]?.color,'',`${fmt(x.types[1])} caixas × ${ft(fil1)} kg/caixa = ${fmt(x.types[1]*fil1)} kg`]);
+            if(x.types[2]>0)details.push([dashboardLabelValue('brocolisCabecaProc','Cabeça processada'),`${fmt(x.types[2])} cx · ${fmt(x.types[2]*fil2)} kg`,meta[2]?.color,'',`${fmt(x.types[2])} caixas × ${ft(fil2)} kg/caixa = ${fmt(x.types[2]*fil2)} kg`]);
+            if(cabKg>0)details.push([dashboardLabelValue('brocolisPacotesCabeca300','Pacotes cabeça 300 g'),`${fmt(Math.round(cabKg/pacote300))} pct`,meta[1]?.color,'rank-est',`${fmt(cabKg)} kg ÷ ${ft(pacote300)} kg/pacote = ${fmt(Math.round(cabKg/pacote300))} pacotes (estimativa)`]);
           }else if(c.id==='tomate'){
             const tomatoKeys=['tomateCumbucasCG','tomateCumbucasM','tomateCumbucasP'],tomatoDefaults=['Cumbucas CG','Cumbucas M','Cumbucas P'];
-            x.types.forEach((v,t)=>{if(v>0)details.push([dashboardLabelValue(tomatoKeys[t],tomatoDefaults[t]),`${fmt(v)} cumbucas`,meta[t]?.color])});
-            if(x.proc>0)details.push([dashboardLabelValue('tomateGranelProcessar','A granel (processar)'),`${fmt(x.proc)} kg`,'var(--critical)']);
+            x.types.forEach((v,t)=>{if(v>0)details.push([dashboardLabelValue(tomatoKeys[t],tomatoDefaults[t]),`${fmt(v)} cumbucas`,meta[t]?.color,'',`Soma das cumbucas ${tomatoDefaults[t].split(' ').pop()} lançadas por este parceiro`])});
+            if(x.proc>0)details.push([dashboardLabelValue('tomateGranelProcessar','A granel (processar)'),`${fmt(x.proc)} kg`,'var(--critical)','',`Soma dos kg a processar lançados por este parceiro`]);
           }else if(c.id==='couveflor'){
-            const filKg=x.types[0]*kgFactorForType(c.id,0),cabKg=x.types[1]*kgFactorForType(c.id,1)+x.types[2]*kgFactorForType(c.id,2);
-            if(x.types[0]>0)details.push([dashboardLabelValue('couveflorFiletado','Filetado'),`${fmt(x.types[0])} cx · ${fmt(filKg)} kg`,meta[0]?.color]);
-            if(x.types[1]>0)details.push([dashboardLabelValue('couveflorCabecaNaoProc','Cabeça não processada'),`${fmt(x.types[1])} cx · ${fmt(x.types[1]*kgFactorForType(c.id,1))} kg`,meta[1]?.color]);
-            if(x.types[2]>0)details.push([dashboardLabelValue('couveflorCabecaProc','Cabeça processada'),`${fmt(x.types[2])} cx · ${fmt(x.types[2]*kgFactorForType(c.id,2))} kg`,meta[2]?.color]);
-            if(filKg+cabKg>0)details.push([dashboardLabelValue('couveflorPacotes300','Pacotes 300 g'),`${fmt(Math.round((filKg+cabKg)/factorNum('couveflorPacoteKg')))} pct`,c.color,'rank-est']);
+            const fil0=kgFactorForType(c.id,0),fil1=kgFactorForType(c.id,1),fil2=kgFactorForType(c.id,2);
+            const filKg=x.types[0]*fil0,cabKg=x.types[1]*fil1+x.types[2]*fil2,pacoteFac=factorNum('couveflorPacoteKg');
+            if(x.types[0]>0)details.push([dashboardLabelValue('couveflorFiletado','Filetado'),`${fmt(x.types[0])} cx · ${fmt(filKg)} kg`,meta[0]?.color,'',`${fmt(x.types[0])} caixas × ${ft(fil0)} kg/caixa = ${fmt(filKg)} kg`]);
+            if(x.types[1]>0)details.push([dashboardLabelValue('couveflorCabecaNaoProc','Cabeça não processada'),`${fmt(x.types[1])} cx · ${fmt(x.types[1]*fil1)} kg`,meta[1]?.color,'',`${fmt(x.types[1])} caixas × ${ft(fil1)} kg/caixa = ${fmt(x.types[1]*fil1)} kg`]);
+            if(x.types[2]>0)details.push([dashboardLabelValue('couveflorCabecaProc','Cabeça processada'),`${fmt(x.types[2])} cx · ${fmt(x.types[2]*fil2)} kg`,meta[2]?.color,'',`${fmt(x.types[2])} caixas × ${ft(fil2)} kg/caixa = ${fmt(x.types[2]*fil2)} kg`]);
+            if(filKg+cabKg>0)details.push([dashboardLabelValue('couveflorPacotes300','Pacotes 300 g'),`${fmt(Math.round((filKg+cabKg)/pacoteFac))} pct`,c.color,'rank-est',`(${fmt(filKg)} + ${fmt(cabKg)}) kg ÷ ${ft(pacoteFac)} kg/pacote = ${fmt(Math.round((filKg+cabKg)/pacoteFac))} pacotes (estimativa)`]);
           }else if(c.id==='pepino'){
-            const pepinoKeys=['pepinoNaoProcessado','pepinoProcessado'],pepinoDefaults=['Não processado','Processado'];
-            x.types.slice(0,2).forEach((v,t)=>{if(v>0)details.push([dashboardLabelValue(pepinoKeys[t],pepinoDefaults[t]),`${fmtDec(v*kgFactorForType(c.id,t))} kg`,meta[t]?.color])});
-            if(x.types[1]>0)details.push([dashboardLabelValue('pepinoPacotes280Processado','Pacotes 280 g (processado)'),`${fmt(Math.round(x.types[1]*kgFactorForType(c.id,1)/factorNum('pepinoPacoteProcessadoKg')))} pct`,c.color,'rank-est']);
+            const pepinoKeys=['pepinoNaoProcessado','pepinoProcessado'],pepinoDefaults=['Não processado','Processado'],pacoteProcFac=factorNum('pepinoPacoteProcessadoKg');
+            x.types.slice(0,2).forEach((v,t)=>{const fac=kgFactorForType(c.id,t);if(v>0)details.push([dashboardLabelValue(pepinoKeys[t],pepinoDefaults[t]),`${fmtDec(v*fac)} kg`,meta[t]?.color,'',`${fmtDec(v)} × ${ft(fac)} kg = ${fmtDec(v*fac)} kg`])});
+            if(x.types[1]>0)details.push([dashboardLabelValue('pepinoPacotes280Processado','Pacotes 280 g (processado)'),`${fmt(Math.round(x.types[1]*kgFactorForType(c.id,1)/pacoteProcFac))} pct`,c.color,'rank-est',`${fmt(x.types[1]*kgFactorForType(c.id,1))} kg ÷ ${ft(pacoteProcFac)} kg/pacote = ${fmt(Math.round(x.types[1]*kgFactorForType(c.id,1)/pacoteProcFac))} pacotes (estimativa)`]);
           }else{
             x.types.forEach((v,t)=>{if(v>0)details.push([meta[t]?.label||('Tipo '+(t+1)),`${fmt(v)} ${cultureUnitLabel(c.id)}`,meta[t]?.color])});
           }
           // Pacotes personalizados (criados em "Editar cálculos" > Pacotes)
           // estimam pelo kg total do parceiro na cultura — mesmo cálculo do
           // card agregado "Estoque por Produto" (packRows), só que por parceiro.
-          if(x.kg>0)packsForCulture(c.id).forEach(p=>details.push([p.name,`${fmt(Math.round(x.kg/Number(p.kg)))} pct`,c.color,'rank-est']));
+          if(x.kg>0)packsForCulture(c.id).forEach(p=>details.push([p.name,`${fmt(Math.round(x.kg/Number(p.kg)))} pct`,c.color,'rank-est',`${fmt(x.kg)} kg ÷ ${ft(p.kg)} kg/un. = ${fmt(Math.round(x.kg/Number(p.kg)))} un. (estimativa)`]));
           details.sort((a,b)=>String(a[0]).localeCompare(String(b[0]),'pt-BR',{sensitivity:'base'}));
-          const detailHtml=details.length?`<div class="rank-detail">${details.map(d=>`<span class="${d[3]||''}" style="--dot:${d[2]||c.color}"><i></i>${esc(d[0])}<b>${esc(d[1])}</b></span>`).join('')}</div>`:'';
+          const detailHtml=details.length?`<div class="rank-detail">${details.map(d=>`<span class="${d[3]||''}" style="--dot:${d[2]||c.color}"${d[4]?` title="${esc(d[4])}"`:''}><i></i>${esc(d[0])}<b>${esc(d[1])}</b></span>`).join('')}</div>`:'';
           return `<div class="rank-row"><div class="rank-head"><b>${esc(x.name)}</b><em>${unLabel} ${cultureUnitLabel(c.id)}</em></div>${detailHtml}<div class="pbar"><i style="width:${pct}%;background:${c.color}"></i></div></div>`;
         }).join(''):'<div class="geral-empty">Sem estoque no momento.</div>';
         return `<div class="culture-split-col"><div class="culture-split-head" style="--c:${c.color}"><i></i>${esc(c.label)}</div><div class="rank-list">${rows}</div></div>`;
@@ -1888,13 +2064,13 @@
         ?'<div class="ra-table-scroll"><table class="stock-table" id="stockTable"></table></div>'
         :'<div style="padding:24px;color:var(--muted);text-align:center">Nenhuma data cadastrada para Brócolis. Use "Adicionar data" na aba Brócolis.</div>';
       scroll.innerHTML=`<div class="dash">
-        <div class="dash-head"><div><h3>Resumo Antigo</h3><p>Formato de planilha antigo — tabela do Brócolis, estimativas e separação por cliente, calculados a partir dos dados atuais</p></div></div>
+        <div class="dash-head"><div><h3>Resumo Simplificado</h3><p>Formato simplificado — tabela do Brócolis, estimativas e separação por cliente, calculados a partir dos dados atuais</p></div></div>
         <div class="ra-grid">
           <div class="ra-col">
             ${tableHtml}
             <div class="dash-grid" id="raEstimateGrid">${estoqueProdutoPanelHtml()}</div>
           </div>
-          <div class="ra-col"><section class="orders-panel"><div class="panel-heading"><h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7h12l1.5 13.5h-15L6 7Z"/><path d="M9 10V6a3 3 0 0 1 6 0v4"/></svg>Separação por cliente</h3><span>quantidades em unidades</span></div><div class="orders-grid" id="raOrdersGrid">${clientOrderCardsHtml()}</div></section></div>
+          <div class="ra-col"><section class="orders-panel"><div class="panel-heading"><h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7h12l1.5 13.5h-15L6 7Z"/><path d="M9 10V6a3 3 0 0 1 6 0v4"/></svg>Separação por cliente</h3><div class="panel-heading-actions"><button type="button" class="panel-heading-add" id="raQuickAddClientBtn" title="Adicionar cliente" aria-label="Adicionar cliente"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Cliente</button><span>quantidades em unidades</span></div></div><div class="orders-grid" id="raOrdersGrid">${clientOrderCardsHtml()}</div></section></div>
         </div>
       </div>`;
       const table=scroll.querySelector('#stockTable');
@@ -1905,6 +2081,8 @@
         wireClearDateButtons(table);
       }
       wireOrderCardEvents(scroll.querySelector('#raOrdersGrid'));
+      const raAddBtn=scroll.querySelector('#raQuickAddClientBtn');
+      if(raAddBtn)raAddBtn.onclick=requireAccess('adicionar_cliente',openAddClientFlow);
     }
     function patchResumoAntigoEstimates(){
       const grid=document.getElementById('raEstimateGrid');
@@ -1918,6 +2096,19 @@
       if(!isTable&&document.body.classList.contains('table-rotated')){
         document.body.classList.remove('table-rotated');
         btn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 0 1 14.5-4.7M20 12a8 8 0 0 1-14.5 4.7"/><path d="M18.5 3v4.3h-4.3M5.5 21v-4.3h4.3"/></svg><span>Girar tabela</span>';
+      }
+      // No "Resumo Simplificado" (que só espelha o Brócolis) o atalho de
+      // adicionar data fica visível também, mas sempre aponta pra Brócolis —
+      // é a cultura que essa aba mostra, mesmo sem ser uma aba de cultura de
+      // verdade (activeProduce() aqui seria "resumoantigo", que não existe
+      // como cultura pra lançar datas).
+      const addDateBtn=document.getElementById('quickAddDateBtn');
+      const showAddDate=isTable||produce==='resumoantigo';
+      addDateBtn.hidden=!showAddDate;
+      if(showAddDate){
+        const targetProduce=produce==='resumoantigo'?'brocolis':produce;
+        addDateBtn.title=`Adicionar data em ${produceLabel(targetProduce)}`;
+        addDateBtn.dataset.forceProduce=produce==='resumoantigo'?'brocolis':'';
       }
     }
     function renderTable(){
@@ -1994,7 +2185,11 @@
       daysForProduce(c.id).forEach(day=>typeMetaForCulture(c.id).forEach((_,t)=>{
         const total=totalDayType(day.id,t,c.id),totalEl=document.querySelector(`[data-total="${day.id}|${t}|${c.id}"]`),kgEl=document.querySelector(`[data-kg="${day.id}|${t}|${c.id}"]`);
         if(totalEl)totalEl.textContent=directKg?fmtDec(total):fmt(total);
-        if(kgEl)kgEl.textContent=fmt(total*kgFactorForType(c.id,t));
+        if(kgEl){
+          const fator=kgFactorForType(c.id,t),kgVal=total*fator;
+          kgEl.textContent=fmt(kgVal);
+          kgEl.title=`${directKg?fmtDec(total):fmt(total)} ${directKg?'':'caixas '}× ${String(fator).replace('.',',')} kg${directKg?'':'/caixa'} = ${fmt(kgVal)} kg`;
+        }
       }));
     }
     function updateTotals(){
@@ -2033,6 +2228,25 @@
       const words=name.replace(/[^\p{L}\p{N} ]/gu,'').trim().split(/\s+/).filter(Boolean);
       if(!words.length)return '?';
       return (words.length===1?words[0].slice(0,2):words[0][0]+words[1][0]).toUpperCase();
+    }
+    // Avatar do cliente: mostra o logo cadastrado por cima das iniciais; se a
+    // imagem falhar ao carregar (link quebrado), remove-se sozinha e deixa as
+    // iniciais (que já estão por baixo) visíveis — sem precisar re-renderizar.
+    function clientAvatarHtml(client){
+      const initialsText=esc(initials(client.name));
+      if(!client.logoUrl)return initialsText;
+      return `${initialsText}<img src="${esc(client.logoUrl)}" alt="" loading="lazy" data-logo-preview="${client.id}" title="Ver logo em tamanho maior" onerror="this.remove()">`;
+    }
+    function wireLogoPreview(container){
+      container.querySelectorAll('[data-logo-preview]').forEach(img=>img.onclick=()=>{
+        const client=state.clients.find(c=>c.id===img.dataset.logoPreview);
+        if(client&&client.logoUrl)openLogoPreview(client);
+      });
+    }
+    function openLogoPreview(client){
+      document.getElementById('logoPreviewTitle').textContent=client.name;
+      document.getElementById('logoPreviewImg').src=client.logoUrl;
+      document.getElementById('logoPreviewDialog').showModal();
     }
     function clientProducts(client){
       if(!Array.isArray(client.products))client.products=PRODUCTS.map((name,i)=>({id:String(i),name}));
@@ -2136,7 +2350,11 @@
       }).join(''):'<div class="field-help" style="padding:10px 14px">Nenhum produto cadastrado — use o botão + acima.</div>';
       const cp=clientProgress(client);
       const summary=products.length?`<div class="order-summary"><div class="order-progress-track"><div class="order-progress-fill${cp.pct>=100&&cp.pedido>0?' done':''}" data-summary-fill="${client.id}" style="width:${Math.min(100,cp.pct)}%"></div></div><span class="order-summary-text" data-summary-text="${client.id}">${esc(progressText(cp,{clientLevel:true}))}</span></div>`:'';
-      return `<article class="order-card"><header><span class="order-avatar">${initials(client.name)}</span><div class="order-id"><strong>${esc(client.name)}</strong><span>Pedido em unidades</span></div><button type="button" class="mini-add" data-add-product="${client.id}" title="Adicionar produto" aria-label="Adicionar produto para ${esc(client.name)}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button></header>${summary}${rows}</article>`;
+      // O atalho rápido no cartão só oculta (pra ninguém excluir sem querer,
+      // nem o master) — excluir de vez só dá pra fazer em "Gerenciar
+      // cadastros", que tem uma confirmação explícita antes de apagar.
+      const hideClientBtn=hasAccess('gerenciar_cadastros')?`<button type="button" class="order-hide" data-hide-client="${client.id}" title="Ocultar cliente" aria-label="Ocultar cliente ${esc(client.name)}">${ICON_EYE_OFF}</button>`:'';
+      return `<article class="order-card"><header><span class="order-avatar">${clientAvatarHtml(client)}</span><div class="order-id"><strong>${esc(client.name)}</strong><span>Pedido em unidades</span></div><button type="button" class="mini-add" data-add-product="${client.id}" title="Adicionar produto" aria-label="Adicionar produto para ${esc(client.name)}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>${hideClientBtn}</header>${summary}${rows}</article>`;
     }
     function clientOrderCardsHtml(){
       const clients=visibleClients();
@@ -2148,6 +2366,8 @@
       container.querySelectorAll('[data-add-product]').forEach(btn=>btn.onclick=()=>openProductDialog(btn.dataset.addProduct));
       container.querySelectorAll('[data-del-product]').forEach(btn=>btn.onclick=()=>{const parts=btn.dataset.delProduct.split('|');removeClientProduct(parts[0],parts[1])});
       container.querySelectorAll('[data-edit-product]').forEach(btn=>btn.onclick=()=>{const parts=btn.dataset.editProduct.split('|');openProductDialog(parts[0],parts[1])});
+      container.querySelectorAll('[data-hide-client]').forEach(btn=>btn.onclick=requireAccess('gerenciar_cadastros',()=>toggleClient(btn.dataset.hideClient)));
+      wireLogoPreview(container);
     }
     function renderOrders(){
       const grid=document.getElementById('ordersGrid');
@@ -2520,11 +2740,12 @@
       const partnerGroups=CULTURES.map(c=>({culture:c,items:state.partners.filter(p=>(p.produce||'brocolis')===c.id)})).filter(g=>g.items.length);
       const dateGroups=CULTURES.map(c=>({culture:c,items:state.days.filter(d=>(d.produce||'brocolis')===c.id)})).filter(g=>g.items.length);
       document.getElementById('partnerList').innerHTML=partnerGroups.length?partnerGroups.map(g=>groupHeaderHtml(g.culture)+g.items.map(p=>{const active=isActive(p);return `<div class="list-item${active?'':' inactive'}"><div class="list-item-avatar">${esc(initials(p.name))}</div><div><strong>${esc(p.name)}</strong><span>${active?'Parceiro ativo':'Oculto do painel'}</span></div><div class="list-item-actions"><button class="mini-edit" data-rename-partner="${p.id}" title="Renomear" aria-label="Renomear ${esc(p.name)}">${ICON_EDIT}</button><button class="mini-toggle" data-toggle-partner="${p.id}" title="${toggleTitle(active)}" aria-label="${toggleTitle(active)} ${esc(p.name)}">${toggleIcon(active)}</button><button class="mini-remove" data-remove-partner="${p.id}" title="Remover" aria-label="Remover ${esc(p.name)}">${ICON_TRASH}</button></div></div>`}).join('')).join(''):'<span class="field-help">Nenhum parceiro cadastrado.</span>';
-      document.getElementById('clientList').innerHTML=state.clients.length?state.clients.map(c=>{const active=isActive(c);return `<div class="list-item${active?'':' inactive'}"><div class="list-item-avatar client">${esc(initials(c.name))}</div><div><strong>${esc(c.name)}</strong><span>${active?'Cliente ativo':'Oculto do painel'}</span></div><div class="list-item-actions"><button class="mini-edit" data-rename-client="${c.id}" title="Renomear" aria-label="Renomear ${esc(c.name)}">${ICON_EDIT}</button><button class="mini-toggle" data-toggle-client="${c.id}" title="${toggleTitle(active)}" aria-label="${toggleTitle(active)} ${esc(c.name)}">${toggleIcon(active)}</button><button class="mini-remove" data-remove-client="${c.id}" title="Remover" aria-label="Remover ${esc(c.name)}">${ICON_TRASH}</button></div></div>`}).join(''):'<span class="field-help">Nenhum cliente cadastrado.</span>';
+      document.getElementById('clientList').innerHTML=state.clients.length?state.clients.map(c=>{const active=isActive(c);const removeBtn=isMaster()?`<button class="mini-remove" data-remove-client="${c.id}" title="Remover" aria-label="Remover ${esc(c.name)}">${ICON_TRASH}</button>`:'';return `<div class="list-item${active?'':' inactive'}"><div class="list-item-avatar client">${clientAvatarHtml(c)}</div><div><strong>${esc(c.name)}</strong><span>${active?'Cliente ativo':'Oculto do painel'}</span></div><div class="list-item-actions"><button class="mini-edit" data-rename-client="${c.id}" title="Renomear" aria-label="Renomear ${esc(c.name)}">${ICON_EDIT}</button><button class="mini-toggle" data-toggle-client="${c.id}" title="${toggleTitle(active)}" aria-label="${toggleTitle(active)} ${esc(c.name)}">${toggleIcon(active)}</button>${removeBtn}</div></div>`}).join(''):'<span class="field-help">Nenhum cliente cadastrado.</span>';
       document.getElementById('dateList').innerHTML=dateGroups.length?dateGroups.map(g=>groupHeaderHtml(g.culture)+g.items.map(d=>{const active=isActive(d);return `<div class="list-item${active?'':' inactive'}"><div><strong>${formatDate(d.iso)}</strong><span>${active?weekDay(d.iso):'Oculta do painel'}</span></div><div class="list-item-actions"><button class="mini-toggle" data-toggle-date="${d.id}" title="${toggleTitle(active)}" aria-label="${toggleTitle(active)} ${formatDate(d.iso)}">${toggleIcon(active)}</button><button class="mini-remove" data-remove-date="${d.id}" title="Remover" aria-label="Remover ${formatDate(d.iso)}">${ICON_TRASH}</button></div></div>`}).join('')).join(''):'<span class="field-help">Nenhuma data cadastrada.</span>';
       document.querySelectorAll('[data-remove-partner]').forEach(btn=>btn.onclick=()=>removePartner(btn.dataset.removePartner));document.querySelectorAll('[data-remove-client]').forEach(btn=>btn.onclick=()=>removeClient(btn.dataset.removeClient));document.querySelectorAll('[data-remove-date]').forEach(btn=>btn.onclick=()=>removeDate(btn.dataset.removeDate));
       document.querySelectorAll('[data-toggle-partner]').forEach(btn=>btn.onclick=()=>togglePartner(btn.dataset.togglePartner));document.querySelectorAll('[data-toggle-client]').forEach(btn=>btn.onclick=()=>toggleClient(btn.dataset.toggleClient));document.querySelectorAll('[data-toggle-date]').forEach(btn=>btn.onclick=()=>toggleDate(btn.dataset.toggleDate));
       document.querySelectorAll('[data-rename-partner]').forEach(btn=>btn.onclick=()=>openRenameDialog('partner',btn.dataset.renamePartner));document.querySelectorAll('[data-rename-client]').forEach(btn=>btn.onclick=()=>openRenameDialog('client',btn.dataset.renameClient));
+      wireLogoPreview(document.getElementById('clientList'));
     }
     let renameTarget=null;
     function openRenameDialog(kind,id){
@@ -2533,13 +2754,20 @@
       document.getElementById('renameDialogTitle').textContent=kind==='partner'?'Renomear parceiro':'Renomear cliente';
       hideAlert('renameAlert');
       const input=document.getElementById('renameName');input.value=item.name;
+      document.getElementById('renameLogoField').hidden=kind!=='client';
+      document.getElementById('renameLogoUrl').value=kind==='client'?(item.logoUrl||''):'';
       document.getElementById('renameDialog').showModal();
       input.focus();input.select();
     }
-    function saveRename(){
+    async function saveRename(){
       if(!renameTarget)return;
       const {kind,id}=renameTarget,input=document.getElementById('renameName'),name=input.value.trim();
       if(!name){showAlert('renameAlert','Digite um nome.');return}
+      let logoUrl='';
+      if(kind==='client'){
+        try{logoUrl=await resolveLogoField('renameLogoUrl','renameSave','renameAlert')}catch(err){return}
+        if(logoUrl&&!isValidLogoUrl(logoUrl)){showAlert('renameAlert','A URL do logo deve começar com http:// ou https:// (ou deixe em branco).');return}
+      }
       const list=kind==='partner'?state.partners:state.clients;
       const item=list.find(x=>x.id===id);if(!item)return;
       const duplicate=kind==='partner'
@@ -2548,6 +2776,7 @@
       if(duplicate){showAlert('renameAlert',`Já existe um ${kind==='partner'?'parceiro':'cliente'} com esse nome${kind==='partner'?' nesta cultura':''}.`);return}
       const oldName=item.name;
       item.name=kind==='partner'?name.toUpperCase():name;
+      if(kind==='client'){if(logoUrl)item.logoUrl=logoUrl;else delete item.logoUrl}
       addLog(`renomeou ${kind==='partner'?'o parceiro':'o cliente'} ${oldName} para ${item.name}`);
       document.getElementById('renameDialog').close();renameTarget=null;
       pendingStructural=true;saveState();renderAll();toast(`${kind==='partner'?'Parceiro':'Cliente'} renomeado.`);
@@ -2589,34 +2818,139 @@
     function openClientDialog(){
       hideAlert('clientAlert');
       document.getElementById('clientName').value='';
+      document.getElementById('clientLogoUrl').value='';
       document.getElementById('clientProducts').innerHTML='';
       addClientProductRow();
       document.getElementById('clientDialog').showModal();
     }
-    function addClient(){
+    // "+ Cliente" é sempre a mesma tela pra todo mundo, master incluso: uma
+    // lista dos clientes já cadastrados e ocultos, pra reativar e lançar os
+    // produtos manualmente — sem risco de criar um cadastro novo (e duplicado)
+    // sem querer. Cadastrar cliente do zero (nome + logo) só pelo botão
+    // dedicado dentro dessa lista, visível só para master.
+    function openAddClientFlow(){openPickClientDialog()}
+    function openPickClientDialog(){
+      const hiddenClients=state.clients.filter(c=>!isActive(c));
+      const list=document.getElementById('pickClientList');
+      list.innerHTML=hiddenClients.length?hiddenClients.map(c=>`<div class="list-item"><div class="list-item-avatar client">${clientAvatarHtml(c)}</div><div><strong>${esc(c.name)}</strong><span>Oculto do painel</span></div><div class="list-item-actions"><button type="button" class="btn btn-soft" data-pick-client="${c.id}">Adicionar ao painel</button></div></div>`).join(''):`<span class="field-help">Nenhum cliente oculto disponível para adicionar.${isMaster()?' Cadastre um novo cliente abaixo.':' Peça a um usuário master para cadastrar um novo cliente.'}</span>`;
+      list.querySelectorAll('[data-pick-client]').forEach(btn=>btn.onclick=()=>pickClient(btn.dataset.pickClient));
+      wireLogoPreview(list);
+      document.getElementById('pickClientNewBtn').hidden=!isMaster();
+      document.getElementById('pickClientDialog').showModal();
+    }
+    function pickClient(id){
+      const client=state.clients.find(c=>c.id===id);if(!client)return;
+      client.active=true;
+      addLog(`reativou o cliente ${client.name} no painel`);
+      document.getElementById('pickClientDialog').close();
+      pendingStructural=true;saveState();renderAll();
+      toast(`${client.name} adicionado ao painel. Use o + no cartão para lançar os produtos.`);
+    }
+    function isValidLogoUrl(url){return /^https?:\/\//i.test(url)}
+    // ── Autoconversão de links do Imgur para o formato direto de imagem ──
+    // Cola-se um link de página (imgur.com/xxxx) ou de álbum/galeria
+    // (imgur.com/a/xxxx) e o painel resolve sozinho para o link direto
+    // (i.imgur.com/xxxx.ext), que é o único formato que uma tag <img> exibe.
+    // O Client-ID abaixo é o identificador público/anônimo da API do Imgur
+    // (sem login, só leitura) — usado só para consultar quais imagens
+    // existem num álbum; se ele parar de funcionar (limite de uso, etc.),
+    // o usuário sempre pode colar o link direto manualmente, como antes.
+    const IMGUR_CLIENT_ID='546c25a59c58ad7';
+    function stripImgBBCode(url){
+      const m=String(url||'').trim().match(/^\[img\](.+)\[\/img\]$/i);
+      return (m?m[1]:url).trim();
+    }
+    function parseImgurLink(url){
+      let m=url.match(/^https?:\/\/(?:www\.)?imgur\.com\/(a|gallery)\/([a-zA-Z0-9]+)/i);
+      if(m)return{kind:'album',id:m[2]};
+      m=url.match(/^https?:\/\/(?:www\.)?imgur\.com\/([a-zA-Z0-9]{5,8})(?:[/?#].*)?$/i);
+      if(m)return{kind:'single',id:m[1]};
+      m=url.match(/^https?:\/\/i\.imgur\.com\/([a-zA-Z0-9]{5,8})$/i);
+      if(m)return{kind:'directNoExt',id:m[1]};
+      return null;
+    }
+    async function resolveLogoUrl(rawUrl){
+      const url=stripImgBBCode(rawUrl);
+      const parsed=parseImgurLink(url);
+      if(!parsed)return{url,changed:url!==rawUrl.trim()};
+      if(parsed.kind!=='album')return{url:`https://i.imgur.com/${parsed.id}.jpg`,changed:true};
+      let json;
+      try{
+        const res=await fetch(`https://api.imgur.com/3/album/${parsed.id}`,{headers:{Authorization:`Client-ID ${IMGUR_CLIENT_ID}`}});
+        json=await res.json();
+        if(!res.ok||!json.success)throw new Error('resposta inválida');
+      }catch(err){
+        throw new Error('Não consegui buscar a imagem desse álbum do Imgur automaticamente. Abra o álbum, clique na foto certa e cole o link direto dela (termina em .jpg/.png).');
+      }
+      const images=(json.data&&json.data.images)||[];
+      if(!images.length)throw new Error('Esse álbum do Imgur está vazio ou é privado — cole o link direto da imagem.');
+      return{url:images[0].link,changed:true,multiple:images.length>1};
+    }
+    // Resolve o campo de logo (id do input) só se for um link do Imgur que
+    // precisa de conversão; desabilita o botão de salvar (id) enquanto busca.
+    async function resolveLogoField(inputId,btnId,alertId){
+      const input=document.getElementById(inputId);
+      const raw=input.value.trim();
+      if(!raw)return'';
+      if(!parseImgurLink(stripImgBBCode(raw)))return raw;
+      const btn=document.getElementById(btnId),original=btn.textContent;
+      btn.disabled=true;btn.textContent='Buscando imagem…';
+      try{
+        const resolved=await resolveLogoUrl(raw);
+        input.value=resolved.url;
+        if(resolved.multiple)toast('Esse álbum do Imgur tem mais de uma foto — usei a primeira. Pra usar outra, cole o link direto dela.');
+        return resolved.url;
+      }catch(err){
+        showAlert(alertId,err.message);
+        throw err;
+      }finally{
+        btn.disabled=false;btn.textContent=original;
+      }
+    }
+    async function addClient(){
       const input=document.getElementById('clientName'),name=input.value.trim();
       if(!name){showAlert('clientAlert','Digite o nome do cliente.');return}
       if(state.clients.some(c=>c.name.toLowerCase()===name.toLowerCase())){showAlert('clientAlert','Este cliente já está cadastrado.');toast('Este cliente já está cadastrado.',true);return}
+      let logoUrl;
+      try{logoUrl=await resolveLogoField('clientLogoUrl','clientSave','clientAlert')}catch(err){return}
+      if(logoUrl&&!isValidLogoUrl(logoUrl)){showAlert('clientAlert','A URL do logo deve começar com http:// ou https:// (ou deixe em branco).');return}
       const seen=new Set(),products=[];
       document.querySelectorAll('#clientProducts input').forEach(el=>{
         const n=el.value.trim();
         if(n&&!seen.has(n.toLowerCase())){seen.add(n.toLowerCase());products.push({id:uid('pr'),name:n})}
       });
-      state.clients.push({id:uid('c'),name,products});
+      const client={id:uid('c'),name,products};
+      if(logoUrl)client.logoUrl=logoUrl;
+      state.clients.push(client);
       addLog(`adicionou o cliente ${name}`);
       hideAlert('clientAlert');document.getElementById('clientDialog').close();pendingStructural=true;saveState();renderAll();
       toast(products.length?`Cliente adicionado com ${products.length} produto${products.length>1?'s':''}.`:'Cliente adicionado. Use o + no cartão para incluir produtos.')
     }
     function addDate(){
-      const input=document.getElementById('stockDate'),iso=input.value,mode=document.getElementById('dateMode').value,produce=activeProduce();
+      const input=document.getElementById('stockDate'),iso=input.value,mode=document.getElementById('dateMode').value,produce=dateDialogProduce||activeProduce();
       if(!iso){showAlert('dateAlert','Escolha uma data.');return}
       let dates=[iso];
       if(mode==='week'){
         const [y,m,d]=iso.split('-').map(Number),ref=new Date(y,m-1,d,12),day=ref.getDay(),back=day===0?6:day-1;ref.setDate(ref.getDate()-back);dates=Array.from({length:6},(_,i)=>{const current=new Date(ref);current.setDate(ref.getDate()+i);return `${current.getFullYear()}-${String(current.getMonth()+1).padStart(2,'0')}-${String(current.getDate()).padStart(2,'0')}`});
       }
-      const existing=new Set(state.days.filter(d=>(d.produce||'brocolis')===produce).map(day=>day.iso)),newDates=dates.filter(date=>!existing.has(date));
-      if(!newDates.length){const msg=(mode==='week'?'Esta semana':'Esta data')+` já está cadastrada em ${produceLabel(produce)}.`;showAlert('dateAlert',msg);toast(msg,true);return}
-      newDates.forEach(date=>state.days.push({id:uid('d'),iso:date,produce}));state.days.sort((a,b)=>a.iso.localeCompare(b.iso));addLog(newDates.length===1?`adicionou a data ${formatDate(newDates[0])} em ${produceLabel(produce)}`:`adicionou ${newDates.length} datas em ${produceLabel(produce)}`);input.value='';hideAlert('dateAlert');document.getElementById('dateDialog').close();pendingStructural=true;saveState();renderAll();toast(newDates.length===1?`Data adicionada em ${produceLabel(produce)}.`:`${newDates.length} datas da semana adicionadas em ${produceLabel(produce)}.`)
+      // Uma data cadastrada porém oculta ainda conta como "já existe" — sem
+      // isso o aviso de duplicata aparecia mesmo com a data invisível na
+      // tabela (confuso). Em vez de só bloquear, reativa a data oculta.
+      const produceDays=state.days.filter(d=>(d.produce||'brocolis')===produce);
+      const created=[],reactivated=[];
+      dates.forEach(date=>{
+        const found=produceDays.find(d=>d.iso===date);
+        if(!found){state.days.push({id:uid('d'),iso:date,produce});created.push(date)}
+        else if(!isActive(found)){found.active=true;reactivated.push(date)}
+      });
+      if(!created.length&&!reactivated.length){const msg=(mode==='week'?'Esta semana':'Esta data')+` já está cadastrada e visível em ${produceLabel(produce)}.`;showAlert('dateAlert',msg);toast(msg,true);return}
+      state.days.sort((a,b)=>a.iso.localeCompare(b.iso));
+      const logParts=[];
+      if(created.length)logParts.push(created.length===1?`adicionou a data ${formatDate(created[0])}`:`adicionou ${created.length} datas`);
+      if(reactivated.length)logParts.push(reactivated.length===1?`reativou a data ${formatDate(reactivated[0])}`:`reativou ${reactivated.length} datas`);
+      addLog(`${logParts.join(' e ')} em ${produceLabel(produce)}`);
+      input.value='';hideAlert('dateAlert');document.getElementById('dateDialog').close();pendingStructural=true;saveState();renderAll();
+      toast(created.length&&reactivated.length?`Datas atualizadas em ${produceLabel(produce)}.`:reactivated.length?(reactivated.length===1?`Data reativada em ${produceLabel(produce)}.`:`${reactivated.length} datas reativadas em ${produceLabel(produce)}.`):(created.length===1?`Data adicionada em ${produceLabel(produce)}.`:`${created.length} datas da semana adicionadas em ${produceLabel(produce)}.`))
     }
     async function removePartner(id){
       const partner=state.partners.find(p=>p.id===id);if(!partner)return;
@@ -2624,6 +2958,10 @@
       state.partners=state.partners.filter(p=>p.id!==id);Object.keys(state.cells).filter(k=>k.startsWith(id+'|')).forEach(k=>delete state.cells[k]);Object.keys(state.processar).filter(k=>k.startsWith(id+'|')).forEach(k=>delete state.processar[k]);addLog(`removeu o parceiro ${partner.name} (${produceLabel(partner.produce||'brocolis')})`);pendingStructural=true;saveState();renderAll();toast('Parceiro removido.')
     }
     async function removeClient(id){
+      // Excluir apaga o cadastro (nome, logo, produtos) de vez — só master
+      // pode fazer isso. Quem só tem "gerenciar_cadastros" ainda pode ocultar
+      // o cliente (toggleClient), que preserva tudo para reativar depois.
+      if(!isMaster()){toast('Apenas o usuário master pode excluir clientes. Use "ocultar" para tirá-lo do painel sem perder o cadastro.',true);return}
       const client=state.clients.find(c=>c.id===id);if(!client)return;
       const ok=await confirmModern(`Remover ${client.name} e todos os pedidos deste cliente?`,{title:'Remover cliente'});if(!ok)return;
       state.clients=state.clients.filter(c=>c.id!==id);Object.keys(state.orders).filter(k=>k.startsWith(id+'-')).forEach(k=>delete state.orders[k]);Object.keys(state.separado).filter(k=>k.startsWith(id+'-')).forEach(k=>delete state.separado[k]);addLog(`removeu o cliente ${client.name}`);pendingStructural=true;saveState();renderAll();toast('Cliente removido.')
@@ -3278,15 +3616,23 @@
       const origInputs=report.querySelectorAll('input'),cloneInputs=clone.querySelectorAll('input');
       origInputs.forEach((inp,i)=>cloneInputs[i].setAttribute('value',inp.value));
       // A captura é para compartilhar o relatório: oculta o cabeçalho verde,
-      // as abas de cultura e os controles de atualização.
-      clone.querySelectorAll('.report-title,.produce-tabs,.table-legend,.dash-actions').forEach(el=>el.remove());
+      // as abas de cultura, os controles de atualização e os atalhos da
+      // tabela de estoque (Data, Girar tabela, limpar/excluir data), além
+      // dos botões "+ Cliente"/"+ produto"/editar produto/remover (×).
+      clone.querySelectorAll('.report-title,.produce-tabs,.table-legend,.dash-actions,#quickAddDateBtn,.rotate-view-btn,.date-clear-btn,.date-remove-btn,.panel-heading-add,.mini-add').forEach(el=>el.remove());
+      // .mini-edit e .order-del ficam dentro de uma grade (.order-row-top)
+      // com colunas fixas por posição — remover esses elementos do DOM
+      // deslocava os itens seguintes para a coluna errada e espremia o
+      // rótulo do produto (quebrava letra por letra). Em vez de remover, só
+      // tornam-se invisíveis, preservando a célula da grade e o layout.
+      clone.querySelectorAll('.mini-edit,.order-del').forEach(el=>{el.style.visibility='hidden'});
       clone.querySelectorAll('.stock-scroll').forEach(el=>{el.style.overflow='visible';el.style.boxShadow='none'});
       const styles=[...document.querySelectorAll('style')].map(s=>s.textContent).join('\n').replace(/:root/g,'.snapshot-root');
-      const manual=document.documentElement.getAttribute('data-theme');
-      const isDark=manual==='dark'||(!manual&&window.matchMedia('(prefers-color-scheme: dark)').matches);
+      // A imagem capturada sai sempre no modo claro, independente do tema
+      // ativo no painel — é o formato pensado para compartilhar/imprimir.
       const holder=document.createElement('div');
       holder.className='snapshot-root';
-      holder.setAttribute('data-theme',isDark?'dark':'light');
+      holder.setAttribute('data-theme','light');
       holder.style.cssText=`width:${contentWidth+40}px;padding:20px;font-family:system-ui,-apple-system,'Segoe UI',Arial,sans-serif;font-size:15px;letter-spacing:-.006em;`;
       const styleEl=document.createElement('style');
       styleEl.textContent=styles+'\n.snapshot-root{background:var(--page);color:var(--ink)}';
@@ -3344,12 +3690,17 @@
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{if(!localStorage.getItem(THEME_KEY))applyTheme('')});
     applyTheme(localStorage.getItem(THEME_KEY)||'');
 
-    function openDateDialog(){
-      if(activeProduce()==='geral'){toast('Selecione a aba de uma cultura para cadastrar datas.',true);return}
+    // forcedProduce é usado pelo atalho do "Resumo Simplificado", que sempre
+    // cadastra em Brócolis mesmo estando fora de uma aba de cultura de verdade.
+    let dateDialogProduce=null;
+    function openDateDialog(forcedProduce){
+      const produce=forcedProduce||activeProduce();
+      if(produce==='geral'){toast('Selecione a aba de uma cultura para cadastrar datas.',true);return}
+      dateDialogProduce=forcedProduce||null;
       hideAlert('dateAlert');
       const today=new Date();
       document.getElementById('stockDate').value=`${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
-      document.getElementById('dateDialogDesc').textContent=`A data será incluída em ${produceLabel(activeProduce())}.`;
+      document.getElementById('dateDialogDesc').textContent=`A data será incluída em ${produceLabel(produce)}.`;
       document.getElementById('dateDialog').showModal();
     }
     function openSettingsDialog(){hideAlert('settingsAlert');document.getElementById('gasUrl').value=getGasUrl();document.getElementById('settingsDialog').showModal()}
@@ -3674,7 +4025,10 @@
     function openSystemDialog(){
       const cult=activeProduce()==='geral'?null:produceLabel(activeProduce());
       const master=isMaster();
-      document.getElementById('sysDateDesc').textContent=cult?`Nova coluna de dia em ${cult}.`:'Selecione antes a aba de uma cultura.';
+      // No "Resumo Simplificado" a data cadastrada vai sempre para Brócolis
+      // (é a cultura que essa aba espelha), então o atalho já mostra isso.
+      const dateCultLabel=activeProduce()==='resumoantigo'?produceLabel('brocolis'):cult;
+      document.getElementById('sysDateDesc').textContent=dateCultLabel?`Nova coluna de dia em ${dateCultLabel}.`:'Selecione antes a aba de uma cultura.';
       document.getElementById('sysClearDesc').textContent=cult?`Zera os valores lançados em ${cult}.`:'Selecione antes a aba de uma cultura.';
       document.getElementById('sysUserTitle').textContent=hasBackend()?'Minha conta':'Trocar usuário';
       document.getElementById('sysUserDesc').textContent=hasBackend()
@@ -3711,9 +4065,9 @@
     }
     const sysActions={
       sysPartner:requireAccess('adicionar_parceiro',()=>openPartnerDialog(activeProduce()==='geral'?null:activeProduce())),
-      sysClient:requireAccess('adicionar_cliente',()=>openClientDialog()),
+      sysClient:requireAccess('adicionar_cliente',openAddClientFlow),
       sysProductCatalog:requireAccess('adicionar_cliente',()=>openProductCatalogDialog()),
-      sysDate:requireAccess('adicionar_data',()=>openDateDialog()),
+      sysDate:requireAccess('adicionar_data',()=>openDateDialog(activeProduce()==='resumoantigo'?'brocolis':undefined)),
       sysManage:requireAccess('gerenciar_cadastros',()=>openManageDialog()),
       sysCulture:()=>openCultureDialog(),
       sysGeneralCultures:()=>openGeneralCulturesDialog(),
@@ -3728,6 +4082,10 @@
       document.getElementById(id).onclick=()=>{document.getElementById('systemDialog').close();systemDialogPending=true;fn()};
     });
     document.getElementById('systemBtn').onclick=()=>openSystemDialog();
+    document.getElementById('helpBtn').onclick=()=>document.getElementById('helpDialog').showModal();
+    document.getElementById('quickAddClientBtn').onclick=requireAccess('adicionar_cliente',openAddClientFlow);
+    document.getElementById('pickClientNewBtn').onclick=()=>{document.getElementById('pickClientDialog').close();openClientDialog()};
+    document.getElementById('quickAddDateBtn').onclick=requireAccess('adicionar_data',()=>openDateDialog(document.getElementById('quickAddDateBtn').dataset.forceProduce||undefined));
     document.getElementById('addPartnerFromManage').onclick=()=>{systemDialogPending=false;openPartnerDialog(activeProduce()==='geral'?null:activeProduce())};
     document.getElementById('addClientProductRow').onclick=()=>addClientProductRow().focus();
     document.getElementById('productSave').onclick=e=>{e.preventDefault();addClientProduct()};
@@ -3787,7 +4145,13 @@
       // ela ficava visível atrás do diálogo de login mesmo sem sessão nenhuma.
       document.body.classList.add('auth-locked');
       if(!getSession()){openAuthDialog();return false}
+      // Já tem sessão salva: em vez de deixar a tela em branco enquanto
+      // confere com a Planilha Google (pode levar alguns segundos), mostra
+      // um indicador de carregamento.
+      const loadingEl=document.getElementById('bootLoading');
+      loadingEl.hidden=false;
       const ok=await loadCloud();
+      loadingEl.hidden=true;
       if(ok){
         document.getElementById('authDialog').close(); // no-op se já estava fechado
         document.body.classList.remove('auth-locked');
