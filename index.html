@@ -1869,7 +1869,7 @@
             ['Pacotes 200 g',fmt(Math.round(fil/pacote200)),'','brocolisPacotes200','brocolisPacote200Kg',`${fmt(fil)} kg ÷ ${factorTxt(pacote200)} kg/pacote = ${fmt(Math.round(fil/pacote200))} pacotes (estimativa)`],
             ['Cabeça não processada',fmt(cabNp)+' kg','','brocolisCabecaNaoProc','kg|brocolis|1',`${fmt(cabNpCx)} caixas × ${factorTxt(cabNpFac)} kg/caixa = ${fmt(cabNp)} kg`],
             ['Cabeça processada',fmt(cabPr)+' kg','','brocolisCabecaProc','kg|brocolis|2',`${fmt(cabPrCx)} caixas × ${factorTxt(cabPrFac)} kg/caixa = ${fmt(cabPr)} kg`],
-            ['Pacotes cabeça 300 g',fmt(Math.round(cab/pacote300)),'','brocolisPacotesCabeca300','brocolisPacote300Kg',`(${fmt(cabNp)} + ${fmt(cabPr)}) kg ÷ ${factorTxt(pacote300)} kg/pacote = ${fmt(Math.round(cab/pacote300))} pacotes (estimativa)`]
+            ['Pacotes cabeça 300 g',fmt(Math.round((fil+cab)/pacote300)),'','brocolisPacotesCabeca300','brocolisPacote300Kg',`(${fmt(fil)} + ${fmt(cab)}) kg ÷ ${factorTxt(pacote300)} kg/pacote = ${fmt(Math.round((fil+cab)/pacote300))} pacotes (estimativa)`]
           ];
         }else if(id==='tomate'){
           const cg=geralTypeTotal(0,'tomate'),m=geralTypeTotal(1,'tomate'),p=geralTypeTotal(2,'tomate');
@@ -1974,7 +1974,7 @@
             if(filKg>0)details.push([dashboardLabelValue('brocolisPacotes200','Pacotes 200 g'),`${fmt(Math.round(filKg/pacote200))} pct`,meta[0]?.color,'rank-est',`${fmt(filKg)} kg ÷ ${ft(pacote200)} kg/pacote = ${fmt(Math.round(filKg/pacote200))} pacotes (estimativa)`]);
             if(x.types[1]>0)details.push([dashboardLabelValue('brocolisCabecaNaoProc','Cabeça não processada'),`${fmt(x.types[1])} cx · ${fmt(x.types[1]*fil1)} kg`,meta[1]?.color,'',`${fmt(x.types[1])} caixas × ${ft(fil1)} kg/caixa = ${fmt(x.types[1]*fil1)} kg`]);
             if(x.types[2]>0)details.push([dashboardLabelValue('brocolisCabecaProc','Cabeça processada'),`${fmt(x.types[2])} cx · ${fmt(x.types[2]*fil2)} kg`,meta[2]?.color,'',`${fmt(x.types[2])} caixas × ${ft(fil2)} kg/caixa = ${fmt(x.types[2]*fil2)} kg`]);
-            if(cabKg>0)details.push([dashboardLabelValue('brocolisPacotesCabeca300','Pacotes cabeça 300 g'),`${fmt(Math.round(cabKg/pacote300))} pct`,meta[1]?.color,'rank-est',`${fmt(cabKg)} kg ÷ ${ft(pacote300)} kg/pacote = ${fmt(Math.round(cabKg/pacote300))} pacotes (estimativa)`]);
+            if(filKg+cabKg>0)details.push([dashboardLabelValue('brocolisPacotesCabeca300','Pacotes cabeça 300 g'),`${fmt(Math.round((filKg+cabKg)/pacote300))} pct`,meta[1]?.color,'rank-est',`(${fmt(filKg)} + ${fmt(cabKg)}) kg ÷ ${ft(pacote300)} kg/pacote = ${fmt(Math.round((filKg+cabKg)/pacote300))} pacotes (estimativa)`]);
           }else if(c.id==='tomate'){
             const tomatoKeys=['tomateCumbucasCG','tomateCumbucasM','tomateCumbucasP'],tomatoDefaults=['Cumbucas CG','Cumbucas M','Cumbucas P'];
             x.types.forEach((v,t)=>{if(v>0)details.push([dashboardLabelValue(tomatoKeys[t],tomatoDefaults[t]),`${fmt(v)} cumbucas`,meta[t]?.color,'',`Soma das cumbucas ${tomatoDefaults[t].split(' ').pop()} lançadas por este parceiro`])});
