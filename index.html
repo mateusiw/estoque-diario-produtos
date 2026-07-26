@@ -984,7 +984,7 @@
     <header class="topbar">
       <div class="brand">
         <div class="brand-mark" aria-hidden="true"><img src="icon.png" alt=""></div>
-        <div><h1>Resumo de Estoque Diário</h1><p>SPG • controle de caixas, processamento e pedidos</p></div>
+        <div><h1>Estoque Diário Produtos</h1><p>Controle de Caixas, Processamento e Pedidos</p></div>
       </div>
       <div class="update-stamp" id="headerUpdateStamp" title="Última vez que algum dado do estoque foi alterado ou sincronizado"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg><span>Atualizado em <strong id="headerUpdateStampTime">—</strong></span></div>
       <button type="button" class="btn btn-danger btn-grow" id="headerRefreshBtn" aria-label="Buscar as atualizações mais recentes da planilha"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 1 0-2.3 6.3"/><path d="M20 5v6h-6"/></svg><span class="btn-label">Atualizar</span></button>
@@ -1001,7 +1001,7 @@
         <button class="btn btn-primary btn-grow" id="syncBtn" aria-label="Salvar na planilha"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7.5 18a4.5 4.5 0 0 1-.6-8.96A5.5 5.5 0 0 1 17.6 8a4 4 0 0 1 .9 7.9"/><path d="M12 18.5v-6m0 0-2.6 2.6M12 12.5l2.6 2.6"/></svg><span class="btn-label">Salvar na planilha</span></button>
       </div>
       <div class="topbar-status" id="topbarStatus">
-        <button class="btn btn-soft btn-grow" id="systemBtn" aria-label="Gerenciar sistema — cadastros, culturas, cálculos, conexão com a planilha e limpeza de dados"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.8v3M12 18.2v3M2.8 12h3M18.2 12h3M5.5 5.5l2.1 2.1M16.4 16.4l2.1 2.1M18.5 5.5l-2.1 2.1M7.6 16.4l-2.1 2.1"/></svg><span class="btn-label">Gerenciar sistema</span></button>
+        <button class="btn btn-soft btn-grow" id="systemBtn" aria-label="Gerenciar sistema — cadastros, culturas, cálculos, conexão com a planilha e limpeza de dados"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82A1.65 1.65 0 0 0 3 13.09H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span class="btn-label">Gerenciar sistema</span></button>
         <div class="presence-bar" id="presenceBar" hidden tabindex="0"><span class="presence-avatars" id="presenceAvatars"></span><span id="presenceText"></span></div>
         <div class="cloud-badge" id="cloudBadge" tabindex="0" aria-label="Somente neste dispositivo"><span class="dot"></span><span id="cloudText">Somente neste dispositivo</span></div>
         <div class="title-chip" tabindex="0" aria-label="Salvo automaticamente neste navegador"><span class="title-dot"></span><span class="save-state" id="saveState">Salvo automaticamente</span></div>
@@ -1025,7 +1025,7 @@
             <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7h12l1.5 13.5h-15L6 7Z"/><path d="M9 10V6a3 3 0 0 1 6 0v4"/></svg>Separação por cliente</h3>
             <div class="panel-heading-actions">
               <button type="button" class="panel-heading-add" id="quickAddClientBtn" title="Adicionar cliente" aria-label="Adicionar cliente"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Cliente</button>
-              <span>quantidades em unidades</span>
+              <span>Quantidades em Unidades</span>
             </div>
           </div>
           <div class="orders-grid" id="ordersGrid"></div>
@@ -1034,7 +1034,7 @@
       <section class="orders-panel" id="simStandalone" hidden>
         <div class="panel-heading">
           <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3 7-7"/><path d="M12 21c-4.4-2-8-5.5-8-11V5l8-3 8 3v5c0 5.5-3.6 9-8 11Z"/></svg>Simulação de pedido</h3>
-          <span>teste um ou mais pedidos hipotéticos contra o estoque, sem afetar os clientes reais</span>
+          <span>Simule um ou mais pedidos baseado no estoque atual</span>
         </div>
         <div id="simOrdersList"></div>
         <datalist id="simClientNames"></datalist>
@@ -1044,7 +1044,7 @@
             <div class="sim-add-pop" id="simAddPop" hidden>
               <div class="sim-add-pop-title">Começar a partir de um cliente</div>
               <div class="sim-add-pop-list" id="simAddPopList"></div>
-              <button type="button" class="sim-add-pop-custom" id="simAddCustom">+ Pedido personalizado (sem cliente)</button>
+              <button type="button" class="sim-add-pop-custom" id="simAddCustom">+ Pedido Personalizado</button>
             </div>
           </div>
           <button type="button" class="btn" id="simClear">Limpar tudo</button>
@@ -1432,7 +1432,7 @@
       const scope=here.slice(0,here.lastIndexOf('/')+1)||here;
       const iconUrl=new URL('icon.png',here).href;
       const manifest={
-        name:'Resumo de Estoque Diário SPG',
+        name:'Estoque Diário SPG Produtos',
         short_name:'Estoque SPG',
         start_url:here,
         scope:scope,
@@ -1579,7 +1579,7 @@
       scrollEl.addEventListener('touchend',e=>{if(e.touches.length<2)pinchStartDist=0});
     })();
     const STORAGE_KEY='spg_estoque_diario_v2', GAS_KEY='spg_estoque_gas_url', THEME_KEY='spg_estoque_theme', TOKEN_KEY='spg_estoque_token', SIM_STORAGE_KEY='spg_estoque_simulacao_v1';
-    const BASE_PRODUCE=[{id:'geral',label:'Geral',color:'#4a5568'},{id:'resumoantigo',label:'Resumo Simplificado',color:'#6b7c93'},{id:'brocolis',label:'Brócolis',color:'#2e9e46'},{id:'tomate',label:'Tomate',color:'#e05252'},{id:'couveflor',label:'Couve-flor',color:'#8a6bd8'},{id:'pepino',label:'Pepino',color:'#1e9c86'},{id:'simulacao',label:'Simulação',color:'#0ea5e9'}];
+    const BASE_PRODUCE=[{id:'geral',label:'Geral',color:'#4a5568'},{id:'resumoantigo',label:'Resumo',color:'#6b7c93'},{id:'brocolis',label:'Brócolis',color:'#2e9e46'},{id:'tomate',label:'Tomate',color:'#e05252'},{id:'couveflor',label:'Couve-flor',color:'#8a6bd8'},{id:'pepino',label:'Pepino',color:'#1e9c86'},{id:'simulacao',label:'Simulação',color:'#0ea5e9'}];
     // "geral", "resumoantigo" e "simulacao" são abas especiais (painéis
     // calculados/ferramentas), não culturas de verdade — não entram em
     // CULTURES para não aparecerem nas telas de cadastro de parceiro/data/
@@ -1931,7 +1931,7 @@
     }
     function cultureLegendHtml(culture){
       const meta=typeMetaForCulture(culture.id);
-      const note=culture.id==='pepino'?'Não proc. em kg • Proc. em unidades (280 g cada, convertido em kg automaticamente) • toque em um número para editar':isDirectKgCulture(culture.id)?'Valores em kg (decimais aceitos) • toque em um número para editar':'Valores em caixas • toque em um número para editar';
+      const note=culture.id==='pepino'?'Toque em um quadrado para editar':isDirectKgCulture(culture.id)?'Valores em kg (decimais aceitos) • toque em um número para editar':'Toque em um quadrado para editar';
       return meta.map(m=>`<span class="lg"><i style="background:${m.color}"></i>${esc(legendTypeLabel(culture,m.label))}</span>`).join('')+`<span class="lg-note">${note}</span>`;
     }
     function geralDayTotal(partner,day,cultureId){return [0,1,2].reduce((s,t)=>s+num(state.cells[cellKey(partner.id,day.id,t,cultureId)]),0)}
@@ -2118,7 +2118,7 @@
         const subEst=x.c.id==='tomate'&&granel>0?`<span class="valrow pcard-subrow"><span class="val">${fmt(estGranelUn)} Cumbucas Estimadas (KG Granel)</span><span class="kg">≈ ${fmt(granel)} kg</span></span>`:'';
         return `<div class="pcard" style="--c:${x.c.color}"><span class="pic">${CULTURE_EMOJI[x.c.id]||genericCultureSvg(x.c.color)}</span><b><i></i>${esc(x.c.label)}</b><span class="valrow"><span class="val"${valTitle}>${fmtUn(x)} ${esc(valLabel)}</span><span class="kg"${kgTitle}>≈ ${fmt(badgeKg)} kg</span></span>${subEst}<div class="pbar"><i style="width:${pct}%"></i></div><span class="pct">${pct}% do peso total</span><div class="pdet">${det}</div></div>`;
       }).join('');
-      return `<section class="dash-panel" style="grid-column:1/-1"><h4>Estoque por Produto<small>unidades e peso estimado • nomes definidos nas configurações</small></h4><div class="produce-cards">${cardsHtml}</div></section>`;
+      return `<section class="dash-panel" style="grid-column:1/-1"><h4>Estoque por Produto<small>Unidades e Peso Estimado.</small></h4><div class="produce-cards">${cardsHtml}</div></section>`;
     }
     function renderGeralTables(scroll){
       scroll.classList.add('as-dash');
@@ -2218,7 +2218,7 @@
 
       scroll.innerHTML=`<div class="dash">
         <div class="dash-head">
-          <div><h3>Estoque Atual de Produtos</h3><p>Visão consolidada de todas as culturas • acompanhamento diário</p></div>
+          <div><h3>Estoque Atual de Produtos</h3><p>Visão Consolidada de Todas as Culturas • Acompanhamento Diário</p></div>
           <div class="dash-actions">
             <div class="dash-filter"><span>PARCEIRO</span><button type="button" class="partner-filter-trigger" id="dashPartnerFilterBtn" aria-haspopup="true" aria-expanded="false"><span>${esc(filterLabel)}</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m7 10 5 5 5-5"/></svg></button><div class="partner-filter-pop" id="dashPartnerFilterPop" hidden><input class="partner-filter-search" id="dashPartnerSearch" type="search" placeholder="Pesquisar parceiro..." autocomplete="off"><label class="partner-filter-all"><input type="checkbox" id="dashPartnerAll" ${filterAll?'checked':''}><span>Selecionar todos (${partnerNames.length})</span></label><div class="partner-filter-list" id="dashPartnerList">${partnerOptions}</div><div class="partner-filter-foot"><button type="button" class="btn" id="dashPartnerClear">Limpar</button><button type="button" class="btn btn-primary" id="dashPartnerApply">Aplicar</button></div></div></div>
           </div>
@@ -2226,8 +2226,8 @@
         <div class="kpi-row">${kpiHtml}</div>
         <div class="dash-grid">
           ${estoqueProdutoPanelHtml()}
-          <section class="dash-panel" style="grid-column:1/-1"><h4>Maiores Estoques por Parceiro<small>composição por tipo • pacotes são estimativas</small></h4><div class="culture-split-grid">${rankSplitHtml}</div></section>
-          <section class="dash-panel" style="grid-column:1/-1"><h4>Idade do Estoque<small>por cultura • o que ainda resta de cada data</small></h4><div class="culture-split-grid">${ageSplitHtml}</div></section>
+          <section class="dash-panel" style="grid-column:1/-1"><h4>Maiores Estoques por Parceiro<small>Composição Por Tipo • Pacotes São Estimativas</small></h4><div class="culture-split-grid">${rankSplitHtml}</div></section>
+          <section class="dash-panel" style="grid-column:1/-1"><h4>Idade do Estoque<small>Por cultura • O que ainda resta de cada data</small></h4><div class="culture-split-grid">${ageSplitHtml}</div></section>
         </div>
       </div>`;
       const filterBtn=scroll.querySelector('#dashPartnerFilterBtn'),filterPop=scroll.querySelector('#dashPartnerFilterPop'),filterAllBox=scroll.querySelector('#dashPartnerAll'),filterBoxes=[...scroll.querySelectorAll('[data-partner-option] input')];
@@ -2260,13 +2260,13 @@
         ?'<div class="ra-table-scroll"><table class="stock-table" id="stockTable"></table></div>'
         :'<div style="padding:24px;color:var(--muted);text-align:center">Nenhuma data cadastrada para Brócolis. Use "Adicionar data" na aba Brócolis.</div>';
       scroll.innerHTML=`<div class="dash">
-        <div class="dash-head"><div><h3>Resumo Simplificado</h3><p>Formato simplificado — tabela do Brócolis, estimativas e separação por cliente, calculados a partir dos dados atuais</p></div></div>
+        <div class="dash-head"><div><h3>Resumo</h3><p>Tabela do Brócolis, Estimativas e Separação por Cliente.</p></div></div>
         <div class="ra-grid">
           <div class="ra-col">
             ${tableHtml}
             <div class="dash-grid" id="raEstimateGrid">${estoqueProdutoPanelHtml()}</div>
           </div>
-          <div class="ra-col"><section class="orders-panel"><div class="panel-heading"><h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7h12l1.5 13.5h-15L6 7Z"/><path d="M9 10V6a3 3 0 0 1 6 0v4"/></svg>Separação por cliente</h3><div class="panel-heading-actions"><button type="button" class="panel-heading-add" id="raQuickAddClientBtn" title="Adicionar cliente" aria-label="Adicionar cliente"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Cliente</button><span>quantidades em unidades</span></div></div><div class="orders-grid" id="raOrdersGrid">${clientOrderCardsHtml()}</div></section></div>
+          <div class="ra-col"><section class="orders-panel"><div class="panel-heading"><h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7h12l1.5 13.5h-15L6 7Z"/><path d="M9 10V6a3 3 0 0 1 6 0v4"/></svg>Separação por cliente</h3><div class="panel-heading-actions"><button type="button" class="panel-heading-add" id="raQuickAddClientBtn" title="Adicionar cliente" aria-label="Adicionar cliente"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Cliente</button><span>Quantidades em Unidades</span></div></div><div class="orders-grid" id="raOrdersGrid">${clientOrderCardsHtml()}</div></section></div>
         </div>
       </div>`;
       const table=scroll.querySelector('#stockTable');
@@ -2293,7 +2293,7 @@
         document.body.classList.remove('table-rotated');
         btn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 0 1 14.5-4.7M20 12a8 8 0 0 1-14.5 4.7"/><path d="M18.5 3v4.3h-4.3M5.5 21v-4.3h4.3"/></svg><span>Girar tabela</span>';
       }
-      // No "Resumo Simplificado" (que só espelha o Brócolis) o atalho de
+      // No "Resumo" (que só espelha o Brócolis) o atalho de
       // adicionar data fica visível também, mas sempre aponta pra Brócolis —
       // é a cultura que essa aba mostra, mesmo sem ser uma aba de cultura de
       // verdade (activeProduce() aqui seria "resumoantigo", que não existe
@@ -2320,7 +2320,7 @@
       if(produce==='resumoantigo'){renderResumoAntigo(scroll);return}
       scroll.classList.remove('as-dash');
       document.getElementById('tableLegend').innerHTML=produce==='tomate'
-        ?`<span class="lg"><i style="background:${TOMATE_META[0].color}"></i>Cumbucas Grande</span><span class="lg"><i style="background:${TOMATE_META[1].color}"></i>Cumbucas Médias</span><span class="lg"><i style="background:${TOMATE_META[2].color}"></i>Cumbucas Pequenas</span><span class="lg-note">Cumbuca 180g • toque em um número para editar</span>`
+        ?`<span class="lg"><i style="background:${TOMATE_META[0].color}"></i>Cumbucas Grande</span><span class="lg"><i style="background:${TOMATE_META[1].color}"></i>Cumbucas Médias</span><span class="lg"><i style="background:${TOMATE_META[2].color}"></i>Cumbucas Pequenas</span><span class="lg-note">Toque em um quadrado para editar</span>`
         :cultureLegendHtml({id:produce});
       const days=daysForProduce(produce);
       if(!days.length){scroll.innerHTML='<div class="stock-zoom-wrap" id="stockZoomWrap"><div style="padding:45px;color:var(--muted)">Adicione ou reative uma data para começar o controle.</div></div>';return}
@@ -2785,7 +2785,7 @@
       const detailOpen=openOrderDetails.has(order.id);
       return `<div class="sim-order-card" data-sim-order="${order.id}">`+
         `<div class="sim-order-head"><span class="sim-order-avatar">${esc(initials(order.name||'Pedido'))}</span>`+
-        `<div class="sim-order-headtext"><input type="text" class="sim-order-name" data-sim-order-name maxlength="60" placeholder="Nome do pedido (ex.: Mercado X)" list="simClientNames" value="${esc(order.name)}">`+
+        `<div class="sim-order-headtext"><input type="text" class="sim-order-name" data-sim-order-name maxlength="60" placeholder="Nome Cliente" list="simClientNames" value="${esc(order.name)}">`+
         `<span class="sim-order-meta" data-sim-order-meta>${esc(simOrderMetaText(order))}</span></div>`+
         `<button type="button" class="mini-remove" data-sim-order-del title="Remover este pedido simulado" aria-label="Remover este pedido simulado">${ICON_TRASH}</button></div>`+
         `<div class="sim-rows-list" data-sim-rows>${rowsHtml}</div>`+
@@ -4154,7 +4154,7 @@
       const logo='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="10"/><path d="M12 19V9M12 12c-3.4 0-5.8-2-5.8-4.8 3.4 0 5.8 1.3 5.8 4.8Zm0 3.2c3.4 0 5.8-2 5.8-4.8-3.4 0-5.8 1.3-5.8 4.8Z"/></svg>';
       document.getElementById('printReport').innerHTML=`
         <header class="pr-header"><div class="pr-logo">${logo}</div><div class="pr-title"><strong>RELATÓRIO GERENCIAL DE ESTOQUE</strong><span>Disponibilidade, processamento e separação por cliente</span></div><div class="pr-issued"><div><b>Data de emissão</b><span>${issued}</span></div><div><b>Identificação</b><span>${reportId}</span></div></div></header>
-        <div class="pr-system">Sistema de Planejamento e Gestão • Resumo de Estoque Diário SPG</div>
+        <div class="pr-system">Sistema de Planejamento e Gestão • Estoque Diário SPG Produtos</div>
         <section class="pr-section"><div class="pr-section-title">1. Parâmetros do relatório</div><table class="pr-meta"><tr><th>Culturas</th><td>${esc(scope)}</td><th>Período</th><td>${period}</td></tr><tr><th>Responsável</th><td>${esc(currentUser()||'Não identificado')}</td><th>Parceiros</th><td>${totalPartners} selecionado${totalPartners===1?'':'s'}</td></tr><tr><th>Pedidos</th><td>${options.includeOrders?orderRows.length+' linha(s) selecionada(s)':'Não incluídos'}</td><th>Última atualização</th><td>${esc(fmtStamp(state.updatedAt))}</td></tr></table></section>
         <section class="pr-section"><div class="pr-section-title">2. Resumo executivo</div><div class="pr-kpis"><div class="pr-kpi"><span>Culturas analisadas</span><strong>${cultures.length}</strong></div><div class="pr-kpi"><span>Parceiros ativos</span><strong>${totalPartners}</strong></div><div class="pr-kpi"><span>Datas consolidadas</span><strong>${allDays.length}</strong></div><div class="pr-kpi"><span>Registros com estoque</span><strong>${totalRecords}</strong></div><div class="pr-kpi"><span>Peso total estimado</span><strong>${fmtDec(totalKg)} kg</strong></div></div></section>
         <section class="pr-section"><div class="pr-section-title">3. Mapa de estoque por cultura, data e parceiro</div>${infos.map(culturePrintHtml).join('')}</section>
@@ -4318,7 +4318,7 @@
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{if(!localStorage.getItem(THEME_KEY))applyTheme('')});
     applyTheme(localStorage.getItem(THEME_KEY)||'');
 
-    // forcedProduce é usado pelo atalho do "Resumo Simplificado", que sempre
+    // forcedProduce é usado pelo atalho do "Resumo", que sempre
     // cadastra em Brócolis mesmo estando fora de uma aba de cultura de verdade.
     let dateDialogProduce=null;
     function openDateDialog(forcedProduce){
@@ -4747,7 +4747,7 @@
     function openSystemDialog(){
       const cult=activeProduce()==='geral'?null:produceLabel(activeProduce());
       const master=isMaster();
-      // No "Resumo Simplificado" a data cadastrada vai sempre para Brócolis
+      // No "Resumo" a data cadastrada vai sempre para Brócolis
       // (é a cultura que essa aba espelha), então o atalho já mostra isso.
       const dateCultLabel=activeProduce()==='resumoantigo'?produceLabel('brocolis'):cult;
       document.getElementById('sysDateDesc').textContent=dateCultLabel?`Nova coluna de dia em ${dateCultLabel}.`:'Selecione antes a aba de uma cultura.';
