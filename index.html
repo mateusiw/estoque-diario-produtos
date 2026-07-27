@@ -342,15 +342,21 @@
     .dash-panel>h4{margin:0 0 14px;font-size:15px;font-weight:800;color:var(--ink);display:flex;align-items:baseline;justify-content:space-between;gap:8px}
     .dash-panel>h4 small{font-size:11.5px;font-weight:650;color:var(--muted)}
     .produce-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(195px,1fr));gap:12px}
-    .pcard{border:1px solid var(--line);border-radius:16px;padding:14px;background:var(--surface-2);display:flex;flex-direction:column;gap:5px}
+    .pcard{border:1px solid var(--line);border-radius:16px;padding:14px;background:var(--surface-2);display:flex;min-width:0;flex-direction:column;gap:5px}
     .pcard .pic{line-height:0;margin-bottom:2px}
     .pcard .pic svg{width:60px;height:60px}
     .pcard b{display:flex;align-items:center;gap:7px;font-size:13.5px;color:var(--ink)}
     .pcard b i{width:8px;height:8px;border-radius:50%;flex:none;background:var(--c)}
     .pcard .valrow{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
-    .pcard-subrow{margin-top:-2px}
+    .pcard-subrow{margin-top:-2px;flex-wrap:nowrap!important;gap:6px!important}
+    .pcard--tomate .pcard-subrow .val{font-size:16px;letter-spacing:-.02em;white-space:nowrap}
+    .pcard--tomate .pcard-subrow .kg{font-size:15px;padding:2px 6px}
     .pcard .val{font-size:19px;font-weight:800;color:var(--ink);font-variant-numeric:tabular-nums}
-    .pcard .kg{font-size:17px;color:var(--c);font-weight:800;border:1.5px solid var(--c);border-radius:8px;padding:2px 8px}
+    .pcard .kg{font-size:17px;color:var(--c);font-weight:800;border:1.5px solid var(--c);border-radius:8px;padding:2px 8px;white-space:nowrap}
+    @media(max-width:620px){
+      .pcard-subrow{flex-wrap:wrap!important}
+      .pcard--tomate .pcard-subrow .val{white-space:normal}
+    }
     .pbar{height:6px;border-radius:999px;background:var(--surface-3);overflow:hidden;margin-top:3px}
     .pbar i{display:block;height:100%;border-radius:999px;background:var(--c)}
     .pcard .pct{font-size:11px;color:var(--muted);font-weight:700}
@@ -470,10 +476,11 @@
     .date-remove-btn svg{width:9px;height:9px}
     .date-remove-btn:hover{filter:brightness(.95)}
     @media print{.date-remove-btn{display:none}}
-    .stock-table .subhead th{height:26px;background:var(--surface-2);padding:5px 4px;vertical-align:middle;cursor:help}
-    .type-chip{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:11px;
-      font-weight:750;color:var(--ink-2);white-space:nowrap;line-height:1}
+    .stock-table .subhead th{height:48px;background:var(--surface-2);padding:4px 2px;vertical-align:middle;cursor:help}
+    .type-chip{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:8.5px;
+      font-weight:750;color:var(--ink-2);line-height:1.08}
     .type-chip i{width:8px;height:8px;border-radius:50%;flex:none}
+    .type-chip span{white-space:normal;overflow-wrap:anywhere;text-align:center}
     .subhead .t0 .type-chip i{background:var(--t0)}
     .subhead .t1 .type-chip i{background:var(--t1)}
     .subhead .t2 .type-chip i{background:var(--t2)}
@@ -1822,7 +1829,7 @@
       const partners=partnersForProduce(culture.id);
       let html='<thead><tr class="date-row"><th class="partner-col">DATA</th>';
       days.forEach(day=>html+=dateHeaderHtml(day,hoje,meta.length,true));
-      html+='</tr><tr class="subhead"><th class="partner-col">PARCEIRO</th>';days.forEach(day=>meta.forEach((m,t)=>html+=`<th class="${t===0?'day-start ':''}" data-day-col="${day.id}" title="${m.label}"><span class="type-chip"><i style="background:${m.color}"></i></span></th>`));html+='</tr></thead><tbody>';
+      html+='</tr><tr class="subhead"><th class="partner-col">PARCEIRO</th>';days.forEach(day=>meta.forEach((m,t)=>{const label=tableTypeLabel(culture,m.label);html+=`<th class="${t===0?'day-start ':''}" data-day-col="${day.id}" title="${esc(label)}"><span class="type-chip"><i style="background:${m.color}"></i><span>${esc(label)}</span></span></th>`}));html+='</tr></thead><tbody>';
       if(!partners.length){
         html+=`<tr><td colspan="${1+days.length*meta.length}" style="padding:24px;color:var(--muted);text-align:center">Nenhum parceiro cadastrado para ${esc(culture.label)}.</td></tr>`;
       }else{
@@ -1842,7 +1849,7 @@
       days.forEach(day=>h+=dateHeaderHtml(day,hoje,3,showClear));
       (extraCols||[]).forEach(label=>h+=`<th rowspan="2" class="day-start">${label}</th>`);
       h+='</tr><tr class="subhead"><th class="partner-col">PARCEIRO</th>';
-      days.forEach(day=>meta.forEach((m,t)=>h+=`<th class="${t===0?'day-start ':''}" data-day-col="${day.id}" title="${m.label}"><span class="type-chip"><i style="background:${m.color}"></i></span></th>`));
+      days.forEach(day=>meta.forEach((m,t)=>{const label=tableTypeLabel({id:'tomate'},m.label);h+=`<th class="${t===0?'day-start ':''}" data-day-col="${day.id}" title="${esc(label)}"><span class="type-chip"><i style="background:${m.color}"></i><span>${esc(label)}</span></span></th>`}));
       return h+'</tr></thead>';
     }
     function tomateGranelBoxInnerHtml(){
@@ -1927,6 +1934,16 @@
       if(label==='Filetado')return `${nome} Filetado`;
       if(label==='Não proc.')return `${nome} Não Processado`;
       if(label==='Proc.')return `${nome} Processado`;
+      return label;
+    }
+    function tableTypeLabel(culture,label){
+      if(culture.id==='tomate'){
+        if(label==='CG')return 'Cumbucas Grande';
+        if(label==='M')return 'Cumbucas Médias';
+        if(label==='P')return 'Cumbucas Pequenas';
+      }
+      if(label==='Não proc.')return 'Não Processado';
+      if(label==='Proc.')return 'Processado';
       return label;
     }
     function cultureLegendHtml(culture){
@@ -2116,7 +2133,7 @@
         // só que já visível de cara, sem precisar abrir o card pra achar.
         const estGranelUn=granel>0?Math.round(granel/factorNum('tomateGranelCumbucaKg')):0;
         const subEst=x.c.id==='tomate'&&granel>0?`<span class="valrow pcard-subrow"><span class="val">${fmt(estGranelUn)} Cumbucas Estimadas (KG Granel)</span><span class="kg">≈ ${fmt(granel)} kg</span></span>`:'';
-        return `<div class="pcard" style="--c:${x.c.color}"><span class="pic">${CULTURE_EMOJI[x.c.id]||genericCultureSvg(x.c.color)}</span><b><i></i>${esc(x.c.label)}</b><span class="valrow"><span class="val"${valTitle}>${fmtUn(x)} ${esc(valLabel)}</span><span class="kg"${kgTitle}>≈ ${fmt(badgeKg)} kg</span></span>${subEst}<div class="pbar"><i style="width:${pct}%"></i></div><span class="pct">${pct}% do peso total</span><div class="pdet">${det}</div></div>`;
+        return `<div class="pcard${x.c.id==='tomate'?' pcard--tomate':''}" style="--c:${x.c.color}"><span class="pic">${CULTURE_EMOJI[x.c.id]||genericCultureSvg(x.c.color)}</span><b><i></i>${esc(x.c.label)}</b><span class="valrow"><span class="val"${valTitle}>${fmtUn(x)} ${esc(valLabel)}</span><span class="kg"${kgTitle}>≈ ${fmt(badgeKg)} kg</span></span>${subEst}<div class="pbar"><i style="width:${pct}%"></i></div><span class="pct">${pct}% do peso total</span><div class="pdet">${det}</div></div>`;
       }).join('');
       return `<section class="dash-panel" style="grid-column:1/-1"><h4>Estoque por Produto<small>Unidades e Peso Estimado.</small></h4><div class="produce-cards">${cardsHtml}</div></section>`;
     }
@@ -4247,7 +4264,7 @@
       // as abas de cultura, os controles de atualização e os atalhos da
       // tabela de estoque (Data, Girar tabela, limpar/excluir data), além
       // dos botões "+ Cliente"/"+ produto"/editar produto/remover (×).
-      clone.querySelectorAll('.produce-tabs,.table-legend,.dash-actions,#quickAddDateBtn,.rotate-view-btn,.date-edit-btn,.date-clear-btn,.date-remove-btn,.panel-heading-add,.mini-add').forEach(el=>el.remove());
+      clone.querySelectorAll('.produce-tabs,.table-legend,.dash-actions,#quickAddDateBtn,.rotate-view-btn,.date-edit-btn,.date-clear-btn,.date-remove-btn,.panel-heading-add,.mini-add,.order-hide').forEach(el=>el.remove());
       // .mini-edit e .order-del ficam dentro de uma grade (.order-row-top)
       // com colunas fixas por posição — remover esses elementos do DOM
       // deslocava os itens seguintes para a coluna errada e espremia o
