@@ -4255,11 +4255,37 @@
     }
     function buildSnapshot(){
       const report=document.querySelector('.report');
-      const widestTable=Math.max(0,...[...document.querySelectorAll('.stock-table')].map(t=>t.scrollWidth));
-      const contentWidth=Math.max(report.offsetWidth,widestTable+4);
       const clone=report.cloneNode(true);
       const origInputs=report.querySelectorAll('input'),cloneInputs=clone.querySelectorAll('input');
       origInputs.forEach((inp,i)=>cloneInputs[i].setAttribute('value',inp.value));
+      // Datas totalmente vazias não acrescentam informação à imagem. Remove
+      // o cabeçalho e todas as suas subcolunas somente da cópia da captura.
+      const originalTables=[...report.querySelectorAll('.stock-table')];
+      const clonedTables=[...clone.querySelectorAll('.stock-table')];
+      originalTables.forEach((originalTable,tableIndex)=>{
+        const clonedTable=clonedTables[tableIndex];
+        if(!clonedTable)return;
+        const dateHeaders=[...originalTable.querySelectorAll('.date-row th[data-day-col]')];
+        const dates=dateHeaders.map((header,index)=>{
+          const span=Number(header.colSpan)||1;
+          const start=1+dateHeaders.slice(0,index).reduce((sum,item)=>sum+(Number(item.colSpan)||1),0);
+          const dayId=header.dataset.dayCol;
+          const hasContent=[...originalTable.querySelectorAll('input.cell[data-key]')].some(input=>{
+            const parts=String(input.dataset.key||'').split('|');
+            return parts[1]===dayId&&num(input.value)>0;
+          });
+          return {dayId,span,start,hasContent};
+        });
+        dates.filter(date=>!date.hasContent).reverse().forEach(date=>{
+          [...clonedTable.querySelectorAll('.date-row th[data-day-col]')].find(th=>th.dataset.dayCol===date.dayId)?.remove();
+          clonedTable.querySelectorAll('.subhead th[data-day-col]').forEach(th=>{if(th.dataset.dayCol===date.dayId)th.remove()});
+          clonedTable.querySelectorAll('tbody tr').forEach(row=>{
+            [...row.children].slice(date.start,date.start+date.span).forEach(cell=>cell.remove());
+          });
+        });
+        const remaining=dates.filter(date=>date.hasContent).length;
+        if(dates.length)clonedTable.style.minWidth=Math.max(900,210+remaining*(dates[0].span||1)*58)+'px';
+      });
       // A captura é para compartilhar o relatório: oculta o cabeçalho verde,
       // as abas de cultura, os controles de atualização e os atalhos da
       // tabela de estoque (Data, Girar tabela, limpar/excluir data), além
@@ -4272,6 +4298,8 @@
       // tornam-se invisíveis, preservando a célula da grade e o layout.
       clone.querySelectorAll('.mini-edit,.order-del').forEach(el=>{el.style.visibility='hidden'});
       clone.querySelectorAll('.stock-scroll').forEach(el=>{el.style.overflow='visible';el.style.boxShadow='none'});
+      const widestTable=Math.max(0,...clonedTables.map(table=>parseFloat(table.style.minWidth)||0));
+      const contentWidth=Math.max(report.offsetWidth,widestTable+4);
       const styles=[...document.querySelectorAll('style')].map(s=>s.textContent).join('\n').replace(/:root/g,'.snapshot-root');
       // A imagem capturada sai sempre no modo claro, independente do tema
       // ativo no painel — é o formato pensado para compartilhar/imprimir.
