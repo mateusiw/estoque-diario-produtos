@@ -1859,9 +1859,9 @@
         const kgTotal=partnerProcessarTotal(partner,days,'tomate');
         if(kgTotal<=0)return '';
         const uni=Math.round(kgTotal/factorNum('tomateGranelCumbucaKg'));
-        return `<div class="tomate-partner-est-row"><span>${esc(partner.name)}</span><b>${fmt(kgTotal)} kg → ${fmt(uni)} cumbucas</b></div>`;
+        return `<div class="tomate-partner-est-row"><span>${esc(partner.name)}</span><b>${fmtDec(kgTotal)} kg → ${fmt(uni)} cumbucas</b></div>`;
       }).join('');
-      return `<div class="tomate-summary-title">Total em kg a granel (a processar)</div><div class="tomate-summary-grand" id="tomateTotalGranel">${fmt(granel)}</div><span class="tomate-summary-sub" id="tomateTotalGranelUni">≈ ${fmt(Math.round(granel/factorNum('tomateGranelCumbucaKg')))} cumbucas estimadas</span>`+
+      return `<div class="tomate-summary-title">Total em kg a granel (a processar)</div><div class="tomate-summary-grand" id="tomateTotalGranel">${fmtDec(granel)}</div><span class="tomate-summary-sub" id="tomateTotalGranelUni">≈ ${fmt(Math.round(granel/factorNum('tomateGranelCumbucaKg')))} cumbucas estimadas</span>`+
         (partnerRows?`<div class="tomate-partner-est-list">${partnerRows}</div>`:'');
     }
     function tomateSummaryHtml(){
@@ -1869,7 +1869,7 @@
       const pct=v=>grand?Math.round(v/grand*100):0;
       return `<div class="tomate-summary">`+
         `<div class="tomate-summary-box"><div class="tomate-summary-title">Total cumbucas</div><div class="tomate-summary-sizes">`+
-        TOMATE_META.map((meta,t)=>{const v=[cg,m,p][t];return `<div class="tomate-size-cell" style="--c:${meta.color}"><strong>${meta.label}</strong><span data-cumbuca-value="${t}">${fmt(v)}</span><em data-cumbuca-pct="${t}">${pct(v)}%</em></div>`}).join('')+
+        TOMATE_META.map((meta,t)=>{const v=[cg,m,p][t];return `<div class="tomate-size-cell" style="--c:${meta.color}"><strong>${meta.label}</strong><span data-cumbuca-value="${t}">${fmtDec(v)}</span><em data-cumbuca-pct="${t}">${pct(v)}%</em></div>`}).join('')+
         `</div></div>`+
         `<div class="tomate-summary-box" id="tomateGranelBox">${tomateGranelBoxInnerHtml()}</div>`+
         `</div>`;
@@ -1884,10 +1884,10 @@
       }else{
         partners.forEach(partner=>{
           prontoHtml+=`<tr><td class="partner-col">${esc(partner.name)}</td>`;
-          days.forEach(day=>TOMATE_META.forEach((m,t)=>{const key=cellKey(partner.id,day.id,t,'tomate'),value=state.cells[key]||'';prontoHtml+=`<td class="${t===0?'day-start ':''}${day.iso===hoje?'today':''}"><input class="cell" inputmode="numeric" aria-label="${esc(partner.name)}, ${formatDate(day.iso)}, ${m.label}, cumbuca pronta" data-key="${key}" value="${value}"></td>`}));
+          days.forEach(day=>TOMATE_META.forEach((m,t)=>{const key=cellKey(partner.id,day.id,t,'tomate'),raw=state.cells[key],value=raw==null||raw===''?'':String(raw).replace('.',',');prontoHtml+=`<td class="${t===0?'day-start ':''}${day.iso===hoje?'today':''}"><input class="cell" inputmode="decimal" aria-label="${esc(partner.name)}, ${formatDate(day.iso)}, ${m.label}, cumbuca pronta" data-key="${key}" value="${value}"></td>`}));
           prontoHtml+='</tr>';
         });
-        prontoHtml+='<tr class="total-row"><td class="partner-col">TOTAL</td>';days.forEach(day=>TOMATE_META.forEach((_,t)=>prontoHtml+=`<td${t===0?' class="day-start"':''} data-tomate-uni="${day.id}|${t}">${fmt(totalDayType(day.id,t,'tomate'))}</td>`));prontoHtml+='</tr>';
+        prontoHtml+='<tr class="total-row"><td class="partner-col">TOTAL</td>';days.forEach(day=>TOMATE_META.forEach((_,t)=>prontoHtml+=`<td${t===0?' class="day-start"':''} data-tomate-uni="${day.id}|${t}">${fmtDec(totalDayType(day.id,t,'tomate'))}</td>`));prontoHtml+='</tr>';
       }
       prontoHtml+='</tbody>';
       let html=`<div class="tomate-grid-label">Cumbucas prontas (unidades)</div><table class="stock-table" style="min-width:${minWidth}">${prontoHtml}</table>`;
@@ -1895,10 +1895,10 @@
         let procHtml=tomateHeadHtml(days,hoje,null,false)+'<tbody>';
         partners.forEach(partner=>{
           procHtml+=`<tr><td class="partner-col">${esc(partner.name)}</td>`;
-          days.forEach(day=>TOMATE_META.forEach((m,t)=>{const key=cellKey(partner.id,day.id,t,'tomate'),value=state.processar[key]||'';procHtml+=`<td class="${t===0?'day-start ':''}${day.iso===hoje?'today':''}"><input class="cell" inputmode="numeric" aria-label="${esc(partner.name)}, ${formatDate(day.iso)}, ${m.label}, kg a processar" data-store="processar" data-key="${key}" value="${value}"></td>`}));
+          days.forEach(day=>TOMATE_META.forEach((m,t)=>{const key=cellKey(partner.id,day.id,t,'tomate'),raw=state.processar[key],value=raw==null||raw===''?'':String(raw).replace('.',',');procHtml+=`<td class="${t===0?'day-start ':''}${day.iso===hoje?'today':''}"><input class="cell" inputmode="decimal" aria-label="${esc(partner.name)}, ${formatDate(day.iso)}, ${m.label}, kg a processar" data-store="processar" data-key="${key}" value="${value}"></td>`}));
           procHtml+='</tr>';
         });
-        procHtml+='<tr class="kg-row"><td class="partner-col">TOTAL</td>';days.forEach(day=>TOMATE_META.forEach((_,t)=>procHtml+=`<td${t===0?' class="day-start"':''} data-tomate-kg="${day.id}|${t}">${fmt(totalDayProcessar(day.id,t,'tomate'))}</td>`));procHtml+='</tr></tbody>';
+        procHtml+='<tr class="kg-row"><td class="partner-col">TOTAL</td>';days.forEach(day=>TOMATE_META.forEach((_,t)=>procHtml+=`<td${t===0?' class="day-start"':''} data-tomate-kg="${day.id}|${t}">${fmtDec(totalDayProcessar(day.id,t,'tomate'))}</td>`));procHtml+='</tr></tbody>';
         html+=`<div class="tomate-grid-label">Kg a processar (a granel)</div><table class="stock-table" style="min-width:${minWidth}">${procHtml}</table>`;
       }
       return html+tomateSummaryHtml();
@@ -1906,13 +1906,13 @@
     function refreshTomateTotals(){
       const days=daysForProduce('tomate');
       days.forEach(day=>[0,1,2].forEach(t=>{
-        const uniEl=document.querySelector(`[data-tomate-uni="${day.id}|${t}"]`);if(uniEl)uniEl.textContent=fmt(totalDayType(day.id,t,'tomate'));
-        const kgEl=document.querySelector(`[data-tomate-kg="${day.id}|${t}"]`);if(kgEl)kgEl.textContent=fmt(totalDayProcessar(day.id,t,'tomate'));
+        const uniEl=document.querySelector(`[data-tomate-uni="${day.id}|${t}"]`);if(uniEl)uniEl.textContent=fmtDec(totalDayType(day.id,t,'tomate'));
+        const kgEl=document.querySelector(`[data-tomate-kg="${day.id}|${t}"]`);if(kgEl)kgEl.textContent=fmtDec(totalDayProcessar(day.id,t,'tomate'));
       }));
       const cg=totalType(0,'tomate'),m=totalType(1,'tomate'),p=totalType(2,'tomate'),grand=cg+m+p;
       const pct=v=>grand?Math.round(v/grand*100):0;
       [cg,m,p].forEach((v,t)=>{
-        const valEl=document.querySelector(`[data-cumbuca-value="${t}"]`);if(valEl)valEl.textContent=fmt(v);
+        const valEl=document.querySelector(`[data-cumbuca-value="${t}"]`);if(valEl)valEl.textContent=fmtDec(v);
         const pctEl=document.querySelector(`[data-cumbuca-pct="${t}"]`);if(pctEl)pctEl.textContent=pct(v)+'%';
       });
       const granelBox=document.getElementById('tomateGranelBox');if(granelBox)granelBox.innerHTML=tomateGranelBoxInnerHtml();
@@ -2374,10 +2374,10 @@
     // kg) — remove qualquer outro caractere na hora, seja digitado ou colado.
     function sanitizeCellValue(el){
       const raw=el.value,allowDecimal=el.inputMode==='decimal';
-      let v=allowDecimal?raw.replace(/[^0-9,]/g,''):raw.replace(/[^0-9]/g,'');
+      let v=allowDecimal?raw.replace(/[^0-9,.]/g,''):raw.replace(/[^0-9]/g,'');
       if(allowDecimal){
-        const i=v.indexOf(',');
-        if(i!==-1)v=v.slice(0,i+1)+v.slice(i+1).replace(/,/g,'');
+        const i=v.search(/[,.]/);
+        if(i!==-1)v=v.slice(0,i+1)+v.slice(i+1).replace(/[,.]/g,'');
       }
       if(v!==raw){
         const pos=Math.max(0,el.selectionStart-(raw.length-v.length));
