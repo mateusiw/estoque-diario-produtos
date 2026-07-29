@@ -1422,6 +1422,12 @@
     <div class="dialog-body"><p id="confirmMessage"></p></div>
     <div class="dialog-foot"><button type="button" class="btn" id="confirmCancelBtn">Cancelar</button><button type="button" class="btn btn-danger" id="confirmOkBtn">Remover</button></div>
   </dialog>
+
+  <dialog id="hideDataDialog">
+    <div class="dialog-head"><div><h3 id="hideDataTitle">Ocultar cliente</h3></div><button type="button" class="dialog-close" id="hideDataCloseBtn" aria-label="Fechar">×</button></div>
+    <div class="dialog-body"><p id="hideDataMessage"></p></div>
+    <div class="dialog-foot"><button type="button" class="btn" id="hideDataCancelBtn">Cancelar</button><button type="button" class="btn btn-soft" id="hideDataKeepBtn">Manter dados</button><button type="button" class="btn btn-danger" id="hideDataClearBtn">Limpar dados</button></div>
+  </dialog>
   <div class="toast-modern" id="modernToast"></div>
 
   <script>
@@ -3205,7 +3211,21 @@
       pendingStructural=true;saveState();renderAll();toast(`${kind==='partner'?'Parceiro':'Cliente'} renomeado.`);
     }
     function togglePartner(id){const p=state.partners.find(x=>x.id===id);if(!p)return;p.active=!isActive(p);addLog(`${isActive(p)?'reexibiu':'ocultou'} o parceiro ${p.name} (${produceLabel(p.produce||'brocolis')})`);pendingStructural=true;saveState();renderAll();toast(isActive(p)?'Parceiro visível novamente.':'Parceiro ocultado do painel.')}
-    function toggleClient(id){const c=state.clients.find(x=>x.id===id);if(!c)return;c.active=!isActive(c);addLog(`${isActive(c)?'reexibiu':'ocultou'} o cliente ${c.name}`);pendingStructural=true;saveState();renderAll();toast(isActive(c)?'Cliente visível novamente.':'Cliente ocultado do painel.')}
+    async function toggleClient(id){
+      const c=state.clients.find(x=>x.id===id);if(!c)return;
+      if(!isActive(c)){c.active=true;addLog(`reexibiu o cliente ${c.name}`);pendingStructural=true;saveState();renderAll();toast('Cliente visível novamente.');return}
+      const ok=await confirmModern(`Ocultar o cliente ${c.name} do painel de separação?`,{title:'Ocultar cliente',confirmText:'Ocultar'});if(!ok)return;
+      const choice=await askKeepOrClearData(c.name);if(choice==='cancel')return;
+      c.active=false;
+      addLog(`ocultou o cliente ${c.name}`);
+      if(choice==='clear'){
+        Object.keys(state.orders).filter(k=>k.startsWith(id+'-')).forEach(k=>{delete state.orders[k];recordOp('orders',k,null)});
+        Object.keys(state.separado).filter(k=>k.startsWith(id+'-')).forEach(k=>{delete state.separado[k];recordOp('separado',k,null)});
+        addLog(`limpou os dados de ${c.name} ao ocultar`);
+      }
+      pendingStructural=true;saveState();renderAll();
+      toast(choice==='clear'?'Cliente ocultado e dados limpos.':'Cliente ocultado do painel.');
+    }
     function toggleDate(id){const d=state.days.find(x=>x.id===id);if(!d)return;d.active=!isActive(d);addLog(`${isActive(d)?'reexibiu':'ocultou'} a data ${formatDate(d.iso)} (${produceLabel(d.produce||'brocolis')})`);pendingStructural=true;saveState();renderAll();toast(isActive(d)?'Data visível novamente.':'Data ocultada do painel.')}
     function openPartnerDialog(preselect){
       hideAlert('partnerAlert');
@@ -3658,6 +3678,16 @@
       dlg.returnValue='';
       dlg.showModal();
       return new Promise(resolve=>{dlg.addEventListener('close',()=>resolve(dlg.returnValue==='confirm'),{once:true})});
+    }
+
+    // Pergunta se limpa os pedidos/separação junto ao ocultar um cliente.
+    // Resolve 'keep', 'clear' ou 'cancel' (fechar/Escape também conta como cancelar).
+    function askKeepOrClearData(clientName){
+      const dlg=document.getElementById('hideDataDialog');
+      document.getElementById('hideDataMessage').textContent=`Deseja manter os pedidos e a separação já lançados para ${clientName}, ou limpar esses dados junto ao ocultar?`;
+      dlg.returnValue='';
+      dlg.showModal();
+      return new Promise(resolve=>{dlg.addEventListener('close',()=>resolve(dlg.returnValue||'cancel'),{once:true})});
     }
 
     function getGasUrl(){return localStorage.getItem(GAS_KEY)||''}
@@ -4882,6 +4912,10 @@
     document.getElementById('confirmCancelBtn').onclick=()=>document.getElementById('confirmDialog').close('cancel');
     document.getElementById('confirmCloseBtn').onclick=()=>document.getElementById('confirmDialog').close('cancel');
     document.getElementById('confirmOkBtn').onclick=()=>document.getElementById('confirmDialog').close('confirm');
+    document.getElementById('hideDataCancelBtn').onclick=()=>document.getElementById('hideDataDialog').close('cancel');
+    document.getElementById('hideDataCloseBtn').onclick=()=>document.getElementById('hideDataDialog').close('cancel');
+    document.getElementById('hideDataKeepBtn').onclick=()=>document.getElementById('hideDataDialog').close('keep');
+    document.getElementById('hideDataClearBtn').onclick=()=>document.getElementById('hideDataDialog').close('clear');
 
     let scrollLocked=false, lockedScrollY=0;
     function syncScrollLock(){
