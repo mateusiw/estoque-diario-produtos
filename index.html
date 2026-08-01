@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Feliz Dia das Namoradas, Ana Paula 💚</title>
+  <title>Uma mensagem especial pra Ana Paula 💚</title>
   <style>
     :root{
       color-scheme: light;
@@ -181,6 +181,19 @@
     .hidden{
       display:none !important;
     }
+    .runaway-btn{
+      position:relative;
+      margin-top:28px;
+      padding:12px 20px;
+      font-size:14px;
+      font-weight:600;
+      color:var(--accent-2);
+      background:var(--bg1);
+      border:2px solid #f3d4dd;
+      border-radius:10px;
+      cursor:pointer;
+      transition:transform .12s ease-out;
+    }
   </style>
 </head>
 <body>
@@ -197,19 +210,25 @@
 
   <div class="card hidden" id="card">
     <div class="icon">💖</div>
-    <h1>Feliz Dia das Namoradas!</h1>
-    <h2>Para Ana Paula</h2>
+    <h1>Você é especial, Ana Paula!</h1>
+    <h2>Uma mensagem com muito carinho</h2>
     <div class="divider"></div>
     <p>
-      Hoje é o dia de parar e dizer o que sinto: você é o melhor presente que a vida me deu.
-      Cada dia ao seu lado é mais leve, mais bonito e mais feliz — obrigado por existir e por
-      escolher caminhar comigo.
+      Ana, você é uma pessoa especial demais. Sua força pra enfrentar os desafios do dia
+      a dia, sua determinação e o jeito como você nunca desiste, mesmo quando tudo parece
+      difícil, inspiram todo mundo ao seu redor.
     </p>
     <p>
-      Que a gente continue construindo essa história com muito carinho, cumplicidade e amor,
-      hoje e sempre. Eu te amo!
+      Você é batalhadora de verdade — corre atrás dos seus objetivos com muita garra, e
+      cada conquista sua é fruto do seu esforço e da sua dedicação. Isso te torna motivo
+      de orgulho pra toda a sua família, que vê em você um exemplo de força e superação.
     </p>
-    <div class="signature">Com todo o meu amor. 💚</div>
+    <p>
+      Que você continue brilhando e colhendo tudo de bom que merece, porque você é
+      incrível.
+    </p>
+    <div class="signature">Com todo o carinho, sempre. 💚</div>
+    <button class="runaway-btn" id="closeBtn">Fechar página ✖</button>
   </div>
 
   <script>
@@ -251,6 +270,34 @@
     unlockBtn.addEventListener('click', tryUnlock);
     input.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') tryUnlock();
+    });
+
+    const closeBtn = document.getElementById('closeBtn');
+    const closePhrases = [
+      'Fechar página ✖', 'Não vale! 😅', 'Tenta de novo', 'Quase! 💨',
+      'Ainda não 😏', 'Pera aí...', 'Não mesmo 💚', 'Segura essa!'
+    ];
+    function dodge(){
+      const btnRect = closeBtn.getBoundingClientRect();
+      const maxX = window.innerWidth - btnRect.width - 16;
+      const maxY = window.innerHeight - btnRect.height - 16;
+      const x = Math.max(16, Math.random() * maxX);
+      const y = Math.max(16, Math.random() * maxY);
+      closeBtn.style.position = 'fixed';
+      closeBtn.style.left = x + 'px';
+      closeBtn.style.top = y + 'px';
+      closeBtn.style.margin = '0';
+      closeBtn.textContent = closePhrases[Math.floor(Math.random() * closePhrases.length)];
+    }
+    closeBtn.addEventListener('mouseenter', dodge);
+    closeBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      dodge();
+    });
+
+    window.addEventListener('beforeunload', (e) => {
+      e.preventDefault();
+      e.returnValue = '';
     });
   </script>
 </body>
