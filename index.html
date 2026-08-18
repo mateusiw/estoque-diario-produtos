@@ -1859,15 +1859,21 @@
       return h+'</tr></thead>';
     }
     function tomateGranelBoxInnerHtml(){
-      const granel=[0,1,2].reduce((s,t)=>s+totalProcessar(t,'tomate'),0);
+      const granelByType=[0,1,2].map(t=>totalProcessar(t,'tomate'));
+      const granel=granelByType.reduce((s,v)=>s+v,0);
       const days=daysForProduce('tomate');
+      const sizesHtml=`<div class="tomate-summary-sizes">`+
+        TOMATE_META.map((meta,t)=>{
+          const v=granelByType[t],uni=Math.round(v/factorNum('tomateGranelCumbucaKg'));
+          return `<div class="tomate-size-cell" style="--c:${meta.color}"><strong>${meta.label}</strong><span data-granel-kg="${t}">${fmtDec(v)} kg</span><em data-granel-uni="${t}">≈ ${fmt(uni)} cumb.</em></div>`;
+        }).join('')+`</div>`;
       const partnerRows=partnersForProduce('tomate').map(partner=>{
         const kgTotal=partnerProcessarTotal(partner,days,'tomate');
         if(kgTotal<=0)return '';
         const uni=Math.round(kgTotal/factorNum('tomateGranelCumbucaKg'));
         return `<div class="tomate-partner-est-row"><span>${esc(partner.name)}</span><b>${fmtDec(kgTotal)} kg → ${fmt(uni)} cumbucas</b></div>`;
       }).join('');
-      return `<div class="tomate-summary-title">Total em kg a granel (a processar)</div><div class="tomate-summary-grand" id="tomateTotalGranel">${fmtDec(granel)}</div><span class="tomate-summary-sub" id="tomateTotalGranelUni">≈ ${fmt(Math.round(granel/factorNum('tomateGranelCumbucaKg')))} cumbucas estimadas</span>`+
+      return `<div class="tomate-summary-title">Total em kg a granel (a processar)</div>`+sizesHtml+`<div class="tomate-summary-grand" id="tomateTotalGranel">${fmtDec(granel)}</div><span class="tomate-summary-sub" id="tomateTotalGranelUni">≈ ${fmt(Math.round(granel/factorNum('tomateGranelCumbucaKg')))} cumbucas estimadas</span>`+
         (partnerRows?`<div class="tomate-partner-est-list">${partnerRows}</div>`:'');
     }
     function tomateSummaryHtml(){
@@ -2082,10 +2088,16 @@
           ];
         }else if(id==='tomate'){
           const cg=geralTypeTotal(0,'tomate'),m=geralTypeTotal(1,'tomate'),p=geralTypeTotal(2,'tomate');
+          const granelCG=geralProcessarTotal(0,'tomate'),granelM=geralProcessarTotal(1,'tomate'),granelP=geralProcessarTotal(2,'tomate');
+          const granelFac=factorNum('tomateGranelCumbucaKg');
+          const estCG=Math.round(granelCG/granelFac),estM=Math.round(granelM/granelFac),estP=Math.round(granelP/granelFac);
           rows=[
             ['Cumbucas CG',fmt(cg),'','tomateCumbucasCG','label|tomate|cg',`Soma das cumbucas CG lançadas em todos os parceiros e datas`],
             ['Cumbucas M',fmt(m),'','tomateCumbucasM','label|tomate|m',`Soma das cumbucas M lançadas em todos os parceiros e datas`],
-            ['Cumbucas P',fmt(p),'','tomateCumbucasP','label|tomate|p',`Soma das cumbucas P lançadas em todos os parceiros e datas`]
+            ['Cumbucas P',fmt(p),'','tomateCumbucasP','label|tomate|p',`Soma das cumbucas P lançadas em todos os parceiros e datas`],
+            ['Cumbucas CG (granel)',fmt(estCG),'rank-est','tomateCumbucasCGGranel','label|tomate|cg-granel',`${fmt(granelCG)} kg a granel ÷ ${factorTxt(granelFac)} kg/cumbuca = ${fmt(estCG)} cumbucas (estimativa)`],
+            ['Cumbucas M (granel)',fmt(estM),'rank-est','tomateCumbucasMGranel','label|tomate|m-granel',`${fmt(granelM)} kg a granel ÷ ${factorTxt(granelFac)} kg/cumbuca = ${fmt(estM)} cumbucas (estimativa)`],
+            ['Cumbucas P (granel)',fmt(estP),'rank-est','tomateCumbucasPGranel','label|tomate|p-granel',`${fmt(granelP)} kg a granel ÷ ${factorTxt(granelFac)} kg/cumbuca = ${fmt(estP)} cumbucas (estimativa)`]
           ];
         }else if(id==='couveflor'){
           const filCx=geralTypeTotal(0,'couveflor'),cabNpCx=geralTypeTotal(1,'couveflor'),cabPrCx=geralTypeTotal(2,'couveflor');
