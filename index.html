@@ -349,7 +349,7 @@
     .pcard b i{width:8px;height:8px;border-radius:50%;flex:none;background:var(--c)}
     .pcard .valrow{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
     .pcard-subrow{margin-top:-2px;flex-wrap:nowrap!important;gap:6px!important}
-    .pcard--tomate .pcard-subrow .val{font-size:16px;letter-spacing:-.02em;white-space:nowrap}
+    .pcard--tomate .pcard-subrow .val{font-size:16px;font-weight:600;letter-spacing:-.02em;white-space:nowrap}
     .pcard--tomate .pcard-subrow .kg{font-size:15px;padding:2px 6px}
     .pcard .val{font-size:19px;font-weight:800;color:var(--ink);font-variant-numeric:tabular-nums}
     .pcard .kg{font-size:17px;color:var(--c);font-weight:800;border:1.5px solid var(--c);border-radius:8px;padding:2px 8px;white-space:nowrap}
@@ -436,9 +436,9 @@
     @media(max-width:700px){.tomate-summary{grid-template-columns:1fr}}
     .stock-table{width:100%;min-width:900px;border-collapse:separate;border-spacing:0;table-layout:fixed;
       font-size:14px;font-variant-numeric:tabular-nums}
-    .stock-table th,.stock-table td{border-bottom:1px solid var(--line);border-left:1px solid var(--line);
+    .stock-table th,.stock-table td{border-bottom:1px solid var(--line-strong);border-left:1px solid var(--line-strong);
       padding:0;text-align:center;height:42px}
-    .stock-table .day-start{border-left:2px solid var(--line-strong)}
+    .stock-table .day-start{border-left:2px solid color-mix(in srgb,var(--line-strong) 55%,var(--ink) 45%)}
     .stock-table .partner-col{width:200px;text-align:right;padding-right:16px;position:sticky;left:0;z-index:3;
       border-left:0;background:var(--surface);font-weight:700;font-size:13.5px;box-shadow:4px 0 12px rgba(9,40,25,.05)}
     .stock-table thead .partner-col{background:var(--surface-2);z-index:4}
@@ -2082,13 +2082,10 @@
           ];
         }else if(id==='tomate'){
           const cg=geralTypeTotal(0,'tomate'),m=geralTypeTotal(1,'tomate'),p=geralTypeTotal(2,'tomate');
-          const granelFac=factorNum('tomateGranelCumbucaKg');
           rows=[
             ['Cumbucas CG',fmt(cg),'','tomateCumbucasCG','label|tomate|cg',`Soma das cumbucas CG lançadas em todos os parceiros e datas`],
             ['Cumbucas M',fmt(m),'','tomateCumbucasM','label|tomate|m',`Soma das cumbucas M lançadas em todos os parceiros e datas`],
-            ['Cumbucas P',fmt(p),'','tomateCumbucasP','label|tomate|p',`Soma das cumbucas P lançadas em todos os parceiros e datas`],
-            ['A granel (processar)',fmt(granel)+' kg',granel>0?'danger':'','tomateGranelProcessar','label|tomate|granel',`Soma dos kg a processar lançados em todos os parceiros e datas`],
-            ['Estimativa cumbucas do granel (ainda a processar)',fmt(Math.round(granel/granelFac)),'highlight','tomateEstimativaGranel','tomateGranelCumbucaKg',`Estimativa a partir do kg a granel que ainda falta processar: ${fmt(granel)} kg ÷ ${factorTxt(granelFac)} kg/cumbuca = ${fmt(Math.round(granel/granelFac))} cumbucas (estimativa, não é contagem real)`]
+            ['Cumbucas P',fmt(p),'','tomateCumbucasP','label|tomate|p',`Soma das cumbucas P lançadas em todos os parceiros e datas`]
           ];
         }else if(id==='couveflor'){
           const filCx=geralTypeTotal(0,'couveflor'),cabNpCx=geralTypeTotal(1,'couveflor'),cabPrCx=geralTypeTotal(2,'couveflor');
@@ -2125,27 +2122,25 @@
           return String(labelA).localeCompare(String(labelB),'pt-BR',{sensitivity:'base'});
         });
         const det=detailRows.map(r=>`<span class="dr ${r[2]||''}"${r[5]?` title="${esc(r[5])}"`:''}>${r[3]?dashboardLabelText(r[3],r[0]):r[0]}<b>${r[1]}</b></span>`).join('');
-        const valLabel=x.c.id==='tomate'?'Cumbucas Prontas':x.c.id==='pepino'?'Unidades':cultureUnitLabel(x.c.id);
+        const valLabel=x.c.id==='tomate'?'Total de Cumbucas':x.c.id==='pepino'?'Unidades':cultureUnitLabel(x.c.id);
         // Pepino é lançado direto em kg, mas o valor grande do card mostra a
         // estimativa de unidades (pacotes 280 g) em vez do kg — mesma conta
         // da linha "Estimativa pacotes 280 g" do detalhamento — pra bater
         // com o número que já aparece como "Estimativa PCT" logo abaixo.
         const pepinoPacoteFac=factorNum('pepinoPacoteKg');
         const pepinoUnEstimate=x.c.id==='pepino'?Math.round(x.kg/pepinoPacoteFac):0;
-        const valDisplay=x.c.id==='pepino'?fmt(pepinoUnEstimate):fmtUn(x);
-        const valTitle=x.c.id==='tomate'?' title="Cumbucas já prontas e embaladas — não inclui o que ainda está a granel para processar"':x.c.id==='pepino'?` title="Estimativa de unidades (pacotes 280 g): ${fmt(x.kg)} kg ÷ ${String(pepinoPacoteFac).replace('.',',')} kg/pacote = ${fmt(pepinoUnEstimate)} unidades (estimativa)"`:'';
-        // Para tomate, o badge de kg mostra só o peso das cumbucas PRONTAS —
-        // o mesmo recorte do valor grande ao lado. O kg do granel (que ainda
-        // vai virar cumbuca) fica só no detalhamento de baixo ("A granel"),
-        // pra não misturar duas coisas diferentes num único número aqui.
-        const badgeKg=x.c.id==='tomate'?x.un*factorNum('tomateCumbucaKg'):x.kg;
-        const kgTitle=x.c.id==='tomate'?` title="Peso só das cumbucas já prontas: ${fmt(x.un)} cumbucas × ${String(factorNum('tomateCumbucaKg')).replace('.',',')} kg/cumbuca = ${fmt(badgeKg)} kg. Não inclui o kg ainda a granel (${fmt(granel)} kg) — veja no detalhamento abaixo."`:'';
-        // Logo abaixo do valor de cumbucas prontas, mostra também a estimativa
-        // do que ainda vai virar cumbuca (a partir do kg a granel) — mesma
-        // conta da linha "Estimativa cumbucas do granel" do detalhamento,
-        // só que já visível de cara, sem precisar abrir o card pra achar.
+        // Tomate: o valor grande do card passa a somar as cumbucas já
+        // prontas com a estimativa de cumbucas do que ainda está a granel —
+        // as duas parcelas dessa soma continuam visíveis, só que menores,
+        // como subEst logo abaixo.
+        const prontasKg=x.un*factorNum('tomateCumbucaKg');
         const estGranelUn=granel>0?Math.round(granel/factorNum('tomateGranelCumbucaKg')):0;
-        const subEst=x.c.id==='tomate'&&granel>0?`<span class="valrow pcard-subrow"><span class="val">${fmt(estGranelUn)} Cumbucas Estimadas (KG Granel)</span><span class="kg">≈ ${fmt(granel)} kg</span></span>`:'';
+        const tomateTotalUn=x.un+estGranelUn,tomateTotalKg=prontasKg+granel;
+        const valDisplay=x.c.id==='pepino'?fmt(pepinoUnEstimate):x.c.id==='tomate'?fmt(tomateTotalUn):fmtUn(x);
+        const valTitle=x.c.id==='tomate'?` title="Soma de ${fmt(x.un)} cumbucas já prontas + ${fmt(estGranelUn)} cumbucas estimadas do que ainda está a granel"`:x.c.id==='pepino'?` title="Estimativa de unidades (pacotes 280 g): ${fmt(x.kg)} kg ÷ ${String(pepinoPacoteFac).replace('.',',')} kg/pacote = ${fmt(pepinoUnEstimate)} unidades (estimativa)"`:'';
+        const badgeKg=x.c.id==='tomate'?tomateTotalKg:x.kg;
+        const kgTitle=x.c.id==='tomate'?` title="Peso das cumbucas prontas (${fmt(prontasKg)} kg) + kg ainda a granel (${fmt(granel)} kg) = ${fmt(tomateTotalKg)} kg"`:'';
+        const subEst=x.c.id==='tomate'?`<span class="valrow pcard-subrow"><span class="val">${fmt(x.un)} Cumbucas Prontas</span><span class="kg">≈ ${fmt(prontasKg)} kg</span></span><span class="valrow pcard-subrow"><span class="val">${fmt(estGranelUn)} Cumbucas Estimadas (KG Granel)</span><span class="kg">≈ ${fmt(granel)} kg</span></span>`:'';
         return `<div class="pcard${x.c.id==='tomate'?' pcard--tomate':''}" style="--c:${x.c.color}"><span class="pic">${CULTURE_EMOJI[x.c.id]||genericCultureSvg(x.c.color)}</span><b><i></i>${esc(x.c.label)}</b><span class="valrow"><span class="val"${valTitle}>${valDisplay} ${esc(valLabel)}</span><span class="kg"${kgTitle}>≈ ${fmt(badgeKg)} kg</span></span>${subEst}<div class="pbar"><i style="width:${pct}%"></i></div><span class="pct">${pct}% do peso total</span><div class="pdet">${det}</div></div>`;
       }).join('');
       return `<section class="dash-panel" style="grid-column:1/-1"><h4>Estoque por Produto<small>Unidades e Peso Estimado.</small></h4><div class="produce-cards">${cardsHtml}</div></section>`;
