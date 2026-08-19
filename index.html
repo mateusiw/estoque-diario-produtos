@@ -55,14 +55,14 @@
     button,input,select{font:inherit;color:inherit}
     ::selection{background:var(--brand-soft-strong)}
     .shell{max-width:1900px;margin:auto;padding:24px 28px 48px}
-    /* Enquanto não há sessão válida (planilha configurada com login), o
+    /* Enquanto não há sessão válida (Supabase configurado com login), o
      * conteúdo real do painel nem chega a ser montado — ver boot(). Esta
      * classe é só a garantia visual caso .shell já exista no DOM. */
     body.auth-locked .shell{display:none}
     body.auth-locked{background:linear-gradient(135deg,#eef1fb 0%,#eafaf3 100%)}
     :root[data-theme="dark"] body.auth-locked{background:linear-gradient(135deg,#11161c,#0d1913)}
     @media(prefers-color-scheme:dark){:root:where(:not([data-theme="light"])) body.auth-locked{background:linear-gradient(135deg,#11161c,#0d1913)}}
-    /* Enquanto verifica a sessão salva (chamada à Planilha Google, pode
+    /* Enquanto verifica a sessão salva (chamada ao Supabase, pode
      * demorar alguns segundos), mostra um indicador em vez de tela vazia. */
     .boot-loading{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;z-index:5}
     .boot-loading[hidden]{display:none}
@@ -985,7 +985,7 @@
 <body class="auth-locked">
   <div class="boot-loading" id="bootLoading" hidden aria-hidden="true">
     <div class="boot-spinner"></div>
-    <p>Conectando à planilha…</p>
+    <p>Conectando ao banco de dados…</p>
   </div>
   <main class="shell">
     <header class="topbar">
@@ -994,7 +994,7 @@
         <div><h1>Estoque Diário Produtos</h1><p>Controle de Caixas, Processamento e Pedidos</p></div>
       </div>
       <div class="update-stamp" id="headerUpdateStamp" title="Última vez que algum dado do estoque foi alterado ou sincronizado"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg><span>Atualizado em <strong id="headerUpdateStampTime">—</strong></span></div>
-      <button type="button" class="btn btn-danger btn-grow" id="headerRefreshBtn" aria-label="Buscar as atualizações mais recentes da planilha"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 1 0-2.3 6.3"/><path d="M20 5v6h-6"/></svg><span class="btn-label">Atualizar</span></button>
+      <button type="button" class="btn btn-danger btn-grow" id="headerRefreshBtn" aria-label="Buscar as atualizações mais recentes do banco de dados"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 1 0-2.3 6.3"/><path d="M20 5v6h-6"/></svg><span class="btn-label">Atualizar</span></button>
       <div class="actions">
         <button class="btn btn-icon-only" id="undoBtn" title="Desfazer (Ctrl+Z)" aria-label="Desfazer última alteração" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg></button>
         <button class="btn btn-icon-only" id="redoBtn" title="Refazer (Ctrl+Y)" aria-label="Refazer última alteração desfeita" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14l5-5-5-5"/><path d="M20 9H9.5a5.5 5.5 0 0 0 0 11H13"/></svg></button>
@@ -1005,10 +1005,10 @@
         <button class="btn btn-grow" id="csvBtn" aria-label="Exportar CSV"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11m0 0-3.5-3.5M12 15l3.5-3.5"/><path d="M5 16v3a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3"/></svg><span class="btn-label">Exportar CSV</span></button>
         <button class="btn btn-grow" id="imgBtn" aria-label="Capturar imagem do painel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8.5A2.5 2.5 0 0 1 6.5 6h1.2l1.1-1.8A1.5 1.5 0 0 1 10.1 3.5h3.8a1.5 1.5 0 0 1 1.3.7L16.3 6h1.2A2.5 2.5 0 0 1 20 8.5v8A2.5 2.5 0 0 1 17.5 19h-11A2.5 2.5 0 0 1 4 16.5v-8Z"/><circle cx="12" cy="12.5" r="3.4"/></svg><span class="btn-label">Capturar imagem</span></button>
         <button class="btn btn-soft btn-grow" id="printBtn" aria-label="Gerar relatório profissional em A4"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3.5h7l3 3V10"/><path d="M14 3.5v3h3"/><path d="M7 14h10v6.5H7z"/><path d="M7 8.5V4H5.5A1.5 1.5 0 0 0 4 5.5v9A1.5 1.5 0 0 0 5.5 16H7M17 16h1.5a1.5 1.5 0 0 0 1.5-1.5v-4A1.5 1.5 0 0 0 18.5 9H7"/></svg><span class="btn-label">Relatório A4</span></button>
-        <button class="btn btn-primary btn-grow" id="syncBtn" aria-label="Salvar na planilha"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7.5 18a4.5 4.5 0 0 1-.6-8.96A5.5 5.5 0 0 1 17.6 8a4 4 0 0 1 .9 7.9"/><path d="M12 18.5v-6m0 0-2.6 2.6M12 12.5l2.6 2.6"/></svg><span class="btn-label">Salvar na planilha</span></button>
+        <button class="btn btn-primary btn-grow" id="syncBtn" aria-label="Salvar na nuvem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7.5 18a4.5 4.5 0 0 1-.6-8.96A5.5 5.5 0 0 1 17.6 8a4 4 0 0 1 .9 7.9"/><path d="M12 18.5v-6m0 0-2.6 2.6M12 12.5l2.6 2.6"/></svg><span class="btn-label">Salvar na nuvem</span></button>
       </div>
       <div class="topbar-status" id="topbarStatus">
-        <button class="btn btn-soft btn-grow" id="systemBtn" aria-label="Gerenciar sistema — cadastros, culturas, cálculos, conexão com a planilha e limpeza de dados"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82A1.65 1.65 0 0 0 3 13.09H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span class="btn-label">Gerenciar sistema</span></button>
+        <button class="btn btn-soft btn-grow" id="systemBtn" aria-label="Gerenciar sistema — cadastros, culturas, cálculos, conexão com o banco de dados e limpeza de dados"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82A1.65 1.65 0 0 0 3 13.09H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span class="btn-label">Gerenciar sistema</span></button>
         <div class="presence-bar" id="presenceBar" hidden tabindex="0"><span class="presence-avatars" id="presenceAvatars"></span><span id="presenceText"></span></div>
         <div class="cloud-badge" id="cloudBadge" tabindex="0" aria-label="Somente neste dispositivo"><span class="dot"></span><span id="cloudText">Somente neste dispositivo</span></div>
         <div class="title-chip" tabindex="0" aria-label="Salvo automaticamente neste navegador"><span class="title-dot"></span><span class="save-state" id="saveState">Salvo automaticamente</span></div>
@@ -1117,7 +1117,7 @@
 
   <dialog id="productCatalogDialog">
     <form method="dialog" id="productCatalogForm">
-      <div class="dialog-head"><div><h3>Catálogo de produtos</h3><p>Cadastre aqui, uma única vez, os produtos que os clientes pedem — nome, cultura de origem e kg por unidade. Ao salvar, fica gravado na planilha e vale para todos os dispositivos.</p></div><button type="button" class="dialog-close" onclick="backOrCloseDialog('productCatalogDialog')" aria-label="Fechar">×</button></div>
+      <div class="dialog-head"><div><h3>Catálogo de produtos</h3><p>Cadastre aqui, uma única vez, os produtos que os clientes pedem — nome, cultura de origem e kg por unidade. Ao salvar, fica gravado no banco de dados e vale para todos os dispositivos.</p></div><button type="button" class="dialog-close" onclick="backOrCloseDialog('productCatalogDialog')" aria-label="Fechar">×</button></div>
       <div class="dialog-body">
         <p class="dialog-alert" id="productCatalogAlert" hidden></p>
         <div id="productCatalogBody"></div>
@@ -1152,10 +1152,11 @@
 
   <dialog id="settingsDialog">
     <form method="dialog" id="settingsForm">
-      <div class="dialog-head"><div><h3>Planilha Google</h3><p>Cole a URL do aplicativo da web gerada após implantar o Code.gs.</p></div><button type="button" class="dialog-close" onclick="backOrCloseDialog('settingsDialog')" aria-label="Fechar">×</button></div>
+      <div class="dialog-head"><div><h3>Banco de dados (Supabase)</h3><p>Cole a URL do projeto e a chave pública "anon", disponíveis em Project Settings → API no painel do Supabase.</p></div><button type="button" class="dialog-close" onclick="backOrCloseDialog('settingsDialog')" aria-label="Fechar">×</button></div>
       <div class="dialog-body">
         <p class="dialog-alert" id="settingsAlert" hidden></p>
-        <div class="field"><label for="gasUrl">URL do Apps Script</label><input id="gasUrl" type="url" placeholder="https://script.google.com/macros/s/.../exec"><div class="field-help">A URL fica salva apenas neste navegador. Após configurar, use “Salvar na planilha”.</div></div>
+        <div class="field"><label for="supaUrl">URL do projeto Supabase</label><input id="supaUrl" type="url" placeholder="https://xxxxxxxxxxxx.supabase.co"><div class="field-help">Fica salva apenas neste navegador.</div></div>
+        <div class="field"><label for="supaKey">Chave pública (anon key)</label><input id="supaKey" type="text" placeholder="eyJhbGciOi..." autocomplete="off"><div class="field-help">É a chave "anon public", feita para ser usada no navegador — não é secreta. Após configurar, use “Salvar na nuvem”.</div></div>
       </div>
       <div class="dialog-foot"><button type="button" class="btn" onclick="backOrCloseDialog('settingsDialog')">Cancelar</button><button type="button" class="btn btn-cloud" id="settingsTest">Testar conexão</button><button type="submit" class="btn btn-primary" value="default" id="settingsSave">Salvar e testar</button></div>
     </form>
@@ -1208,7 +1209,6 @@
       </div>
       <label class="auth-remember"><input type="checkbox" id="authRemember" checked><span>Manter conectado</span></label>
       <button type="submit" class="btn btn-primary auth-submit" id="authSave">Entrar</button>
-      <button type="button" class="auth-link" id="authSettingsBtn" title="Trocar a URL do Apps Script conectada">Configurar conexão</button>
     </form>
   </dialog>
 
@@ -1248,7 +1248,7 @@
   </dialog>
 
   <dialog id="logDialog">
-    <div class="dialog-head"><div><h3>Histórico de alterações</h3><p>Registro das últimas ações feitas no painel, com usuário e horário. Também fica salvo na aba “Histórico” da planilha a cada sincronização.</p></div><button type="button" class="dialog-close" onclick="backOrCloseDialog('logDialog')" aria-label="Fechar">×</button></div>
+    <div class="dialog-head"><div><h3>Histórico de alterações</h3><p>Registro das últimas ações feitas no painel, com usuário e horário. Também fica salvo no banco de dados a cada sincronização.</p></div><button type="button" class="dialog-close" onclick="backOrCloseDialog('logDialog')" aria-label="Fechar">×</button></div>
     <div class="dialog-body"><div class="log-list" id="logList"></div></div>
     <div class="dialog-foot"><button class="btn btn-primary" onclick="backOrCloseDialog('logDialog')">Fechar</button></div>
   </dialog>
@@ -1275,12 +1275,12 @@
       <div class="sys-section">Usuário e histórico</div>
       <div class="sys-grid">
         <button type="button" class="sys-item" id="sysUser"><span class="sys-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="8.2" r="3.6"/><path d="M5 20c.8-3.8 3.6-6 7-6s6.2 2.2 7 6"/></svg></span><span class="sys-txt"><strong id="sysUserTitle">Trocar usuário</strong><span id="sysUserDesc">Define quem assina as alterações neste dispositivo.</span></span></button>
-        <button type="button" class="sys-item" id="sysLog"><span class="sys-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg></span><span class="sys-txt"><strong>Histórico de alterações</strong><span>Quem alterou o quê e quando — também salvo na aba “Histórico” da planilha.</span></span></button>
+        <button type="button" class="sys-item" id="sysLog"><span class="sys-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg></span><span class="sys-txt"><strong>Histórico de alterações</strong><span>Quem alterou o quê e quando — também salvo no banco de dados.</span></span></button>
         <button type="button" class="sys-item" id="sysUsers" hidden><span class="sys-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3 19c.6-3.4 3-5.4 6-5.4s5.4 2 6 5.4"/><circle cx="17.5" cy="9" r="2.4"/><path d="M15.8 13.8c2.4.3 4 1.9 4.5 4.7"/></svg></span><span class="sys-txt"><strong>Gerenciar usuários</strong><span>Criar contas, definir perfil (master ou só para preencher), ativar/desativar.</span></span></button>
       </div>
-      <div class="sys-section" id="sysDataSection">Planilha e dados</div>
+      <div class="sys-section" id="sysDataSection">Banco de dados</div>
       <div class="sys-grid" id="sysDataGrid">
-        <button type="button" class="sys-item" id="sysSettings"><span class="sys-ico cloud"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h9M17 7h3M4 17h4M12 17h8"/><circle cx="15" cy="7" r="2.1"/><circle cx="8" cy="17" r="2.1"/></svg></span><span class="sys-txt"><strong>Configurar Planilha Google</strong><span>URL do Apps Script usada na sincronização.</span></span></button>
+        <button type="button" class="sys-item" id="sysSettings"><span class="sys-ico cloud"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h9M17 7h3M4 17h4M12 17h8"/><circle cx="15" cy="7" r="2.1"/><circle cx="8" cy="17" r="2.1"/></svg></span><span class="sys-txt"><strong>Configurar Supabase</strong><span>URL do projeto e chave anon usadas na sincronização.</span></span></button>
         <button type="button" class="sys-item danger" id="sysClear"><span class="sys-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4.5A1.5 1.5 0 0 1 10.5 3h3A1.5 1.5 0 0 1 15 4.5V7"/><path d="M6 7l1 12.5A2 2 0 0 0 9 21h6a2 2 0 0 0 2-1.5L18 7"/><path d="M10 11v6M14 11v6"/></svg></span><span class="sys-txt"><strong>Limpar dados</strong><span id="sysClearDesc">Zera os valores lançados na cultura selecionada.</span></span></button>
       </div>
     </div>
@@ -1289,7 +1289,7 @@
 
   <dialog id="cultureDialog">
     <form method="dialog" id="cultureForm">
-      <div class="dialog-head"><div><h3>Nova cultura</h3><p>A cultura vira uma nova aba no painel, com tabela própria de parceiros e datas, e é gravada na planilha como as demais.</p></div><button type="button" class="dialog-close" onclick="backOrCloseDialog('cultureDialog')" aria-label="Fechar">×</button></div>
+      <div class="dialog-head"><div><h3>Nova cultura</h3><p>A cultura vira uma nova aba no painel, com tabela própria de parceiros e datas, e é gravada no banco de dados como as demais.</p></div><button type="button" class="dialog-close" onclick="backOrCloseDialog('cultureDialog')" aria-label="Fechar">×</button></div>
       <div class="dialog-body">
         <p class="dialog-alert" id="cultureAlert" hidden></p>
         <div class="field"><label for="cultureName">Nome da cultura</label><input id="cultureName" maxlength="40" placeholder="Ex.: Alface" autocomplete="off" required></div>
@@ -1308,14 +1308,14 @@
   <dialog id="generalCulturesDialog">
     <form method="dialog" id="generalCulturesForm">
       <div class="dialog-head"><div><h3>Culturas visíveis na aba Geral</h3><p>Desmarque uma cultura para ocultar seus cartões no resumo geral. Os lançamentos e a aba da cultura não serão apagados.</p></div><button type="button" class="dialog-close" onclick="backOrCloseDialog('generalCulturesDialog')" aria-label="Fechar">×</button></div>
-      <div class="dialog-body"><div class="culture-check-group" id="generalCulturesList"></div><div class="field-help">Esta configuração fica salva na planilha e vale para todos os dispositivos.</div></div>
+      <div class="dialog-body"><div class="culture-check-group" id="generalCulturesList"></div><div class="field-help">Esta configuração fica salva no banco de dados e vale para todos os dispositivos.</div></div>
       <div class="dialog-foot"><button type="button" class="btn" onclick="backOrCloseDialog('generalCulturesDialog')">Cancelar</button><button type="submit" class="btn btn-primary" id="generalCulturesSave">Salvar visibilidade</button></div>
     </form>
   </dialog>
 
   <dialog id="factorsDialog">
     <form method="dialog" id="factorsForm">
-      <div class="dialog-head"><div><h3>Editar cálculos</h3><p>Renomeie, exclua ou ajuste os fatores usados nos totais de KG e nas estimativas. Ao salvar, as alterações são gravadas na planilha e valem para todos os dispositivos.</p></div><button type="button" class="dialog-close" onclick="backOrCloseDialog('factorsDialog')" aria-label="Fechar">×</button></div>
+      <div class="dialog-head"><div><h3>Editar cálculos</h3><p>Renomeie, exclua ou ajuste os fatores usados nos totais de KG e nas estimativas. Ao salvar, as alterações são gravadas no banco de dados e valem para todos os dispositivos.</p></div><button type="button" class="dialog-close" onclick="backOrCloseDialog('factorsDialog')" aria-label="Fechar">×</button></div>
       <div class="dialog-body"><p class="dialog-alert" id="factorsAlert" hidden></p><div id="factorsBody"></div></div>
       <div class="dialog-foot"><button type="button" class="btn" id="factorsReset">Restaurar padrões</button><button type="button" class="btn" onclick="backOrCloseDialog('factorsDialog')">Cancelar</button><button type="submit" class="btn btn-primary" id="factorsSave">Salvar cálculos</button></div>
     </form>
@@ -1430,6 +1430,7 @@
   </dialog>
   <div class="toast-modern" id="modernToast"></div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     // ── PWA: favicon/apple-touch-icon apontam pro arquivo icon.png (ao lado
     // do index.html); só o manifest continua sendo montado na hora, porque
@@ -1591,7 +1592,14 @@
       },{passive:false});
       scrollEl.addEventListener('touchend',e=>{if(e.touches.length<2)pinchStartDist=0});
     })();
-    const STORAGE_KEY='spg_estoque_diario_v2', GAS_KEY='spg_estoque_gas_url', THEME_KEY='spg_estoque_theme', TOKEN_KEY='spg_estoque_token', SIM_STORAGE_KEY='spg_estoque_simulacao_v1';
+    const STORAGE_KEY='spg_estoque_diario_v2', SUPA_URL_KEY='spg_estoque_supa_url', SUPA_ANON_KEY='spg_estoque_supa_key', THEME_KEY='spg_estoque_theme', TOKEN_KEY='spg_estoque_token', SIM_STORAGE_KEY='spg_estoque_simulacao_v1';
+    // Projeto Supabase padrão do painel — já vem pronto pra usar, sem
+    // precisar abrir "Configurar conexão" na primeira vez. Continua possível
+    // trocar por outro projeto em Gerenciar sistema > Configurar Supabase:
+    // o que for salvo no localStorage (via saveSettings) sempre tem prioridade
+    // sobre esses valores padrão (ver getSupaConfig()).
+    const DEFAULT_SUPA_URL='https://kjrpwpdpgykynguarihs.supabase.co';
+    const DEFAULT_SUPA_ANON_KEY='sb_publishable_0A8k2lTD7eqsmcggzdfUOg_mzbaGxKo';
     const BASE_PRODUCE=[{id:'geral',label:'Geral',color:'#4a5568'},{id:'resumoantigo',label:'Resumo',color:'#6b7c93'},{id:'brocolis',label:'Brócolis',color:'#2e9e46'},{id:'tomate',label:'Tomate',color:'#e05252'},{id:'couveflor',label:'Couve-flor',color:'#8a6bd8'},{id:'pepino',label:'Pepino',color:'#1e9c86'},{id:'simulacao',label:'Simulação',color:'#0ea5e9'}];
     // "geral", "resumoantigo" e "simulacao" são abas especiais (painéis
     // calculados/ferramentas), não culturas de verdade — não entram em
@@ -1623,7 +1631,7 @@
     function recordOp(store,key,value){pendingOps[store+'|'+key]={store,key,value:value==null?null:value}}
     function applyOps(target,ops){Object.values(ops).forEach(op=>{const s=target[op.store]=target[op.store]||{};if(op.value==null)delete s[op.key];else s[op.key]=op.value})}
     // Reaplica no estado (vindo da nuvem/outra aba) os registros de histórico
-    // feitos aqui e ainda não confirmados na planilha.
+    // feitos aqui e ainda não confirmados no banco de dados.
     function applyPendingLogs(target){
       if(!pendingLogs.length)return;
       target.log=Array.isArray(target.log)?target.log:[];
@@ -1638,11 +1646,11 @@
       {key:'adicionar_data',label:'Adicionar data'},
       {key:'gerenciar_cadastros',label:'Gerenciar cadastros'}
     ];
-    // Quando a Planilha Google está configurada, o login com usuário/senha
-    // (verificado no Apps Script) é obrigatório e define o perfil de acesso.
-    // Sem planilha configurada (uso só neste dispositivo), mantém-se o modo
+    // Quando o Supabase está configurado, o login com usuário/senha
+    // (verificado no banco de dados) é obrigatório e define o perfil de acesso.
+    // Sem backend configurado (uso só neste dispositivo), mantém-se o modo
     // simples de identificação por nome, sem senha — não há o que proteger.
-    function hasBackend(){return !!getGasUrl()}
+    function hasBackend(){const c=getSupaConfig();return !!(c.url&&c.key)}
     // "Manter conectado" define onde a sessão fica guardada: localStorage
     // sobrevive ao fechar o navegador; sessionStorage some quando a aba fecha
     // (mais seguro em computador compartilhado). getSession() checa as duas.
@@ -1759,7 +1767,7 @@
       state.updatedAt=new Date().toISOString();localStorage.setItem(STORAGE_KEY,JSON.stringify(state));
       const el=document.getElementById('saveState');el.textContent='Salvo agora';clearTimeout(saveState.timer);saveState.timer=setTimeout(()=>el.textContent='Salvo automaticamente',1200);
       updateHeaderStamp();
-      if(cloud&&getGasUrl()&&cloudLoaded){clearTimeout(cloudTimer);cloudTimer=setTimeout(()=>{cloudTimer=null;syncCloud(true)},1800)}
+      if(cloud&&hasBackend()&&cloudLoaded){clearTimeout(cloudTimer);cloudTimer=setTimeout(()=>{cloudTimer=null;syncCloud(true)},1800)}
     }
     function updateHeaderStamp(){
       const el=document.getElementById('headerUpdateStampTime');if(el)el.textContent=fmtStamp(state.updatedAt);
@@ -1789,7 +1797,7 @@
     const PEPINO_META=[{label:'Não proc.',color:'var(--t1)'},{label:'Proc.',color:'var(--t2)'}];
     const KG_FACTORS={brocolis:[10,9,9],tomate:[10,10,10],couveflor:[9,8,11],pepino:[1,.28]};
     // Fatores de conversão editáveis pelo painel (botão "Editar cálculos").
-    // Ficam em state.factors, que é salvo junto com o resto na planilha.
+    // Ficam em state.factors, que é salvo junto com o resto no banco de dados.
     const FACTOR_DEFAULTS={tomateCumbucaKg:.18,tomateGranelCumbucaKg:.189,brocolisPacote200Kg:.22,brocolisPacote300Kg:.33,couveflorPacoteKg:.33,pepinoPacoteKg:.31,pepinoPacoteProcessadoKg:.31};
     function factorNum(key){const v=Number((state.factors||{})[key]);return isFinite(v)&&v>0?v:FACTOR_DEFAULTS[key]}
     function typeMetaForCulture(id){if(id==='tomate')return TOMATE_META;if(isDirectKgCulture(id))return PEPINO_META;return TYPE_META}
@@ -2698,7 +2706,7 @@
       return demand;
     }
     // ── Simulação de Pedido (aba própria, à parte dos pedidos reais) ─────
-    // Fica só neste navegador (localStorage) — não sincroniza com a planilha
+    // Fica só neste navegador (localStorage) — não sincroniza com o banco
     // nem com outros dispositivos, é um rascunho pessoal de "e se". Suporta
     // vários pedidos simulados (cartões) ao mesmo tempo; a disponibilidade
     // soma a demanda de TODOS os cartões + os pedidos reais já lançados.
@@ -3609,7 +3617,7 @@
       addLog('atualizou os cálculos (fatores de conversão e estimativas)');
       document.getElementById('factorsDialog').close();
       pendingStructural=true;saveState();renderAll();
-      toast('Cálculos atualizados — serão gravados na planilha.');
+      toast('Cálculos atualizados — serão gravados no banco de dados.');
     }
     document.getElementById('factorsReset').onclick=()=>{
       document.querySelectorAll('#factorsBody [data-factor]').forEach(el=>el.value=String(el.dataset.def).replace('.',','));
@@ -3697,7 +3705,22 @@
       return new Promise(resolve=>{dlg.addEventListener('close',()=>resolve(dlg.returnValue||'cancel'),{once:true})});
     }
 
-    function getGasUrl(){return localStorage.getItem(GAS_KEY)||''}
+    function getSupaConfig(){return {url:(localStorage.getItem(SUPA_URL_KEY)||DEFAULT_SUPA_URL).trim(),key:(localStorage.getItem(SUPA_ANON_KEY)||DEFAULT_SUPA_ANON_KEY).trim()}}
+    // Cliente do Supabase é recriado sozinho sempre que a URL/chave salva
+    // muda (comparando configKey) — assim salvar uma nova conexão não exige
+    // recarregar a página. Trocar de cliente invalida os channels de Realtime
+    // abertos com o cliente antigo (teardownRealtime cuida disso).
+    let supaClient=null,supaClientConfigKey='';
+    function getSupaClient(){
+      const c=getSupaConfig();
+      if(!c.url||!c.key)return null;
+      const configKey=c.url+'|'+c.key;
+      if(supaClient&&supaClientConfigKey===configKey)return supaClient;
+      teardownRealtime();
+      supaClient=window.supabase.createClient(c.url,c.key);
+      supaClientConfigKey=configKey;
+      return supaClient;
+    }
     function setCloudToken(token){
       cloudToken=token||null;
       try{if(cloudToken)localStorage.setItem(TOKEN_KEY,cloudToken);else localStorage.removeItem(TOKEN_KEY)}catch(e){}
@@ -3712,8 +3735,43 @@
       badge.setAttribute('aria-label',detail||text||'');
       document.getElementById('cloudText').textContent=text;
     }
-    async function gasCall(action,data={},extra={}){const url=getGasUrl();if(!url)throw new Error('Configure primeiro a URL do Apps Script.');const response=await fetch(url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action,data,...extra})});if(!response.ok)throw new Error('Erro HTTP '+response.status);const result=await response.json();if(!result.ok){const err=new Error(result.error||'Erro no Apps Script');err.conflito=result.conflito===true;err.authError=result.authError===true;throw err}return result.data}
-    // Sessão inválida/expirada (detectada pelo Apps Script): esconde o
+    // Cada "action" do painel vira uma função (RPC) no banco — ver
+    // supabase-schema.sql. params(data,extra) traduz o formato que o resto do
+    // código já usa (o mesmo de quando isso era uma chamada ao Apps Script)
+    // para os parâmetros nomeados que a função Postgres espera.
+    const RPC_ACTIONS={
+      ping:{fn:'ping',params:()=>({})},
+      estadoAuth:{fn:'estado_auth',params:()=>({})},
+      login:{fn:'login',params:data=>({p_usuario:data.usuario,p_senha:data.senha})},
+      criarUsuario:{fn:'criar_usuario',params:(data,extra)=>({p_usuario:data.usuario,p_senha:data.senha,p_perfil:data.perfil||'preenchimento',p_permissoes:Array.isArray(data.permissoes)?data.permissoes:null,p_sessao_usuario:extra.usuario||null,p_sessao_token:extra.token||null})},
+      atualizarUsuario:{fn:'atualizar_usuario',params:(data,extra)=>({p_alvo:data.alvo,p_senha:data.senha||null,p_perfil:data.perfil||null,p_ativo:typeof data.ativo==='boolean'?data.ativo:null,p_permissoes:Array.isArray(data.permissoes)?data.permissoes:null,p_sessao_usuario:extra.usuario||null,p_sessao_token:extra.token||null})},
+      removerUsuario:{fn:'remover_usuario',params:(data,extra)=>({p_alvo:data.alvo,p_sessao_usuario:extra.usuario||null,p_sessao_token:extra.token||null})},
+      listarUsuarios:{fn:'listar_usuarios',params:(data,extra)=>({p_sessao_usuario:extra.usuario||null,p_sessao_token:extra.token||null})},
+      carregarEstoque:{fn:'carregar_estoque',params:(data,extra)=>({p_sessao_usuario:extra.usuario||null,p_sessao_token:extra.token||null})},
+      salvarEstoque:{fn:'salvar_estoque',params:(data,extra)=>({p_state:data,p_base_token:extra.baseToken||null,p_force:extra.force===true,p_sessao_usuario:extra.usuario||null,p_sessao_token:extra.token||null})}
+    };
+    async function backendCall(action,data={},extra={}){
+      const client=getSupaClient();
+      if(!client)throw new Error('Configure primeiro a conexão com o Supabase.');
+      const spec=RPC_ACTIONS[action];
+      if(!spec)throw new Error('Ação não reconhecida: '+action);
+      const {data:result,error}=await client.rpc(spec.fn,spec.params(data,extra));
+      if(error){
+        const raw=String(error.message||'Erro no banco de dados');
+        const isAuth=raw.startsWith('AUTH:');
+        const err=new Error(isAuth?raw.slice(5).trim():raw);
+        err.authError=isAuth;
+        throw err;
+      }
+      if(result&&typeof result==='object'&&result.conflito===true){
+        const err=new Error(result.error||'Conflito de dados.');
+        err.conflito=true;
+        throw err;
+      }
+      if(action==='salvarEstoque')broadcastEstoqueAtualizado();
+      return result;
+    }
+    // Sessão inválida/expirada (detectada pelo Supabase): esconde o
     // conteúdo de novo e força novo login antes de mostrar qualquer coisa.
     function handleAuthError(){
       setSession(null);updateUserChip();
@@ -3722,12 +3780,12 @@
       openAuthDialog();
     }
     async function syncCloud(silent=false){
-      if(!getGasUrl()){document.getElementById('settingsDialog').showModal();if(!silent)toast('Configure a Planilha Google primeiro.',true);return}
+      if(!hasBackend()){document.getElementById('settingsDialog').showModal();if(!silent)toast('Configure a conexão com o Supabase primeiro.',true);return}
       if(syncInFlight){clearTimeout(cloudTimer);cloudTimer=setTimeout(()=>{cloudTimer=null;syncCloud(true)},1500);return}
       let force=false;
       if(!cloudLoaded){
         if(silent)return;
-        const ok=await confirmModern('O painel ainda não conseguiu carregar os dados da planilha nesta sessão. Salvar agora pode sobrescrever lançamentos mais novos feitos em outro computador. O ideal é verificar a conexão e recarregar a página antes. Salvar mesmo assim?',{title:'Planilha não carregada',confirmText:'Salvar mesmo assim'});
+        const ok=await confirmModern('O painel ainda não conseguiu carregar os dados do banco nesta sessão. Salvar agora pode sobrescrever lançamentos mais novos feitos em outro computador. O ideal é verificar a conexão e recarregar a página antes. Salvar mesmo assim?',{title:'Dados não carregados',confirmText:'Salvar mesmo assim'});
         if(!ok)return;
         force=true;
       }
@@ -3736,10 +3794,10 @@
       const sentOps=pendingOps,sentStructural=pendingStructural,sentLogs=pendingLogs;
       pendingOps={};pendingStructural=false;pendingLogs=[];
       try{
-        const result=await gasCall('salvarEstoque',state,{baseToken:cloudToken,force,...sessionCreds()});
+        const result=await backendCall('salvarEstoque',state,{baseToken:cloudToken,force,...sessionCreds()});
         setCloudToken(result.token||cloudToken);cloudLoaded=true;
-        setCloudStatus('online','Sincronizado com a planilha');
-        if(!silent)toast('Estoque salvo na Planilha Google.');
+        setCloudStatus('online','Sincronizado com o banco de dados');
+        if(!silent)toast('Estoque salvo na nuvem.');
       }catch(e){
         pendingOps={...sentOps,...pendingOps};
         pendingStructural=pendingStructural||sentStructural;
@@ -3762,7 +3820,7 @@
       setCloudStatus('','Mesclando alterações de outra pessoa…');
       try{
         for(let tentativa=0;tentativa<3;tentativa++){
-          const r=await gasCall('carregarEstoque',{},sessionCreds());
+          const r=await backendCall('carregarEstoque',{},sessionCreds());
           if(r?.sessao)updateSessionDetails(r.sessao);
           if(Array.isArray(r?.usuarios))usersCache=r.usuarios;
           const remote=(r&&typeof r==='object'&&'estado' in r)?r.estado:r;
@@ -3777,9 +3835,9 @@
           saveState(false);
           const sentOps=pendingOps,sentLogs=pendingLogs;pendingOps={};pendingLogs=[];
           try{
-            const result=await gasCall('salvarEstoque',state,{baseToken:cloudToken,force:false,...sessionCreds()});
+            const result=await backendCall('salvarEstoque',state,{baseToken:cloudToken,force:false,...sessionCreds()});
             setCloudToken(result.token||cloudToken);
-            setCloudStatus('online','Sincronizado com a planilha');
+            setCloudStatus('online','Sincronizado com o banco de dados');
             if(!silent)toast('Alterações de outra pessoa mescladas ao painel.');
             return;
           }catch(err){
@@ -3795,17 +3853,17 @@
       }
     }
     async function handleConflict(){
-      setCloudStatus('error','Conflito: a planilha tem dados mais novos');
-      const usarPlanilha=await confirmModern('A planilha tem alterações mais novas — salvas por outro computador ou editadas direto na planilha. Recomendado: usar os dados da planilha (os lançamentos feitos neste computador e ainda não sincronizados serão substituídos). Usar os dados da planilha?',{title:'Conflito de dados',confirmText:'Usar planilha'});
-      if(usarPlanilha){pendingOps={};pendingStructural=false;pendingLogs=[];await loadCloud();return}
-      const sobrescrever=await confirmModern('Então manter os dados DESTE computador e sobrescrever a planilha? Os lançamentos mais novos do outro computador serão PERDIDOS.',{title:'Sobrescrever planilha',confirmText:'Sobrescrever'});
+      setCloudStatus('error','Conflito: o banco tem dados mais novos');
+      const usarNuvem=await confirmModern('O banco de dados tem alterações mais novas — salvas por outro computador ou editadas direto no Supabase. Recomendado: usar os dados do banco (os lançamentos feitos neste computador e ainda não sincronizados serão substituídos). Usar os dados do banco?',{title:'Conflito de dados',confirmText:'Usar dados do banco'});
+      if(usarNuvem){pendingOps={};pendingStructural=false;pendingLogs=[];await loadCloud();return}
+      const sobrescrever=await confirmModern('Então manter os dados DESTE computador e sobrescrever o banco? Os lançamentos mais novos do outro computador serão PERDIDOS.',{title:'Sobrescrever banco de dados',confirmText:'Sobrescrever'});
       if(!sobrescrever)return;
       try{
-        const result=await gasCall('salvarEstoque',state,{baseToken:cloudToken,force:true,...sessionCreds()});
+        const result=await backendCall('salvarEstoque',state,{baseToken:cloudToken,force:true,...sessionCreds()});
         setCloudToken(result.token||cloudToken);cloudLoaded=true;
         pendingOps={};pendingStructural=false;pendingLogs=[];
-        setCloudStatus('online','Sincronizado com a planilha');
-        toast('Planilha sobrescrita com os dados deste computador.');
+        setCloudStatus('online','Sincronizado com o banco de dados');
+        toast('Banco de dados sobrescrito com os dados deste computador.');
       }catch(e){
         if(e.authError){setCloudStatus('error','Sessão expirada');handleAuthError();return}
         setCloudStatus('error','Falha na sincronização',e.message);toast(e.message,true);
@@ -3813,14 +3871,14 @@
     }
     let lastCloudCheck=0;
     async function loadCloud(quiet=false){
-      if(!getGasUrl()){setCloudStatus('','Somente neste dispositivo');return false}
+      if(!hasBackend()){setCloudStatus('','Somente neste dispositivo');return false}
       lastCloudCheck=Date.now();
       if(!quiet)setCloudStatus('','Buscando atualizações na base de dados…');
       try{
         // carregarEstoque já valida a sessão no mesmo passo (o servidor
         // confere usuário/token antes de responder) — não precisa de uma
         // chamada separada só para checar se a sessão está ok.
-        const r=await gasCall('carregarEstoque',{},sessionCreds());
+        const r=await backendCall('carregarEstoque',{},sessionCreds());
         if(r?.sessao)updateSessionDetails(r.sessao);
         if(Array.isArray(r?.usuarios))usersCache=r.usuarios;
         const remote=(r&&typeof r==='object'&&'estado' in r)?r.estado:r;
@@ -3833,20 +3891,20 @@
           if(Object.keys(pendingOps).length){applyOps(state,pendingOps);saveState(false)}
           else localStorage.setItem(STORAGE_KEY,JSON.stringify(state));
           renderAll();restoreFocus(foco);
-          if(!quiet)toast('Painel atualizado com os dados da Planilha Google.');
+          if(!quiet)toast('Painel atualizado com os dados do banco de dados.');
         }
         cloudLoaded=true;
-        setCloudStatus('online','Conectado à planilha');
+        setCloudStatus('online','Conectado ao banco de dados');
         return true;
       }catch(e){
         cloudLoaded=false;
         if(e.authError){setCloudStatus('error','Sessão expirada');handleAuthError();return false}
-        setCloudStatus('error','Planilha indisponível — usando dados locais',e.message);
+        setCloudStatus('error','Banco de dados indisponível — usando dados locais',e.message);
         return false;
       }
     }
     function refreshFromCloud(){
-      if(!getGasUrl())return;
+      if(!hasBackend())return;
       if(hasBackend()&&!getSession())return; // ainda não autenticado — não tenta sincronizar
       if(document.visibilityState!=='visible')return;
       if(cloudTimer||syncInFlight)return; // envio em andamento ou na fila — ele reconcilia sozinho
@@ -3858,12 +3916,40 @@
     document.addEventListener('visibilitychange',refreshFromCloud);
     window.addEventListener('focus',refreshFromCloud);
     window.addEventListener('pageshow',e=>{if(e.persisted)refreshFromCloud()});
-    // Colaboração ao vivo: enquanto a página está aberta, busca as alterações
-    // das outras pessoas periodicamente (sem perder o campo em edição).
+    // Colaboração ao vivo: além do polling de segurança abaixo (rede de
+    // proteção caso o Realtime caia), um channel de broadcast avisa os outros
+    // painéis abertos na hora em que alguém salva — refreshFromCloud() já tem
+    // todos os guards certos (não mexe com diálogo aberto, sync em andamento
+    // etc.), então é só reaproveitá-la como handler do broadcast.
     setInterval(refreshFromCloud,20000);
-    // "Quem está online agora": cada aba aberta manda um sinal de vida com a
-    // cultura/seção que está vendo; o servidor devolve a lista atualizada de
-    // todo mundo online (como no Google Planilhas, só que por polling).
+    let syncChannel=null,presenceChannel=null;
+    function teardownRealtime(){
+      if(syncChannel){try{supaClient.removeChannel(syncChannel)}catch(e){} syncChannel=null}
+      if(presenceChannel){try{supaClient.removeChannel(presenceChannel)}catch(e){} presenceChannel=null}
+    }
+    function broadcastEstoqueAtualizado(){
+      if(!syncChannel)return;
+      try{syncChannel.send({type:'broadcast',event:'atualizado',payload:{t:Date.now()}})?.catch?.(()=>{})}catch(e){}
+    }
+    // Assina os dois channels do Realtime (broadcast de sincronização +
+    // presença) — chamada depois de um login bem-sucedido ou ao restaurar uma
+    // sessão salva. Chamar de novo com o mesmo cliente derruba e refaz as
+    // assinaturas (evita ficar duplicado ao logar de novo sem recarregar).
+    function initRealtime(){
+      const client=getSupaClient();
+      if(!client)return;
+      teardownRealtime();
+      syncChannel=client.channel('estoque-sync');
+      syncChannel.on('broadcast',{event:'atualizado'},()=>refreshFromCloud());
+      syncChannel.subscribe();
+      presenceChannel=client.channel('presenca',{config:{presence:{key:currentUser()||uid('anon')}}});
+      presenceChannel.on('presence',{event:'sync'},()=>renderPresence(collectPresenceList()));
+      presenceChannel.subscribe(status=>{if(status==='SUBSCRIBED')trackPresence()});
+    }
+    // "Quem está online agora": em vez de sondar o servidor periodicamente,
+    // cada aba mantém sua presença "ao vivo" no channel do Realtime — o
+    // Supabase já detecta sozinho quando a conexão cai (fechou a aba, perdeu
+    // internet), sem depender de um TTL de expiração como antes.
     function currentActivityLabel(){
       const id=activeProduce();
       const p=PRODUCE.find(x=>x.id===id);
@@ -3919,11 +4005,11 @@
       return colors[h%colors.length];
     }
     let presenceCache={};
-    // Início "real" da sessão desta aba — marcado no momento do login (não
-    // inferido pelo servidor a partir de falhas de sinal de vida, que é
-    // frágil: o cache do Apps Script pode ser reciclado a qualquer sincronização
-    // e reiniciava a sessão sem a pessoa ter saído de fato). Reatribuído em
-    // saveAuth() e unlockWithSession() sempre que um login é concluído.
+    // Início "real" da sessão desta aba — marcado no momento do login e
+    // enviado junto no track() de presença, pra "online há Xh" ser calculado
+    // a partir do login de verdade, não do último reconhecimento do channel
+    // de Realtime. Reatribuído em saveAuth() e unlockWithSession() sempre que
+    // um login é concluído.
     let presenceSessionStart=Date.now();
     function renderPresence(list){
       const bar=document.getElementById('presenceBar');if(!bar)return;
@@ -4037,21 +4123,39 @@
         if(!pop.hidden&&!pop.contains(e.target)&&!e.target.closest('.pbubble'))hidePresencePop();
       });
     })();
-    let presenceInFlight=false;
-    async function sendPresence(){
-      if(!getGasUrl())return;
-      if(hasBackend()&&!getSession())return;
+    // Lê o estado atual do channel de presença e traduz pro mesmo formato de
+    // lista que renderPresence() já sabia consumir quando isso vinha do
+    // servidor por polling — assim renderPresence/showPresencePop/
+    // applyLiveCellHighlights não precisaram mudar nada.
+    function collectPresenceList(){
+      if(!presenceChannel)return [];
+      const now=Date.now(),map=presenceChannel.presenceState();
+      return Object.keys(map).map(key=>{
+        const metas=map[key],meta=metas[metas.length-1]||{};
+        const sessionStart=Number(meta.sessionStart)||now;
+        return {
+          usuario:meta.usuario||key,
+          atividade:meta.atividade||'',
+          celula:meta.celula||'',
+          storeName:meta.storeName==='processar'?'processar':'cells',
+          segundosAtras:0,
+          onlineSegundos:Math.max(0,Math.round((now-sessionStart)/1000))
+        };
+      }).sort((a,b)=>a.usuario.localeCompare(b.usuario,'pt-BR'));
+    }
+    function trackPresence(){
+      if(!presenceChannel)return;
+      // presença é cosmética — nunca deve incomodar o usuário, por isso o
+      // catch tanto síncrono (try/catch) quanto da Promise que track() devolve.
+      try{presenceChannel.track({usuario:currentUser(),atividade:currentActivityLabel(),celula:focusedCellKey||'',storeName:focusedCellStore,sessionStart:presenceSessionStart})?.catch?.(()=>{})}catch(e){}
+    }
+    function sendPresence(){
+      if(!hasBackend()||!getSession())return;
       if(document.visibilityState!=='visible')return;
-      if(presenceInFlight)return;
-      presenceInFlight=true;
-      try{
-        const r=await gasCall('presenca',{atividade:currentActivityLabel(),sessionStart:presenceSessionStart,celula:focusedCellKey||'',storeName:focusedCellStore},sessionCreds());
-        renderPresence(r);
-      }catch(e){/* presença é cosmética — nunca deve incomodar o usuário */}
-      finally{presenceInFlight=false}
+      trackPresence();
     }
     document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')sendPresence()});
-    setInterval(sendPresence,20000);
+    setInterval(sendPresence,60000);
     // Espelhamento entre abas do MESMO navegador: quando outra aba grava o
     // localStorage, esta aba adota o estado na hora, sem esperar a nuvem.
     window.addEventListener('storage',e=>{
@@ -4072,33 +4176,33 @@
         }
       }catch(err){}
     });
-    async function testGasConnection(){
-      const input=document.getElementById('gasUrl'),url=input.value.trim(),btn=document.getElementById('settingsTest'),alertEl=document.getElementById('settingsAlert');
-      if(!/^https:\/\/script\.google\.com\/macros\/s\/[^/]+\/exec\/?(\?.*)?$/.test(url)){showAlert('settingsAlert','Cole uma URL válida terminada em /exec antes de testar.');return}
+    async function testSupabaseConnection(){
+      const urlInput=document.getElementById('supaUrl'),keyInput=document.getElementById('supaKey');
+      const url=urlInput.value.trim(),key=keyInput.value.trim();
+      const btn=document.getElementById('settingsTest'),alertEl=document.getElementById('settingsAlert');
+      if(!/^https:\/\//.test(url)){showAlert('settingsAlert','Cole a URL do projeto Supabase (começa com https://) antes de testar.');return}
+      if(key.length<20){showAlert('settingsAlert','Cole a chave "anon public" do projeto antes de testar.');return}
       alertEl.classList.remove('success');hideAlert('settingsAlert');
       const original=btn.textContent;btn.disabled=true;btn.textContent='Testando…';
       try{
-        const response=await fetch(url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'ping'})});
-        if(!response.ok){showAlert('settingsAlert',`A planilha respondeu com erro HTTP ${response.status}. Reimplante o Apps Script: Implantar > Gerenciar implantações > editar (lápis) > Nova versão > Implantar.`);return}
-        const result=await response.json();
-        if(!result.ok){showAlert('settingsAlert','O Apps Script respondeu, mas com erro: “'+(result.error||'desconhecido')+'”. Confira o SPREADSHEET_ID no Code.gs e se já rodou configurarProjeto().');return}
-        alertEl.textContent=`Conexão OK — planilha “${(result.data&&result.data.planilha)||'sem nome'}” respondendo normalmente.`;
+        const client=window.supabase.createClient(url,key);
+        const {data,error}=await client.rpc('ping');
+        if(error)throw new Error(error.message||'Erro desconhecido');
+        alertEl.textContent=`Conexão OK — banco de dados respondendo normalmente (status: ${(data&&data.status)||'online'}).`;
         alertEl.hidden=false;alertEl.classList.add('success');
       }catch(e){
-        const isFileProtocol=location.protocol==='file:';
-        const hint=isFileProtocol
-          ?' Você está abrindo este painel direto do arquivo (file://) — o Google costuma bloquear essa conexão por CORS. Tente hospedar este HTML em um servidor (ex.: GitHub Pages, Netlify) em vez de abrir o arquivo direto, ou acesse pelo Chrome/Edge sem bloqueadores de terceiros ativos.'
-          :' Confira se implantou como Aplicativo da Web (Executar como: você / Quem pode acessar: qualquer pessoa) e se colou a URL /exec da implantação mais recente.';
-        showAlert('settingsAlert','Não foi possível conectar: '+e.message+'.'+hint);
+        showAlert('settingsAlert','Não foi possível conectar: '+e.message+'. Confira se a URL e a chave anon estão corretas e se você já rodou o supabase-schema.sql neste projeto.');
       }finally{
         btn.disabled=false;btn.textContent=original;
       }
     }
     async function saveSettings(){
-      const input=document.getElementById('gasUrl'),url=input.value.trim();
-      if(!/^https:\/\/script\.google\.com\/macros\/s\/[^/]+\/exec\/?(\?.*)?$/.test(url)){showAlert('settingsAlert','Cole uma URL válida terminada em /exec.');return}
-      localStorage.setItem(GAS_KEY,url);hideAlert('settingsAlert');document.getElementById('settingsDialog').close();
-      // A partir de agora a planilha está configurada: login por usuário/senha
+      const urlInput=document.getElementById('supaUrl'),keyInput=document.getElementById('supaKey');
+      const url=urlInput.value.trim(),key=keyInput.value.trim();
+      if(!/^https:\/\//.test(url)){showAlert('settingsAlert','Cole a URL do projeto Supabase (começa com https://).');return}
+      if(key.length<20){showAlert('settingsAlert','Cole a chave "anon public" do projeto.');return}
+      localStorage.setItem(SUPA_URL_KEY,url);localStorage.setItem(SUPA_ANON_KEY,key);hideAlert('settingsAlert');document.getElementById('settingsDialog').close();
+      // A partir de agora o banco está configurado: login por usuário/senha
       // passa a valer (ou o bootstrap do primeiro administrador, se for o caso).
       if(hasBackend()){
         await unlockWithSession();
@@ -4420,11 +4524,11 @@
       document.getElementById('dateDialogDesc').textContent=`A data será incluída em ${produceLabel(produce)}.`;
       document.getElementById('dateDialog').showModal();
     }
-    function openSettingsDialog(){hideAlert('settingsAlert');document.getElementById('gasUrl').value=getGasUrl();document.getElementById('settingsDialog').showModal()}
+    function openSettingsDialog(){hideAlert('settingsAlert');const c=getSupaConfig();document.getElementById('supaUrl').value=c.url;document.getElementById('supaKey').value=c.key;document.getElementById('settingsDialog').showModal()}
     function openManageDialog(){renderManager();document.getElementById('manageDialog').showModal()}
     // ── Usuário e histórico ───────────────────────────────
     function updateUserChip(){const el=document.getElementById('userBtnName');if(el)el.textContent=currentUser()||'Entrar'}
-    // Sem planilha configurada: identificação simples por nome (sem senha).
+    // Sem Supabase configurado: identificação simples por nome (sem senha).
     function openLoginDialog(){
       hideAlert('loginAlert');
       document.getElementById('loginName').value=currentUser();
@@ -4448,8 +4552,8 @@
     // Sem usuário definido, o diálogo não pode ser fechado com Esc.
     document.getElementById('loginDialog').addEventListener('cancel',e=>{if(!currentUser())e.preventDefault()});
 
-    // Com planilha configurada: login de verdade (usuário/senha) verificado
-    // no Apps Script, com dois perfis — master (acesso total) e preenchimento
+    // Com Supabase configurado: login de verdade (usuário/senha) verificado
+    // no banco de dados, com dois perfis — master (acesso total) e preenchimento
     // (só lança valores). Se ainda não existe nenhum usuário cadastrado, o
     // próprio diálogo vira "criar administrador" (bootstrap).
     let authBootstrapMode=false;
@@ -4466,15 +4570,15 @@
       document.getElementById('authBootstrapHelp').hidden=true;
       document.getElementById('authSave').textContent='Entrar';
       document.getElementById('authDialogDesc').textContent='Estoque diário';
-      // Mostra o formulário JÁ, sem esperar o Apps Script responder — o
-      // Google costuma demorar 1-3s, e ficar com a tela em branco até lá
+      // Mostra o formulário JÁ, sem esperar o Supabase responder — a rede
+      // costuma demorar um pouco, e ficar com a tela em branco até lá
       // parece muito mais lento do que realmente é.
       if(!document.getElementById('authDialog').open)document.getElementById('authDialog').showModal();
       document.getElementById('authUser').focus();
       // Já sabemos (de uma visita anterior) que existem usuários cadastrados
-      // nesta planilha — não precisa perguntar de novo ao servidor.
+      // neste banco de dados — não precisa perguntar de novo ao servidor.
       if(localStorage.getItem(BOOTSTRAP_KEY)==='1')return;
-      gasCall('estadoAuth').then(info=>{
+      backendCall('estadoAuth').then(info=>{
         if(info.temUsuarios){
           try{localStorage.setItem(BOOTSTRAP_KEY,'1')}catch(e){}
           return;
@@ -4502,10 +4606,10 @@
       try{
         let session;
         if(authBootstrapMode){
-          const created=await gasCall('criarUsuario',{usuario,senha});
+          const created=await backendCall('criarUsuario',{usuario,senha});
           session={usuario:created.usuario,perfil:created.perfil,token:created.token,permissoes:created.permissoes||[]};
         }else{
-          const logged=await gasCall('login',{usuario,senha});
+          const logged=await backendCall('login',{usuario,senha});
           session={usuario:logged.usuario,perfil:logged.perfil,token:logged.token,permissoes:logged.permissoes||[]};
         }
         setSession(session,document.getElementById('authRemember').checked);
@@ -4518,7 +4622,7 @@
         addLog(authBootstrapMode?'criou a conta administradora e entrou no sistema':'entrou no sistema');
         saveState();
         toast(`Bem-vindo, ${session.usuario}.`);
-        presenceSessionStart=Date.now();sendPresence();
+        presenceSessionStart=Date.now();initRealtime();sendPresence();
         loadCloud();
       }catch(e){
         showAlert('authAlert',e.message);
@@ -4527,6 +4631,7 @@
     async function logout(){
       addLog('saiu do sistema');saveState();
       setSession(null);
+      teardownRealtime();
       document.body.classList.add('auth-locked');
       updateUserChip();applyProfileGating();
       toast('Você saiu do painel.');
@@ -4555,13 +4660,8 @@
     };
     document.getElementById('authSave').onclick=e=>{e.preventDefault();saveAuth()};
     document.getElementById('authForm').onsubmit=e=>{e.preventDefault();saveAuth()};
-    // Sem sessão, o login é a própria tela inicial e não pode ser fechado com
-    // Esc. A conexão ainda pode ser configurada pelo link dentro do cartão.
+    // Sem sessão, o login é a própria tela inicial e não pode ser fechado com Esc.
     document.getElementById('authDialog').addEventListener('cancel',e=>{if(!getSession())e.preventDefault()});
-    // Escape hatch: se a URL da planilha estiver errada, dá para corrigi-la
-    // sem sair da tela de login — os dois diálogos nativos empilham, então
-    // basta abrir por cima sem fechar o de login.
-    document.getElementById('authSettingsBtn').onclick=()=>{systemDialogPending=false;openSettingsDialog()};
 
     function renderLogList(){
       const list=[...(Array.isArray(state.log)?state.log:[])].reverse().slice(0,200);
@@ -4693,7 +4793,7 @@
       const list=document.getElementById('usersList');
       if(!cachedUsers)list.innerHTML='<span class="field-help">Carregando…</span>';
       try{
-        const users=cachedUsers||await gasCall('listarUsuarios',{},sessionCreds());
+        const users=cachedUsers||await backendCall('listarUsuarios',{},sessionCreds());
         usersCache=users;
         list.innerHTML=users.length?users.map(u=>{
           const isSelf=u.usuario.toLowerCase()===(currentUser()||'').toLowerCase();
@@ -4717,7 +4817,7 @@
       const before=usersCache&&usersCache.map(u=>({...u}));
       if(usersCache){usersCache=usersCache.map(u=>u.usuario===usuario?{...u,ativo:!wasActive}:u);refreshUsersList(usersCache)}
       try{
-        const updated=await gasCall('atualizarUsuario',{alvo:usuario,ativo:!wasActive},sessionCreds());
+        const updated=await backendCall('atualizarUsuario',{alvo:usuario,ativo:!wasActive},sessionCreds());
         if(usersCache){usersCache=usersCache.map(u=>u.usuario===usuario?updated:u);refreshUsersList(usersCache)}
         addLog(`${wasActive?'desativou':'ativou'} o usuário ${usuario}`);saveState();
       }catch(e){
@@ -4734,7 +4834,7 @@
       const before=usersCache&&usersCache.map(u=>({...u}));
       if(usersCache){usersCache=usersCache.map(u=>u.usuario===usuario?{...u,perfil:next}:u);refreshUsersList(usersCache)}
       try{
-        const updated=await gasCall('atualizarUsuario',{alvo:usuario,perfil:next},sessionCreds());
+        const updated=await backendCall('atualizarUsuario',{alvo:usuario,perfil:next},sessionCreds());
         if(usersCache){usersCache=usersCache.map(u=>u.usuario===usuario?updated:u);refreshUsersList(usersCache)}
         addLog(`alterou o perfil de ${usuario} para ${next==='master'?'Master':'Só para preencher'}`);saveState();
       }catch(e){
@@ -4750,7 +4850,7 @@
       const before=usersCache&&usersCache.map(u=>({...u}));
       if(usersCache){usersCache=usersCache.filter(u=>u.usuario!==usuario);refreshUsersList(usersCache)}
       try{
-        await gasCall('removerUsuario',{alvo:usuario},sessionCreds());
+        await backendCall('removerUsuario',{alvo:usuario},sessionCreds());
         addLog(`removeu o usuário ${usuario}`);saveState();
       }catch(e){
         if(before){usersCache=before;refreshUsersList(usersCache)}
@@ -4771,7 +4871,7 @@
       const permissoes=[...document.querySelectorAll('#userPermissionsList input:checked')].map(input=>input.value);
       const btn=document.getElementById('userPermissionsSave');btn.disabled=true;hideAlert('userPermissionsAlert');
       try{
-        const updated=await gasCall('atualizarUsuario',{alvo:userPermissionsTarget,permissoes},sessionCreds());
+        const updated=await backendCall('atualizarUsuario',{alvo:userPermissionsTarget,permissoes},sessionCreds());
         if(usersCache){usersCache=usersCache.map(u=>u.usuario===userPermissionsTarget?updated:u);refreshUsersList(usersCache)}
         addLog(`alterou as permissões de ${userPermissionsTarget}: ${permissoes.length?permissoes.map(key=>(ACCESS_PERMISSIONS.find(p=>p.key===key)||{}).label).join(', '):'nenhum acesso de cadastro'}`);saveState();
         document.getElementById('userPermissionsDialog').close();toast('Permissões atualizadas.');
@@ -4794,7 +4894,7 @@
       const senha=document.getElementById('userPassValue').value;
       if(senha.length<4){showAlert('userPassAlert','A senha deve ter pelo menos 4 caracteres.');return}
       try{
-        await gasCall('atualizarUsuario',{alvo:userPassTarget,senha},sessionCreds());
+        await backendCall('atualizarUsuario',{alvo:userPassTarget,senha},sessionCreds());
         addLog(`redefiniu a senha de ${userPassTarget}`);saveState();
         document.getElementById('userPassDialog').close();
         toast('Senha atualizada.');
@@ -4816,7 +4916,7 @@
       const submit=e.submitter||document.querySelector('#newUserForm button[type="submit"]');
       if(submit)submit.disabled=true;
       try{
-        const created=await gasCall('criarUsuario',{usuario,senha,perfil,permissoes:defaultPermissions},sessionCreds());
+        const created=await backendCall('criarUsuario',{usuario,senha,perfil,permissoes:defaultPermissions},sessionCreds());
         if(usersCache){usersCache=usersCache.map(u=>u.usuario===usuario?{usuario:created.usuario,perfil:created.perfil,ativo:true,permissoes:created.permissoes||[]}:u);refreshUsersList(usersCache)}
         addLog(`criou o usuário ${usuario} (${perfil==='master'?'Master':'Só para preencher'})`);saveState();
         document.getElementById('newUserName').value='';document.getElementById('newUserPass').value='';document.getElementById('newUserProfile').value='preenchimento';
@@ -4901,7 +5001,7 @@
     document.getElementById('addClientProductRow').onclick=()=>addClientProductRow().focus();
     document.getElementById('productSave').onclick=e=>{e.preventDefault();addClientProduct()};
     document.getElementById('productForm').onsubmit=e=>{e.preventDefault();addClientProduct()};
-    document.getElementById('partnerSave').onclick=e=>{e.preventDefault();addPartner()};document.getElementById('clientSave').onclick=e=>{e.preventDefault();addClient()};document.getElementById('dateSave').onclick=e=>{e.preventDefault();addDate()};document.getElementById('settingsSave').onclick=e=>{e.preventDefault();saveSettings()};document.getElementById('settingsTest').onclick=()=>testGasConnection();document.getElementById('renameSave').onclick=e=>{e.preventDefault();saveRename()};document.getElementById('editDateSave').onclick=e=>{e.preventDefault();saveEditDate()};
+    document.getElementById('partnerSave').onclick=e=>{e.preventDefault();addPartner()};document.getElementById('clientSave').onclick=e=>{e.preventDefault();addClient()};document.getElementById('dateSave').onclick=e=>{e.preventDefault();addDate()};document.getElementById('settingsSave').onclick=e=>{e.preventDefault();saveSettings()};document.getElementById('settingsTest').onclick=()=>testSupabaseConnection();document.getElementById('renameSave').onclick=e=>{e.preventDefault();saveRename()};document.getElementById('editDateSave').onclick=e=>{e.preventDefault();saveEditDate()};
     document.getElementById('partnerForm').onsubmit=e=>{e.preventDefault();addPartner()};document.getElementById('clientForm').onsubmit=e=>{e.preventDefault();addClient()};document.getElementById('dateForm').onsubmit=e=>{e.preventDefault();addDate()};document.getElementById('settingsForm').onsubmit=e=>{e.preventDefault();saveSettings()};document.getElementById('renameForm').onsubmit=e=>{e.preventDefault();saveRename()};document.getElementById('editDateForm').onsubmit=e=>{e.preventDefault();saveEditDate()};
     document.getElementById('undoBtn').onclick=()=>undo();document.getElementById('redoBtn').onclick=()=>redo();
     document.getElementById('syncBtn').onclick=()=>syncCloud(false);document.getElementById('csvBtn').onclick=exportCsv;
@@ -4945,14 +5045,14 @@
     }
     document.querySelectorAll('dialog').forEach(d=>new MutationObserver(syncScrollLock).observe(d,{attributes:true,attributeFilter:['open']}));
 
-    // Com planilha configurada, o login por usuário/senha é obrigatório: o
+    // Com Supabase configurado, o login por usuário/senha é obrigatório: o
     // conteúdo do painel só é montado (renderAll) depois de confirmar uma
     // sessão válida. Até lá, .auth-locked esconde .shell inteiro — os dados
     // reais nunca chegam a existir no DOM antes do login.
     //
     // Se já existe uma sessão salva, ela é validada buscando os dados reais
     // direto (loadCloud → carregarEstoque, que já confere usuário/token no
-    // servidor) — uma única ida ao Apps Script, em vez de "checar sessão" e
+    // servidor) — uma única ida ao Supabase, em vez de "checar sessão" e
     // depois "buscar dados" em duas chamadas separadas.
     async function unlockWithSession(){
       // Trava o conteúdo JÁ, antes de qualquer outra coisa: parte do topo
@@ -4962,8 +5062,8 @@
       document.body.classList.add('auth-locked');
       if(!getSession()){openAuthDialog();return false}
       // Já tem sessão salva: em vez de deixar a tela em branco enquanto
-      // confere com a Planilha Google (pode levar alguns segundos), mostra
-      // um indicador de carregamento.
+      // confere com o Supabase (pode levar alguns segundos), mostra um
+      // indicador de carregamento.
       const loadingEl=document.getElementById('bootLoading');
       loadingEl.hidden=false;
       const ok=await loadCloud();
@@ -4972,7 +5072,7 @@
         document.getElementById('authDialog').close(); // no-op se já estava fechado
         document.body.classList.remove('auth-locked');
         renderAll();
-        presenceSessionStart=Date.now();sendPresence();
+        presenceSessionStart=Date.now();initRealtime();sendPresence();
         return true;
       }
       // loadCloud já chamou handleAuthError() se o problema foi de sessão
