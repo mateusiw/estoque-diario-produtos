@@ -121,11 +121,22 @@
     .brand p{font-size:13px;margin:3px 0 0;color:var(--muted)}
     /* Fica sempre visível no cabeçalho (qualquer aba), pra dar noção imediata
        de quando o estoque foi mexido pela última vez — diferente dos outros
-       badges, não recolhe no hover, já que o objetivo é ser visto de cara. */
-    .update-stamp{order:1;display:flex;align-items:center;gap:7px;padding:8px 14px;border-radius:13px;
+       badges, não recolhe no hover, já que o objetivo é ser visto de cara.
+       Passar o mouse (ou focar) mostra um balão extra ABAIXO com qual
+       cultura/cadastro foi a última coisa alterada, no mesmo estilo dos
+       outros balões flutuantes do cabeçalho (.cloud-badge #cloudText). */
+    .update-stamp{position:relative;order:1;display:flex;align-items:center;gap:7px;padding:8px 14px;border-radius:13px;
       background:var(--surface-2);border:1px solid var(--line);font-size:11.5px;color:var(--muted);white-space:nowrap}
     .update-stamp svg{width:15px;height:15px;flex:none;color:var(--muted)}
     .update-stamp strong{color:var(--ink);font-weight:700}
+    .update-stamp .update-stamp-detail{
+      position:absolute;top:calc(100% + 8px);left:50%;transform:translateX(-50%);
+      background:var(--ink);color:var(--page);padding:6px 11px;border-radius:8px;
+      font-size:12px;font-weight:700;white-space:nowrap;max-width:360px;overflow:hidden;text-overflow:ellipsis;
+      opacity:0;visibility:hidden;pointer-events:none;transition:opacity .15s ease;
+      box-shadow:var(--shadow-md);z-index:60}
+    .update-stamp:hover .update-stamp-detail:not(:empty),
+    .update-stamp:focus-within .update-stamp-detail:not(:empty){opacity:1;visibility:visible}
     #headerRefreshBtn{order:1}
     @keyframes header-refresh-spin{to{transform:rotate(360deg)}}
     #headerRefreshBtn.is-loading svg{animation:header-refresh-spin .8s linear infinite}
@@ -997,7 +1008,7 @@
         <div class="brand-mark" aria-hidden="true"><img src="icon.png" alt=""></div>
         <div><h1>Estoque Diário Produtos</h1><p>Controle de Caixas, Processamento e Pedidos</p></div>
       </div>
-      <div class="update-stamp" id="headerUpdateStamp" title="Última vez que algum dado do estoque foi alterado ou sincronizado"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg><span>Atualizado em <strong id="headerUpdateStampTime">—</strong></span></div>
+      <div class="update-stamp" id="headerUpdateStamp" tabindex="0" aria-label="Última vez que algum dado do estoque foi alterado"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg><span>Atualizado em <strong id="headerUpdateStampTime">—</strong></span><span class="update-stamp-detail" id="headerUpdateStampDetail"></span></div>
       <button type="button" class="btn btn-danger btn-grow" id="headerRefreshBtn" aria-label="Buscar as atualizações mais recentes do banco de dados"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 1 0-2.3 6.3"/><path d="M20 5v6h-6"/></svg><span class="btn-label">Atualizar</span></button>
       <div class="actions">
         <button class="btn btn-icon-only" id="undoBtn" title="Desfazer (Ctrl+Z)" aria-label="Desfazer última alteração" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg></button>
@@ -1716,7 +1727,7 @@
     function uid(prefix){return prefix+'_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,7)}
     function activeProduce(){return state.activeProduce||PRODUCE[0].id}
     function produceLabel(id){return (PRODUCE.find(p=>p.id===id)||{}).label||id}
-    function freshState(){return {version:2,factorRulesVersion:1,partners:DEFAULT_PARTNERS.map((name,i)=>({id:'p'+i,name,produce:'brocolis'})),days:DEFAULT_DATES.map(iso=>({id:'d_'+iso,iso,produce:'brocolis'})),clients:DEFAULT_CLIENTS.map((name,i)=>({id:'c'+i,name})),activeProduce:'geral',cells:{},processar:{},orders:{'c0-0':3600,'c3-0':1455},separado:{},factors:{},factorConfig:{},dashboardLabels:{},generalHiddenCultures:{},cultures:[],log:[],updatedAt:new Date().toISOString(),lastActivityAt:new Date().toISOString()}}
+    function freshState(){return {version:2,factorRulesVersion:1,partners:DEFAULT_PARTNERS.map((name,i)=>({id:'p'+i,name,produce:'brocolis'})),days:DEFAULT_DATES.map(iso=>({id:'d_'+iso,iso,produce:'brocolis'})),clients:DEFAULT_CLIENTS.map((name,i)=>({id:'c'+i,name})),activeProduce:'geral',cells:{},processar:{},orders:{'c0-0':3600,'c3-0':1455},separado:{},factors:{},factorConfig:{},dashboardLabels:{},generalHiddenCultures:{},cultures:[],log:[],updatedAt:new Date().toISOString(),lastActivityAt:new Date().toISOString(),lastActivityLabel:'',recentActivity:[]}}
     function migrateFactorRules(target){
       if(!target||Number(target.factorRulesVersion||0)>=1)return target;
       target.factors=target.factors||{};
@@ -1759,6 +1770,8 @@
           saved.cultures=saved.cultures||[];
           saved.log=saved.log||[];
           saved.lastActivityAt=saved.lastActivityAt||saved.updatedAt;
+          saved.lastActivityLabel=saved.lastActivityLabel||'';
+          saved.recentActivity=Array.isArray(saved.recentActivity)?saved.recentActivity:[];
           return migrateFactorRules(saved);
         }
       }catch(e){}
@@ -1777,10 +1790,35 @@
     // O selo do cabeçalho não acompanha state.updatedAt (que muda a qualquer
     // salvamento, incluindo trocar de aba ou mexer em configurações) — só
     // avança quando alguém realmente lança/edita um valor na tabela de
-    // estoque ou adiciona um cliente, via markActivity().
-    function markActivity(){state.lastActivityAt=new Date().toISOString()}
+    // estoque ou adiciona um cliente, via markActivity(). "action" é a frase
+    // que descreve o que foi feito (ex.: "alterou o estoque de Brócolis"),
+    // sempre com o nome de quem fez na frente (ex.: "Ana Paula alterou o
+    // estoque de Brócolis"). state.recentActivity guarda só a última ação de
+    // cada usuário ativo nos últimos segundos (não uma lista crescente),
+    // então se duas pessoas mexerem quase ao mesmo tempo (cada uma no seu
+    // dispositivo) o balão do cabeçalho mostra as duas, separadas por "•" —
+    // isso é o que sincroniza entre dispositivos (via cloud, junto do resto
+    // do state), não só nesta aba.
+    const ACTIVITY_WINDOW_MS=15000;
+    function markActivity(action){
+      state.lastActivityAt=new Date().toISOString();
+      if(!action)return;
+      const user=currentUser()||'Alguém',now=Date.now();
+      state.recentActivity=Array.isArray(state.recentActivity)?state.recentActivity:[];
+      const idx=state.recentActivity.findIndex(e=>e&&e.u===user);
+      if(idx!==-1){state.recentActivity[idx].a=action;state.recentActivity[idx].t=now}
+      else state.recentActivity.push({u:user,a:action,t:now});
+      state.recentActivity=state.recentActivity.filter(e=>e&&now-e.t<ACTIVITY_WINDOW_MS).sort((a,b)=>a.t-b.t).slice(-4);
+      state.lastActivityLabel=recentActivityText();
+    }
+    function recentActivityText(){
+      const list=(Array.isArray(state.recentActivity)?state.recentActivity:[]).filter(e=>e&&Date.now()-e.t<ACTIVITY_WINDOW_MS);
+      if(!list.length)return state.lastActivityLabel||'';
+      return list.slice().reverse().map(e=>`${e.u} ${e.a}`).join(' • ');
+    }
     function updateHeaderStamp(){
       const el=document.getElementById('headerUpdateStampTime');if(el)el.textContent=fmtStamp(state.lastActivityAt||state.updatedAt);
+      const detailEl=document.getElementById('headerUpdateStampDetail');if(detailEl)detailEl.textContent=recentActivityText();
     }
     function esc(v){return String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
     function num(v){return Math.max(0,Number(String(v).replace(',','.'))||0)}
@@ -2433,7 +2471,7 @@
       const value=num(e.target.value);
       if(value)store[e.target.dataset.key]=value;else delete store[e.target.dataset.key];
       recordOp(storeName,e.target.dataset.key,value||null);
-      markActivity();
+      markActivity(`alterou o estoque de ${produceLabel(e.target.dataset.key.split('|')[3])}`);
       updateTotals();saveState();
     }
     // Navegação por teclado ao estilo Planilhas Google: Enter desce pra
@@ -3395,7 +3433,7 @@
       if(logoUrl)client.logoUrl=logoUrl;
       state.clients.push(client);
       addLog(`adicionou o cliente ${name}`);
-      markActivity();
+      markActivity(`adicionou o cliente ${name}`);
       hideAlert('clientAlert');document.getElementById('clientDialog').close();pendingStructural=true;saveState();renderAll();
       toast(products.length?`Cliente adicionado com ${products.length} produto${products.length>1?'s':''}.`:'Cliente adicionado. Use o + no cartão para incluir produtos.')
     }
