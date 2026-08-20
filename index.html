@@ -1712,7 +1712,7 @@
     function uid(prefix){return prefix+'_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,7)}
     function activeProduce(){return state.activeProduce||PRODUCE[0].id}
     function produceLabel(id){return (PRODUCE.find(p=>p.id===id)||{}).label||id}
-    function freshState(){return {version:2,factorRulesVersion:1,partners:DEFAULT_PARTNERS.map((name,i)=>({id:'p'+i,name,produce:'brocolis'})),days:DEFAULT_DATES.map(iso=>({id:'d_'+iso,iso,produce:'brocolis'})),clients:DEFAULT_CLIENTS.map((name,i)=>({id:'c'+i,name})),activeProduce:'geral',cells:{},processar:{},orders:{'c0-0':3600,'c3-0':1455},separado:{},factors:{},factorConfig:{},dashboardLabels:{},generalHiddenCultures:{},cultures:[],log:[],updatedAt:new Date().toISOString()}}
+    function freshState(){return {version:2,factorRulesVersion:1,partners:DEFAULT_PARTNERS.map((name,i)=>({id:'p'+i,name,produce:'brocolis'})),days:DEFAULT_DATES.map(iso=>({id:'d_'+iso,iso,produce:'brocolis'})),clients:DEFAULT_CLIENTS.map((name,i)=>({id:'c'+i,name})),activeProduce:'geral',cells:{},processar:{},orders:{'c0-0':3600,'c3-0':1455},separado:{},factors:{},factorConfig:{},dashboardLabels:{},generalHiddenCultures:{},cultures:[],log:[],updatedAt:new Date().toISOString(),lastActivityAt:new Date().toISOString()}}
     function migrateFactorRules(target){
       if(!target||Number(target.factorRulesVersion||0)>=1)return target;
       target.factors=target.factors||{};
@@ -1754,6 +1754,7 @@
           saved.generalHiddenCultures=saved.generalHiddenCultures||{};
           saved.cultures=saved.cultures||[];
           saved.log=saved.log||[];
+          saved.lastActivityAt=saved.lastActivityAt||saved.updatedAt;
           return migrateFactorRules(saved);
         }
       }catch(e){}
@@ -1769,8 +1770,13 @@
       updateHeaderStamp();
       if(cloud&&hasBackend()&&cloudLoaded){clearTimeout(cloudTimer);cloudTimer=setTimeout(()=>{cloudTimer=null;syncCloud(true)},1800)}
     }
+    // O selo do cabeçalho não acompanha state.updatedAt (que muda a qualquer
+    // salvamento, incluindo trocar de aba ou mexer em configurações) — só
+    // avança quando alguém realmente lança/edita um valor na tabela de
+    // estoque ou adiciona um cliente, via markActivity().
+    function markActivity(){state.lastActivityAt=new Date().toISOString()}
     function updateHeaderStamp(){
-      const el=document.getElementById('headerUpdateStampTime');if(el)el.textContent=fmtStamp(state.updatedAt);
+      const el=document.getElementById('headerUpdateStampTime');if(el)el.textContent=fmtStamp(state.lastActivityAt||state.updatedAt);
     }
     function esc(v){return String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
     function num(v){return Math.max(0,Number(String(v).replace(',','.'))||0)}
@@ -2423,6 +2429,7 @@
       const value=num(e.target.value);
       if(value)store[e.target.dataset.key]=value;else delete store[e.target.dataset.key];
       recordOp(storeName,e.target.dataset.key,value||null);
+      markActivity();
       updateTotals();saveState();
     }
     // Navegação por teclado ao estilo Planilhas Google: Enter desce pra
@@ -3384,6 +3391,7 @@
       if(logoUrl)client.logoUrl=logoUrl;
       state.clients.push(client);
       addLog(`adicionou o cliente ${name}`);
+      markActivity();
       hideAlert('clientAlert');document.getElementById('clientDialog').close();pendingStructural=true;saveState();renderAll();
       toast(products.length?`Cliente adicionado com ${products.length} produto${products.length>1?'s':''}.`:'Cliente adicionado. Use o + no cartão para incluir produtos.')
     }
