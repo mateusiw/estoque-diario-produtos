@@ -3796,6 +3796,7 @@
       try{
         const result=await backendCall('salvarEstoque',state,{baseToken:cloudToken,force,...sessionCreds()});
         setCloudToken(result.token||cloudToken);cloudLoaded=true;
+        snapshotBaseline();
         setCloudStatus('online','Sincronizado com o banco de dados');
         if(!silent)toast('Estoque salvo na nuvem.');
       }catch(e){
@@ -3813,6 +3814,103 @@
           if(!silent)toast(e.message,true);
         }
       }finally{syncInFlight=false;document.getElementById('syncBtn').disabled=false}
+    }
+    // ── Mesclagem automática de conflitos ─────────────────────────────
+    // Antes, quando duas pessoas mexiam em cadastros (parceiro, cliente,
+    // data, cultura...) quase ao mesmo tempo, aparecia um diálogo pedindo
+    // pra escolher entre "usar dados do banco" ou "sobrescrever". Com
+    // Realtime, várias pessoas mexem no painel ao mesmo tempo o tempo todo
+    // — esse aviso virou fricção sem necessidade. Agora mescla sozinho
+    // (igual o Planilhas Google faz com edições simultâneas) e só avisa
+    // com um toast discreto, sem interromper ninguém.
+    // structuralBaseline guarda uma cópia do estado no momento em que esta
+    // aba ficou sincronizada com o banco pela última vez — é a "base comum"
+    // de uma mesclagem de 3 pontas (base × versão local × versão do banco).
+    let structuralBaseline=null;
+    function snapshotBaseline(){structuralBaseline=JSON.parse(JSON.stringify(state))}
+    // Mescla um array de objetos com "id" único (parceiros, clientes, datas,
+    // culturas, produtos do catálogo...) comparando com a base comum — mesma
+    // ideia do merge de 3 pontas do Git. Sem base conhecida (esta aba nunca
+    // sincronizou), assume base vazia: nada é tratado como "removido", só
+    // une os dois lados (e o local vence em caso de empate no mesmo id).
+    function mergeArrayById(remoteArr,localArr,baseArr){
+      remoteArr=Array.isArray(remoteArr)?remoteArr:[];
+      localArr=Array.isArray(localArr)?localArr:[];
+      baseArr=Array.isArray(baseArr)?baseArr:[];
+      const baseMap=new Map(baseArr.map(x=>[x.id,x]));
+      const localMap=new Map(localArr.map(x=>[x.id,x]));
+      const result=[],seen=new Set();
+      remoteArr.forEach(remoteItem=>{
+        const id=remoteItem.id;seen.add(id);
+        const localItem=localMap.get(id);
+        if(!localItem){
+          if(baseMap.has(id))return; // removido neste dispositivo
+          result.push(remoteItem);
+          return;
+        }
+        const baseItem=baseMap.get(id);
+        const localChanged=!baseItem||JSON.stringify(localItem)!==JSON.stringify(baseItem);
+        result.push(localChanged?localItem:remoteItem);
+      });
+      localArr.forEach(localItem=>{if(!seen.has(localItem.id)&&!baseMap.has(localItem.id))result.push(localItem)});
+      return result;
+    }
+    // Mesma ideia, para objetos simples usados como mapa (chave → valor).
+    function mergeMapByKey(remoteObj,localObj,baseObj){
+      remoteObj=remoteObj||{};localObj=localObj||{};baseObj=baseObj||{};
+      const keys=new Set([...Object.keys(remoteObj),...Object.keys(localObj),...Object.keys(baseObj)]);
+      const result={};
+      keys.forEach(key=>{
+        if(!(key in localObj)){
+          if(key in baseObj)return; // removido neste dispositivo
+          if(key in remoteObj)result[key]=remoteObj[key];
+          return;
+        }
+        const localChanged=!(key in baseObj)||JSON.stringify(localObj[key])!==JSON.stringify(baseObj[key]);
+        result[key]=localChanged?localObj[key]:remoteObj[key];
+      });
+      return result;
+    }
+    // Combina a versão mais nova do banco com os cadastros feitos aqui desde
+    // a última sincronização. Os lançamentos de célula/pedido/separação
+    // continuam entrando por cima via applyOps (pendingOps), igual já
+    // funcionava antes só para esses casos.
+    function mergeStructural(remote){
+      const base=structuralBaseline,empty=[];
+      const merged=migrateFactorRules(JSON.parse(JSON.stringify(remote)));
+      merged.partners=mergeArrayById(remote.partners,state.partners,base?base.partners:empty);
+      merged.days=mergeArrayById(remote.days,state.days,base?base.days:empty);
+      merged.cultures=mergeArrayById(remote.cultures,state.cultures,base?base.cultures:empty);
+      merged.productCatalog=mergeArrayById(remote.productCatalog,state.productCatalog,base?base.productCatalog:empty);
+      const baseClients=base?base.clients:empty;
+      const baseClientsMap=new Map((baseClients||[]).map(c=>[c.id,c]));
+      merged.clients=mergeArrayById(remote.clients,state.clients,baseClients).map(client=>{
+        const localClient=(state.clients||[]).find(c=>c.id===client.id);
+        if(!localClient)return client;
+        const baseClient=baseClientsMap.get(client.id);
+        client.products=mergeArrayById(client.products,localClient.products,baseClient?baseClient.products:empty);
+        return client;
+      });
+      const localFactors=state.factors||{},baseFactors=(base&&base.factors)||{},remoteFactors=remote.factors||{};
+      merged.factors=merged.factors||{};
+      new Set([...Object.keys(localFactors),...Object.keys(remoteFactors),...Object.keys(baseFactors)]).forEach(key=>{
+        if(key==='kg'||key==='packs'){
+          merged.factors[key]=mergeMapByKey(remoteFactors[key],localFactors[key],baseFactors[key]);
+        }else{
+          if(!(key in localFactors)){
+            if(!(key in baseFactors)&&key in remoteFactors)merged.factors[key]=remoteFactors[key];
+            return;
+          }
+          const localChanged=!(key in baseFactors)||JSON.stringify(localFactors[key])!==JSON.stringify(baseFactors[key]);
+          merged.factors[key]=localChanged?localFactors[key]:remoteFactors[key];
+        }
+      });
+      merged.factorConfig=mergeMapByKey(remote.factorConfig,state.factorConfig,base?base.factorConfig:{});
+      merged.dashboardLabels=mergeMapByKey(remote.dashboardLabels,state.dashboardLabels,base?base.dashboardLabels:{});
+      merged.generalHiddenCultures=mergeMapByKey(remote.generalHiddenCultures,state.generalHiddenCultures,base?base.generalHiddenCultures:{});
+      applyOps(merged,pendingOps);
+      applyPendingLogs(merged);
+      return merged;
     }
     // Mescla no estilo Google Planilhas: busca a versão mais nova, reaplica
     // por cima apenas os lançamentos pendentes deste painel e salva de novo.
@@ -3837,6 +3935,7 @@
           try{
             const result=await backendCall('salvarEstoque',state,{baseToken:cloudToken,force:false,...sessionCreds()});
             setCloudToken(result.token||cloudToken);
+            snapshotBaseline();
             setCloudStatus('online','Sincronizado com o banco de dados');
             if(!silent)toast('Alterações de outra pessoa mescladas ao painel.');
             return;
@@ -3852,19 +3951,36 @@
         setCloudStatus('error','Falha na sincronização',err.message);if(!silent)toast(err.message,true);
       }
     }
+    // Conflito em cadastros (parceiro/cliente/data/cultura/fatores...): em
+    // vez de perguntar, mescla sozinho a versão do banco com o que foi
+    // mexido neste dispositivo (ver mergeStructural) e salva o resultado.
     async function handleConflict(){
-      setCloudStatus('error','Conflito: o banco tem dados mais novos');
-      const usarNuvem=await confirmModern('O banco de dados tem alterações mais novas — salvas por outro computador ou editadas direto no Supabase. Recomendado: usar os dados do banco (os lançamentos feitos neste computador e ainda não sincronizados serão substituídos). Usar os dados do banco?',{title:'Conflito de dados',confirmText:'Usar dados do banco'});
-      if(usarNuvem){pendingOps={};pendingStructural=false;pendingLogs=[];await loadCloud();return}
-      const sobrescrever=await confirmModern('Então manter os dados DESTE computador e sobrescrever o banco? Os lançamentos mais novos do outro computador serão PERDIDOS.',{title:'Sobrescrever banco de dados',confirmText:'Sobrescrever'});
-      if(!sobrescrever)return;
+      setCloudStatus('','Mesclando cadastros de outra pessoa…');
+      let sentOps=null,sentLogs=null;
       try{
+        const r=await backendCall('carregarEstoque',{},sessionCreds());
+        if(r?.sessao)updateSessionDetails(r.sessao);
+        if(Array.isArray(r?.usuarios))usersCache=r.usuarios;
+        const remote=(r&&typeof r==='object'&&'estado' in r)?r.estado:r;
+        setCloudToken((r&&r.token)||null);
+        if(!(remote?.version===2&&remote.partners&&remote.days))throw new Error('Resposta inválida do banco de dados.');
+        const aba=activeProduce(),foco=captureFocus();
+        const merged=mergeStructural(remote);
+        merged.activeProduce=aba;
+        state=merged;
+        renderAll();restoreFocus(foco);
+        cloudLoaded=true;
+        saveState(false);
+        sentOps=pendingOps;sentLogs=pendingLogs;
+        pendingOps={};pendingLogs=[];
         const result=await backendCall('salvarEstoque',state,{baseToken:cloudToken,force:true,...sessionCreds()});
-        setCloudToken(result.token||cloudToken);cloudLoaded=true;
-        pendingOps={};pendingStructural=false;pendingLogs=[];
+        setCloudToken(result.token||cloudToken);
+        pendingStructural=false;
+        snapshotBaseline();
         setCloudStatus('online','Sincronizado com o banco de dados');
-        toast('Banco de dados sobrescrito com os dados deste computador.');
+        toast('Alterações de cadastro feitas por outra pessoa foram mescladas automaticamente.');
       }catch(e){
+        if(sentOps){pendingOps={...sentOps,...pendingOps};pendingLogs=[...sentLogs,...pendingLogs]}
         if(e.authError){setCloudStatus('error','Sessão expirada');handleAuthError();return}
         setCloudStatus('error','Falha na sincronização',e.message);toast(e.message,true);
       }
@@ -3893,6 +4009,7 @@
           renderAll();restoreFocus(foco);
           if(!quiet)toast('Painel atualizado com os dados do banco de dados.');
         }
+        snapshotBaseline();
         cloudLoaded=true;
         setCloudStatus('online','Conectado ao banco de dados');
         return true;
