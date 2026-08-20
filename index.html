@@ -351,6 +351,10 @@
     .pcard-subrow{margin-top:-2px;flex-wrap:nowrap!important;gap:6px!important}
     .pcard--tomate .pcard-subrow .val{font-size:16px;font-weight:600;letter-spacing:-.02em;white-space:nowrap}
     .pcard--tomate .pcard-subrow .kg{font-size:15px;padding:2px 6px}
+    /* Linha com label longo (ex.: "Somando Estimativa..."): permite quebrar,
+       senão o badge de valor é empurrado pra fora do card e some visualmente. */
+    .pcard-subrow.pcard-subrow--wrap{flex-wrap:wrap!important}
+    .pcard-subrow.pcard-subrow--wrap .val{white-space:normal!important}
     .pcard .val{font-size:19px;font-weight:800;color:var(--ink);font-variant-numeric:tabular-nums}
     .pcard .kg{font-size:17px;color:var(--c);font-weight:800;border:1.5px solid var(--c);border-radius:8px;padding:2px 8px;white-space:nowrap}
     @media(max-width:620px){
@@ -2165,7 +2169,7 @@
         const valDisplay=x.c.id==='pepino'?fmt(pepinoUnEstimate):x.c.id==='tomate'?fmt(x.un):fmtUn(x);
         const valTitle=x.c.id==='pepino'?` title="Estimativa de unidades (pacotes 280 g): ${fmt(x.kg)} kg ÷ ${String(pepinoPacoteFac).replace('.',',')} kg/pacote = ${fmt(pepinoUnEstimate)} unidades (estimativa)"`:'';
         const badgeKg=x.c.id==='tomate'?prontasKg:x.kg;
-        const totalRow=(x.un>0&&granel>0)?`<span class="valrow pcard-subrow"><span class="val" title="Soma de ${fmt(x.un)} cumbucas já prontas + ${fmt(estGranelUn)} cumbucas estimadas do que ainda está a granel">Somando Estimativa de Cumbucas a Granel com Cumbucas Processadas</span><span class="kg">${fmt(tomateTotalUn)} Cumbucas e ${fmt(tomateTotalKg)} kg</span></span>`:'';
+        const totalRow=(x.un>0&&granel>0)?`<span class="valrow pcard-subrow pcard-subrow--wrap"><span class="val" title="Soma de ${fmt(x.un)} cumbucas já prontas + ${fmt(estGranelUn)} cumbucas estimadas do que ainda está a granel">Somando Estimativa de Cumbucas a Granel com Cumbucas Processadas</span><span class="kg">${fmt(tomateTotalUn)} Cumbucas e ${fmt(tomateTotalKg)} kg</span></span>`:'';
         const subEst=x.c.id==='tomate'?`<span class="valrow pcard-subrow"><span class="val" style="color:var(--critical)">KG a Processar (Granel)</span><span class="kg" style="color:var(--critical);border-color:var(--critical)">${fmt(granel)} kg</span></span><span class="valrow pcard-subrow"><span class="val" style="color:var(--critical)" title="${fmt(granel)} kg a granel ÷ ${String(factorNum('tomateGranelCumbucaKg')).replace('.',',')} kg/cumbuca = ${fmt(estGranelUn)} cumbucas (estimativa)">Estimativa de Cumbucas (Granel)</span><span class="kg" style="color:var(--critical);border-color:var(--critical)">≈ ${fmt(estGranelUn)}</span></span>${totalRow}`:'';
         const detBlock=x.c.id==='tomate'?'':`<div class="pdet">${det}</div>`;
         const valStyle=x.c.id==='tomate'?' style="color:var(--good)"':'';
