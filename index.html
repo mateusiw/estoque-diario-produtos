@@ -1971,6 +1971,40 @@
       }
       return html+tomateSummaryHtml();
     }
+    // Pepino em duas tabelas separadas (igual ao Tomate): uma para "Não
+    // processado" e outra para "Processado". Os dados continuam nas mesmas
+    // chaves (tipo 0 e 1 em state.cells), então nada lançado antes se perde;
+    // TOTAL/KG usam os mesmos data-total/data-kg que patchCultureTotals atualiza.
+    function pepinoBlockHtml(days,hoje){
+      if(!days.length)return `<div style="padding:24px;color:var(--muted);text-align:center">Nenhuma data cadastrada para Pepino. Use “Adicionar data” nesta aba.</div>`;
+      const partners=partnersForProduce('pepino');
+      const minWidth=Math.max(900,210+days.length*110)+'px';
+      const titles=['Pepino não processado (kg)','Pepino processado'];
+      return PEPINO_META.map((m,t)=>{
+        const label=tableTypeLabel({id:'pepino'},m.label);
+        let h='<thead><tr class="date-row"><th class="partner-col">DATA</th>';
+        days.forEach(day=>h+=dateHeaderHtml(day,hoje,1,t===0));
+        h+='</tr><tr class="subhead"><th class="partner-col">PARCEIRO</th>';
+        days.forEach(day=>h+=`<th class="day-start" data-day-col="${day.id}" title="${esc(label)}"><span class="type-chip"><i style="background:${m.color}"></i><span>${esc(label)}</span></span></th>`);
+        h+='</tr></thead><tbody>';
+        if(!partners.length){
+          h+=`<tr><td colspan="${1+days.length}" style="padding:24px;color:var(--muted);text-align:center">Nenhum parceiro cadastrado para Pepino. Use “Adicionar parceiro”.</td></tr>`;
+        }else{
+          partners.forEach(partner=>{
+            h+=`<tr><td class="partner-col">${esc(partner.name)}</td>`;
+            days.forEach(day=>{const key=cellKey(partner.id,day.id,t,'pepino'),raw=state.cells[key],value=raw==null||raw===''?'':String(raw).replace('.',',');h+=`<td class="day-start${day.iso===hoje?' today':''}"><input class="cell" inputmode="decimal" aria-label="${esc(partner.name)}, ${formatDate(day.iso)}, ${esc(label)}, Pepino" data-key="${key}" value="${value}"></td>`});
+            h+='</tr>';
+          });
+          h+='<tr class="total-row"><td class="partner-col">TOTAL</td>';
+          days.forEach(day=>h+=`<td class="day-start" data-total="${day.id}|${t}|pepino">${fmtDec(totalDayType(day.id,t,'pepino'))}</td>`);
+          h+='</tr><tr class="kg-row"><td class="partner-col">KG</td>';
+          days.forEach(day=>{const qty=totalDayType(day.id,t,'pepino'),fator=kgFactorForType('pepino',t),kgVal=qty*fator;h+=`<td class="day-start" data-kg="${day.id}|${t}|pepino" title="${esc(`${fmtDec(qty)} × ${String(fator).replace('.',',')} kg = ${fmt(kgVal)} kg`)}">${fmt(kgVal)}</td>`});
+          h+='</tr>';
+        }
+        h+='</tbody>';
+        return `<div class="tomate-grid-label">${titles[t]||esc(label)}</div><table class="stock-table" style="min-width:${minWidth}">${h}</table>`;
+      }).join('');
+    }
     function refreshTomateTotals(){
       const days=daysForProduce('tomate');
       days.forEach(day=>[0,1,2].forEach(t=>{
@@ -2423,6 +2457,12 @@
       const hoje=todayIso();
       if(produce==='tomate'){
         scroll.innerHTML=`<div class="stock-zoom-wrap" id="stockZoomWrap">${tomateBlockHtml(days,hoje)}</div>`;
+        scroll.querySelectorAll('input.cell').forEach(input=>{input.addEventListener('input',onCellInput);input.addEventListener('change',onCellChange);input.addEventListener('keydown',onCellKeydown);input.addEventListener('focus',onCellFocus);input.addEventListener('mouseup',onCellMouseup)});
+        wireClearDateButtons(scroll);
+        return;
+      }
+      if(produce==='pepino'){
+        scroll.innerHTML=`<div class="stock-zoom-wrap" id="stockZoomWrap">${pepinoBlockHtml(days,hoje)}</div>`;
         scroll.querySelectorAll('input.cell').forEach(input=>{input.addEventListener('input',onCellInput);input.addEventListener('change',onCellChange);input.addEventListener('keydown',onCellKeydown);input.addEventListener('focus',onCellFocus);input.addEventListener('mouseup',onCellMouseup)});
         wireClearDateButtons(scroll);
         return;
