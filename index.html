@@ -268,7 +268,21 @@
     .presence-avatars .pmore{background:var(--surface-3);color:var(--ink-2)}
 
     /* ── Abas de vegetal ─────────────────────────────────── */
-    .produce-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 0;padding:0 2px}
+    /* Fica grudada logo abaixo do cabeçalho ao rolar a página, pra trocar de
+       aba sem precisar voltar ao topo. --tabs-top é calculado via JS
+       (updateTabsStickyTop) a partir da altura real do cabeçalho, que muda
+       com a largura da tela. Ao grudar, ganha fundo translúcido (.is-stuck)
+       pra não ficar ilegível por cima da tabela. */
+    .produce-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 0;padding:6px 8px;
+      position:sticky;top:var(--tabs-top,96px);z-index:35;border-radius:18px;border:1px solid transparent;
+      transition:background .15s,box-shadow .15s,border-color .15s}
+    .produce-tabs.is-stuck{background:var(--surface-translucent);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+      border-color:var(--border);box-shadow:var(--shadow-md)}
+    @media(max-width:620px){
+      .produce-tabs{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}
+      .produce-tabs::-webkit-scrollbar{display:none}
+      .produce-tab{flex:none}
+    }
     .produce-tab{border:1px solid var(--line);background:var(--surface);color:var(--ink-2);border-radius:999px;
       padding:9px 16px;font-size:13.5px;font-weight:750;cursor:pointer;display:inline-flex;align-items:center;gap:8px;
       box-shadow:var(--shadow-sm);transition:transform .15s,box-shadow .15s,border-color .15s,background .15s,color .15s}
@@ -814,6 +828,7 @@
     .factor-field-head{display:grid;grid-template-columns:minmax(0,1fr) 28px;gap:5px;align-items:center;margin-bottom:5px}
     .factor-field input.factor-name-input{height:29px;padding:0 7px;text-align:left;font-size:11px;font-weight:750;color:var(--ink-2)}
     .factor-field-head .mini-remove{width:28px;height:28px}
+    .factor-hint{display:block;margin-top:5px;font-size:10.5px;line-height:1.35;color:var(--muted)}
     .factor-hidden-list{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;padding-top:9px;border-top:1px dashed var(--line)}
     .factor-hidden-list:not(:has(.factor-restore:not([hidden]))){display:none}
     .factor-restore{border:1px dashed var(--line-strong);border-radius:8px;background:var(--surface);padding:5px 8px;color:var(--muted);font-size:10.5px;font-weight:750;cursor:pointer}
@@ -1563,6 +1578,26 @@
         if(!ticking){requestAnimationFrame(onScroll);ticking=true}
       },{passive:true});
     })();
+    // Abas de cultura grudadas abaixo do cabeçalho: o "top" do sticky
+    // depende da altura real do cabeçalho (que muda com a largura da tela e
+    // quando os botões mudam de lugar no celular), então é medido aqui.
+    (function(){
+      const topbar=document.querySelector('.topbar'),tabs=document.getElementById('produceTabs');
+      if(!topbar||!tabs)return;
+      let stickyTop=96;
+      function updateTabsStickyTop(){
+        stickyTop=(parseFloat(getComputedStyle(topbar).top)||0)+topbar.offsetHeight+8;
+        document.documentElement.style.setProperty('--tabs-top',stickyTop+'px');
+        updateStuck();
+      }
+      function updateStuck(){
+        tabs.classList.toggle('is-stuck',window.scrollY>0&&tabs.getBoundingClientRect().top<=stickyTop+1);
+      }
+      if(window.ResizeObserver)new ResizeObserver(updateTabsStickyTop).observe(topbar);
+      window.addEventListener('resize',updateTabsStickyTop);
+      window.addEventListener('scroll',updateStuck,{passive:true});
+      updateTabsStickyTop();
+    })();
     // Girar a tabela (modo paisagem) — vira a tabela de lado dentro da tela
     // do celular, sem precisar deitar o aparelho de verdade.
     document.getElementById('rotateViewBtn').onclick=()=>{
@@ -1975,11 +2010,25 @@
     // processado" e outra para "Processado". Os dados continuam nas mesmas
     // chaves (tipo 0 e 1 em state.cells), então nada lançado antes se perde;
     // TOTAL/KG usam os mesmos data-total/data-kg que patchCultureTotals atualiza.
+    // Pepino: tipo 0 (não processado) é lançado em KG; tipo 1 (processado)
+    // é lançado em UNIDADES (pacotes de 280 g). Textos do "passar o mouse"
+    // das linhas TOTAL e KG, explicando a conta e a unidade de cada valor.
+    function pepinoTips(t,qty,fator){
+      const ft=String(fator).replace('.',','),kg=qty*fator;
+      if(t===1)return {
+        total:`Pepino PROCESSADO — valor em UNIDADES (pacotes de 280 g)\nSoma das unidades lançadas por todos os parceiros neste dia = ${fmtDec(qty)} unidades`,
+        kg:`Pepino PROCESSADO — resultado em KG\nCada unidade pesa ${ft} kg\n${fmtDec(qty)} unidades × ${ft} kg = ${fmt(kg)} kg`
+      };
+      return {
+        total:`Pepino NÃO processado — valor em KG\nSoma dos kg lançados por todos os parceiros neste dia = ${fmtDec(qty)} kg`,
+        kg:`Pepino NÃO processado — resultado em KG\nJá é lançado em kg (fator ${ft})\n${fmtDec(qty)} kg × ${ft} = ${fmt(kg)} kg`
+      };
+    }
     function pepinoBlockHtml(days,hoje){
       if(!days.length)return `<div style="padding:24px;color:var(--muted);text-align:center">Nenhuma data cadastrada para Pepino. Use “Adicionar data” nesta aba.</div>`;
       const partners=partnersForProduce('pepino');
       const minWidth=Math.max(900,210+days.length*110)+'px';
-      const titles=['Pepino não processado (kg)','Pepino processado'];
+      const titles=['Pepino não processado (lançar em kg)','Pepino processado (lançar em unidades)'];
       return PEPINO_META.map((m,t)=>{
         const label=tableTypeLabel({id:'pepino'},m.label);
         let h='<thead><tr class="date-row"><th class="partner-col">DATA</th>';
@@ -1995,10 +2044,10 @@
             days.forEach(day=>{const key=cellKey(partner.id,day.id,t,'pepino'),raw=state.cells[key],value=raw==null||raw===''?'':String(raw).replace('.',',');h+=`<td class="day-start${day.iso===hoje?' today':''}"><input class="cell" inputmode="decimal" aria-label="${esc(partner.name)}, ${formatDate(day.iso)}, ${esc(label)}, Pepino" data-key="${key}" value="${value}"></td>`});
             h+='</tr>';
           });
-          h+='<tr class="total-row"><td class="partner-col">TOTAL</td>';
-          days.forEach(day=>h+=`<td class="day-start" data-total="${day.id}|${t}|pepino">${fmtDec(totalDayType(day.id,t,'pepino'))}</td>`);
+          h+=`<tr class="total-row"><td class="partner-col">TOTAL ${t===1?'(unidades)':'(kg)'}</td>`;
+          days.forEach(day=>{const qty=totalDayType(day.id,t,'pepino'),tip=pepinoTips(t,qty,kgFactorForType('pepino',t));h+=`<td class="day-start" data-total="${day.id}|${t}|pepino" title="${esc(tip.total)}">${fmtDec(qty)}</td>`});
           h+='</tr><tr class="kg-row"><td class="partner-col">KG</td>';
-          days.forEach(day=>{const qty=totalDayType(day.id,t,'pepino'),fator=kgFactorForType('pepino',t),kgVal=qty*fator;h+=`<td class="day-start" data-kg="${day.id}|${t}|pepino" title="${esc(`${fmtDec(qty)} × ${String(fator).replace('.',',')} kg = ${fmt(kgVal)} kg`)}">${fmt(kgVal)}</td>`});
+          days.forEach(day=>{const qty=totalDayType(day.id,t,'pepino'),fator=kgFactorForType('pepino',t),kgVal=qty*fator;h+=`<td class="day-start" data-kg="${day.id}|${t}|pepino" title="${esc(pepinoTips(t,qty,fator).kg)}">${fmt(kgVal)}</td>`});
           h+='</tr>';
         }
         h+='</tbody>';
@@ -2204,12 +2253,14 @@
           const npCx=geralTypeTotal(0,'pepino'),prCx=geralTypeTotal(1,'pepino');
           const npFac=kgFactorForType('pepino',0),prFac=kgFactorForType('pepino',1);
           const np=npCx*npFac,pr=prCx*prFac;
-          const pacoteFac=factorNum('pepinoPacoteKg'),pacoteProcFac=factorNum('pepinoPacoteProcessadoKg');
+          // Processado é lançado em UNIDADES (prCx = unidades); só o não
+          // processado (kg) precisa ser convertido em pacotes por estimativa.
+          const pacoteFac=factorNum('pepinoPacoteKg'),npEstUn=Math.round(np/pacoteFac),totUn=Math.round(prCx)+npEstUn;
           rows=[
-            ['Não processado',fmt(np)+' kg','','pepinoNaoProcessado','kg|pepino|0',`${fmtDec(npCx)} × ${factorTxt(npFac)} kg = ${fmt(np)} kg`],
-            ['Processado',fmt(pr)+' kg','','pepinoProcessado','kg|pepino|1',`${fmtDec(prCx)} × ${factorTxt(prFac)} kg = ${fmt(pr)} kg`],
-            ['Estimativa pacotes 280 g',fmt(Math.round((np+pr)/pacoteFac)),'','pepinoEstimativaPacotes280','pepinoPacoteKg',`(${fmt(np)} + ${fmt(pr)}) kg ÷ ${factorTxt(pacoteFac)} kg/pacote = ${fmt(Math.round((np+pr)/pacoteFac))} pacotes (estimativa)`],
-            ['Pacotes 280 g (processado)',fmt(Math.round(pr/pacoteProcFac)),'','pepinoPacotes280Processado','pepinoPacoteProcessadoKg',`${fmt(pr)} kg ÷ ${factorTxt(pacoteProcFac)} kg/pacote = ${fmt(Math.round(pr/pacoteProcFac))} pacotes (estimativa)`]
+            ['Não processado',fmt(np)+' kg','','pepinoNaoProcessado','kg|pepino|0',`Valor em KG (lançado direto em kg)\nSoma dos kg de pepino não processado = ${fmt(np)} kg`],
+            ['Processado',`${fmt(prCx)} un · ${fmt(pr)} kg`,'','pepinoProcessado','kg|pepino|1',`Lançado em UNIDADES (pacotes de 280 g)\nUnidades: ${fmt(prCx)}\nPeso: ${fmt(prCx)} unidades × ${factorTxt(prFac)} kg = ${fmt(pr)} kg`],
+            ['Estimativa pacotes 280 g',fmt(totUn),'','pepinoEstimativaPacotes280','pepinoPacoteKg',`Resultado em UNIDADES (pacotes de 280 g)\nJá processadas: ${fmt(prCx)} unidades\n+ Estimativa do não processado: ${fmt(np)} kg ÷ ${factorTxt(pacoteFac)} kg/pacote = ${fmt(npEstUn)} unidades\n= ${fmt(totUn)} unidades (estimativa)`],
+            ['Pacotes 280 g (processado)',fmt(prCx),'','pepinoPacotes280Processado','pepinoPacoteProcessadoKg',`Resultado em UNIDADES\nSão as unidades de pepino processado lançadas = ${fmt(prCx)} unidades (valor real, não é estimativa)`]
           ];
         }
         return rows.filter(r=>!r[4]||!isFactorHidden(r[4])).map(r=>{
@@ -2224,13 +2275,16 @@
           return String(labelA).localeCompare(String(labelB),'pt-BR',{sensitivity:'base'});
         });
         const det=detailRows.map(r=>`<span class="dr ${r[2]||''}"${r[5]?` title="${esc(r[5])}"`:''}>${r[3]?dashboardLabelText(r[3],r[0]):r[0]}<b>${r[1]}</b></span>`).join('');
-        const valLabel=x.c.id==='tomate'?'Cumbucas Processada':x.c.id==='pepino'?'Unidades':cultureUnitLabel(x.c.id);
-        // Pepino é lançado direto em kg, mas o valor grande do card mostra a
-        // estimativa de unidades (pacotes 280 g) em vez do kg — mesma conta
-        // da linha "Estimativa pacotes 280 g" do detalhamento — pra bater
-        // com o número que já aparece como "Estimativa PCT" logo abaixo.
-        const pepinoPacoteFac=factorNum('pepinoPacoteKg');
-        const pepinoUnEstimate=x.c.id==='pepino'?Math.round(x.kg/pepinoPacoteFac):0;
+        const isPepino=x.c.id==='pepino',splitCard=x.c.id==='tomate'||isPepino;
+        const valLabel=x.c.id==='tomate'?'Cumbucas Processada':isPepino?'Unidades Processadas':cultureUnitLabel(x.c.id);
+        // Pepino segue o mesmo formato do Tomate: o valor grande é só o que
+        // JÁ foi processado (unidades reais). O não processado (kg) e a
+        // estimativa de unidades que ele vai render aparecem à parte, em
+        // vermelho, e por fim a soma das duas coisas.
+        const pepinoPacoteFac=factorNum('pepinoPacoteKg'),pepinoPrFac=kgFactorForType('pepino',1);
+        const pepinoPrUn=isPepino?Math.round(geralTypeTotal(1,'pepino')):0,pepinoNpKg=isPepino?geralTypeTotal(0,'pepino')*kgFactorForType('pepino',0):0;
+        const pepinoPrKg=pepinoPrUn*pepinoPrFac;
+        const pepinoNpEstUn=Math.round(pepinoNpKg/pepinoPacoteFac),pepinoUnEstimate=pepinoPrUn+pepinoNpEstUn;
         // Tomate: o valor grande do card é só as cumbucas já prontas (sem
         // somar a estimativa do que ainda está a granel) — o total (prontas
         // + estimativa do granel) e o granel isolado aparecem à parte, como
@@ -2238,15 +2292,22 @@
         const prontasKg=x.un*factorNum('tomateCumbucaKg');
         const estGranelUn=granel>0?Math.round(granel/factorNum('tomateGranelCumbucaKg')):0;
         const tomateTotalUn=x.un+estGranelUn,tomateTotalKg=prontasKg+granel;
-        const valDisplay=x.c.id==='pepino'?fmt(pepinoUnEstimate):x.c.id==='tomate'?fmt(x.un):fmtUn(x);
-        const valTitle=x.c.id==='pepino'?` title="Estimativa de unidades (pacotes 280 g): ${fmt(x.kg)} kg ÷ ${String(pepinoPacoteFac).replace('.',',')} kg/pacote = ${fmt(pepinoUnEstimate)} unidades (estimativa)"`:'';
-        const badgeKg=x.c.id==='tomate'?prontasKg:x.kg;
+        const ftx=v=>String(v).replace('.',',');
+        const valDisplay=isPepino?fmt(pepinoPrUn):x.c.id==='tomate'?fmt(x.un):fmtUn(x);
+        const valTitle=isPepino?` title="${esc(`Unidades de pepino JÁ PROCESSADAS (valor real, lançado na tabela de baixo)\n${fmt(pepinoPrUn)} unidades × ${ftx(pepinoPrFac)} kg = ${fmt(pepinoPrKg)} kg`)}"`:'';
+        const badgeKg=x.c.id==='tomate'?prontasKg:isPepino?pepinoPrKg:x.kg;
         const totalRow=(x.un>0&&granel>0)?`<span class="valrow pcard-subrow pcard-subrow--wrap"><span class="val" title="Soma de ${fmt(x.un)} cumbucas já prontas + ${fmt(estGranelUn)} cumbucas estimadas do que ainda está a granel">Somando Estimativa de Cumbucas a Granel com Cumbucas Processadas</span><span class="kg">${fmt(tomateTotalUn)} Cumbucas e ${fmt(tomateTotalKg)} kg</span></span>`:'';
-        const subEst=x.c.id==='tomate'?`<span class="valrow pcard-subrow"><span class="val" style="color:var(--critical)">KG a Processar (Granel)</span><span class="kg" style="color:var(--critical);border-color:var(--critical)">${fmt(granel)} kg</span></span><span class="valrow pcard-subrow"><span class="val" style="color:var(--critical)" title="${fmt(granel)} kg a granel ÷ ${String(factorNum('tomateGranelCumbucaKg')).replace('.',',')} kg/cumbuca = ${fmt(estGranelUn)} cumbucas (estimativa)">Estimativa de Cumbucas (Granel)</span><span class="kg" style="color:var(--critical);border-color:var(--critical)">≈ ${fmt(estGranelUn)}</span></span>${totalRow}`:'';
-        const detBlock=x.c.id==='tomate'?'':`<div class="pdet">${det}</div>`;
-        const valStyle=x.c.id==='tomate'?' style="color:var(--good)"':'';
-        const kgStyle=x.c.id==='tomate'?' style="color:var(--good);border-color:var(--good)"':'';
-        return `<div class="pcard${x.c.id==='tomate'?' pcard--tomate':''}" style="--c:${x.c.color}"><span class="pic">${CULTURE_EMOJI[x.c.id]||genericCultureSvg(x.c.color)}</span><b><i></i>${esc(x.c.label)}</b><span class="valrow"><span class="val"${valTitle}${valStyle}>${valDisplay} ${esc(valLabel)}</span><span class="kg"${kgStyle}>≈ ${fmt(badgeKg)} kg</span></span>${subEst}<div class="pbar"><i style="width:${pct}%"></i></div><span class="pct">${pct}% do peso total</span>${detBlock}</div>`;
+        const redVal=' style="color:var(--critical)"',redKg=' style="color:var(--critical);border-color:var(--critical)"';
+        const pepinoTotalRow=(pepinoPrUn>0&&pepinoNpKg>0)?`<span class="valrow pcard-subrow pcard-subrow--wrap"><span class="val" title="${esc(`${fmt(pepinoPrUn)} unidades já processadas + ${fmt(pepinoNpEstUn)} unidades estimadas do não processado = ${fmt(pepinoUnEstimate)} unidades\nPeso: ${fmt(pepinoPrKg)} kg + ${fmt(pepinoNpKg)} kg = ${fmt(pepinoPrKg+pepinoNpKg)} kg`)}">Somando Estimativa do Não Processado com Unidades Processadas</span><span class="kg">${fmt(pepinoUnEstimate)} Unidades e ${fmt(pepinoPrKg+pepinoNpKg)} kg</span></span>`:'';
+        const subEst=x.c.id==='tomate'?`<span class="valrow pcard-subrow"><span class="val" style="color:var(--critical)">KG a Processar (Granel)</span><span class="kg" style="color:var(--critical);border-color:var(--critical)">${fmt(granel)} kg</span></span><span class="valrow pcard-subrow"><span class="val" style="color:var(--critical)" title="${fmt(granel)} kg a granel ÷ ${String(factorNum('tomateGranelCumbucaKg')).replace('.',',')} kg/cumbuca = ${fmt(estGranelUn)} cumbucas (estimativa)">Estimativa de Cumbucas (Granel)</span><span class="kg" style="color:var(--critical);border-color:var(--critical)">≈ ${fmt(estGranelUn)}</span></span>${totalRow}`
+          :isPepino?`<span class="valrow pcard-subrow"><span class="val"${redVal} title="${esc(`Pepino NÃO processado — valor em KG (tabela de cima)\nSoma dos kg lançados = ${fmt(pepinoNpKg)} kg`)}">KG Não Processado</span><span class="kg"${redKg}>${fmt(pepinoNpKg)} kg</span></span><span class="valrow pcard-subrow"><span class="val"${redVal} title="${esc(`Estimativa em UNIDADES do que o não processado vai render\n${fmt(pepinoNpKg)} kg ÷ ${ftx(pepinoPacoteFac)} kg/unidade = ${fmt(pepinoNpEstUn)} unidades (estimativa)`)}">Estimativa de Unidades (Não Processado)</span><span class="kg"${redKg}>≈ ${fmt(pepinoNpEstUn)}</span></span>${pepinoTotalRow}`:'';
+        // Pepino: as linhas de detalhe antigas repetiam os mesmos números do
+        // topo do card — agora só aparecem as estimativas personalizadas.
+        const pepinoPacks=isPepino?packRows('pepino'):[];
+        const detBlock=x.c.id==='tomate'?'':isPepino?(pepinoPacks.length?`<div class="pdet">${pepinoPacks.map(r=>`<span class="dr" title="${esc(r[5])}">${r[0]}<b>${r[1]}</b></span>`).join('')}</div>`:''):`<div class="pdet">${det}</div>`;
+        const valStyle=splitCard?' style="color:var(--good)"':'';
+        const kgStyle=splitCard?' style="color:var(--good);border-color:var(--good)"':'';
+        return `<div class="pcard${splitCard?' pcard--tomate':''}" style="--c:${x.c.color}"><span class="pic">${CULTURE_EMOJI[x.c.id]||genericCultureSvg(x.c.color)}</span><b><i></i>${esc(x.c.label)}</b><span class="valrow"><span class="val"${valTitle}${valStyle}>${valDisplay} ${esc(valLabel)}</span><span class="kg"${kgStyle}>≈ ${fmt(badgeKg)} kg</span></span>${subEst}<div class="pbar"><i style="width:${pct}%"></i></div><span class="pct">${pct}% do peso total</span>${detBlock}</div>`;
       }).join('');
       return `<section class="dash-panel" style="grid-column:1/-1"><h4>Estoque por Produto<small>Unidades e Peso Estimado.</small></h4><div class="produce-cards">${cardsHtml}</div></section>`;
     }
@@ -2317,9 +2378,10 @@
             if(x.types[2]>0)details.push([dashboardLabelValue('couveflorCabecaProc','Cabeça processada'),`${fmt(x.types[2])} cx · ${fmt(x.types[2]*fil2)} kg`,meta[2]?.color,'',`${fmt(x.types[2])} caixas × ${ft(fil2)} kg/caixa = ${fmt(x.types[2]*fil2)} kg`]);
             if(filKg+cabKg>0)details.push([dashboardLabelValue('couveflorPacotes300','Pacotes 300 g'),`${fmt(Math.round((filKg+cabKg)/pacoteFac))} pct`,c.color,'rank-est',`(${fmt(filKg)} + ${fmt(cabKg)}) kg ÷ ${ft(pacoteFac)} kg/pacote = ${fmt(Math.round((filKg+cabKg)/pacoteFac))} pacotes (estimativa)`]);
           }else if(c.id==='pepino'){
-            const pepinoKeys=['pepinoNaoProcessado','pepinoProcessado'],pepinoDefaults=['Não processado','Processado'],pacoteProcFac=factorNum('pepinoPacoteProcessadoKg');
-            x.types.slice(0,2).forEach((v,t)=>{const fac=kgFactorForType(c.id,t);if(v>0)details.push([dashboardLabelValue(pepinoKeys[t],pepinoDefaults[t]),`${fmtDec(v*fac)} kg`,meta[t]?.color,'',`${fmtDec(v)} × ${ft(fac)} kg = ${fmtDec(v*fac)} kg`])});
-            if(x.types[1]>0)details.push([dashboardLabelValue('pepinoPacotes280Processado','Pacotes 280 g (processado)'),`${fmt(Math.round(x.types[1]*kgFactorForType(c.id,1)/pacoteProcFac))} pct`,c.color,'rank-est',`${fmt(x.types[1]*kgFactorForType(c.id,1))} kg ÷ ${ft(pacoteProcFac)} kg/pacote = ${fmt(Math.round(x.types[1]*kgFactorForType(c.id,1)/pacoteProcFac))} pacotes (estimativa)`]);
+            const npFac=kgFactorForType(c.id,0),prFac=kgFactorForType(c.id,1),np=x.types[0]*npFac,prUn=x.types[1];
+            if(np>0)details.push([dashboardLabelValue('pepinoNaoProcessado','Não processado'),`${fmtDec(np)} kg`,meta[0]?.color,'',`Valor em KG (lançado direto em kg)\nSoma dos kg de pepino não processado deste parceiro = ${fmtDec(np)} kg`]);
+            if(prUn>0)details.push([dashboardLabelValue('pepinoProcessado','Processado'),`${fmtDec(prUn)} un · ${fmtDec(prUn*prFac)} kg`,meta[1]?.color,'',`Lançado em UNIDADES (pacotes de 280 g)\nUnidades: ${fmtDec(prUn)}\nPeso: ${fmtDec(prUn)} unidades × ${ft(prFac)} kg = ${fmtDec(prUn*prFac)} kg`]);
+            if(prUn>0)details.push([dashboardLabelValue('pepinoPacotes280Processado','Pacotes 280 g (processado)'),`${fmt(prUn)} pct`,c.color,'',`Resultado em UNIDADES\nSão as unidades de pepino processado lançadas por este parceiro = ${fmt(prUn)} (valor real, não é estimativa)`]);
           }else{
             x.types.forEach((v,t)=>{if(v>0)details.push([meta[t]?.label||('Tipo '+(t+1)),`${fmt(v)} ${cultureUnitLabel(c.id)}`,meta[t]?.color])});
           }
@@ -2590,11 +2652,12 @@
       const directKg=isDirectKgCulture(c.id);
       daysForProduce(c.id).forEach(day=>typeMetaForCulture(c.id).forEach((_,t)=>{
         const total=totalDayType(day.id,t,c.id),totalEl=document.querySelector(`[data-total="${day.id}|${t}|${c.id}"]`),kgEl=document.querySelector(`[data-kg="${day.id}|${t}|${c.id}"]`);
-        if(totalEl)totalEl.textContent=directKg?fmtDec(total):fmt(total);
+        const pTip=c.id==='pepino'?pepinoTips(t,total,kgFactorForType(c.id,t)):null;
+        if(totalEl){totalEl.textContent=directKg?fmtDec(total):fmt(total);if(pTip)totalEl.title=pTip.total}
         if(kgEl){
           const fator=kgFactorForType(c.id,t),kgVal=total*fator;
           kgEl.textContent=fmt(kgVal);
-          kgEl.title=`${directKg?fmtDec(total):fmt(total)} ${directKg?'':'caixas '}× ${String(fator).replace('.',',')} kg${directKg?'':'/caixa'} = ${fmt(kgVal)} kg`;
+          kgEl.title=pTip?pTip.kg:`${directKg?fmtDec(total):fmt(total)} ${directKg?'':'caixas '}× ${String(fator).replace('.',',')} kg${directKg?'':'/caixa'} = ${fmt(kgVal)} kg`;
         }
       }));
     }
@@ -3614,10 +3677,12 @@
           {key:'couveflorPacoteKg',label:'KG por pacote 300 g',def:.33}
         ]},
         {culture:'pepino',fields:[
-          {key:'kg|pepino|0',label:'Não processado',def:1},
-          {key:'kg|pepino|1',label:'Processado (280 g)',def:.28},
-          {key:'pepinoPacoteKg',label:'Estimativa pacotes 280 g (total)',def:.31},
-          {key:'pepinoPacoteProcessadoKg',label:'Pacotes 280 g (processado)',def:.31}
+          // "hint" é a explicação fixa (não muda ao renomear o campo), pra
+          // nunca ficar ambíguo qual campo é de qual tabela do Pepino.
+          {key:'kg|pepino|0',label:'Não processado (lançado em kg)',def:1,hint:'NÃO processado (tabela de cima, lançada em kg). Deixe 1 — o valor já é kg.'},
+          {key:'kg|pepino|1',label:'KG por unidade — Processado (280 g)',def:.28,hint:'PROCESSADO (tabela de baixo, lançada em unidades). Peso de 1 unidade: 0,28 kg.'},
+          {key:'pepinoPacoteKg',label:'KG por pacote — estimativa do não processado',def:.31,hint:'Quantos kg de pepino NÃO processado rendem 1 pacote. Ex.: 500 kg → 1650 un = 0,30.'},
+          {key:'pepinoPacoteProcessadoKg',label:'Pacotes 280 g (processado)',labelOnly:true,hint:'Só o nome da linha que mostra as unidades PROCESSADAS (sem conta).'}
         ]}
       ];
       customCultures().forEach(c=>{
@@ -3661,7 +3726,7 @@
         const fieldsHtml=group.fields.length?`<div class="factor-grid">`+group.fields.map(f=>{
           const hidden=isFactorHidden(f.key),label=factorDisplayLabel(f.key,f.label);
           const valueInput=f.labelOnly?'':`<input type="text" inputmode="decimal" data-factor="${esc(f.key)}" data-def="${f.def}" value="${String(factorCurrentValue(f.key)).replace('.',',')}">`;
-          return `<div class="factor-field" data-factor-row="${esc(f.key)}" data-factor-default-label="${esc(f.label)}" ${hidden?'hidden':''}><div class="factor-field-head"><input class="factor-name-input" type="text" maxlength="70" data-factor-label value="${esc(label)}" aria-label="Nome do cálculo"><button type="button" class="mini-remove" data-del-factor="${esc(f.key)}" title="Excluir cálculo" aria-label="Excluir cálculo ${esc(label)}">${ICON_TRASH}</button></div>${valueInput}</div>`;
+          return `<div class="factor-field" data-factor-row="${esc(f.key)}" data-factor-default-label="${esc(f.label)}" ${hidden?'hidden':''}><div class="factor-field-head"><input class="factor-name-input" type="text" maxlength="70" data-factor-label value="${esc(label)}" aria-label="Nome do cálculo"><button type="button" class="mini-remove" data-del-factor="${esc(f.key)}" title="Excluir cálculo" aria-label="Excluir cálculo ${esc(label)}">${ICON_TRASH}</button></div>${valueInput}${f.hint?`<small class="factor-hint">${esc(f.hint)}</small>`:''}</div>`;
         }).join('')+'</div>'+`<div class="factor-hidden-list">${group.fields.map(f=>`<button type="button" class="factor-restore" data-restore-factor="${esc(f.key)}" ${isFactorHidden(f.key)?'':'hidden'}>Reexibir: ${esc(factorDisplayLabel(f.key,f.label))}</button>`).join('')}</div>`:'';
         const packs=(((state.factors||{}).packs||{})[c.id]||[]);
         return `<div class="factor-group"><div class="factor-group-head" style="--c:${c.color}"><i></i>${esc(c.label)}${removeBtn}</div>${fieldsHtml}`+
