@@ -1877,13 +1877,17 @@
 
     const TYPE_META=[{label:'Filetado',color:'var(--t0)'},{label:'Não proc.',color:'var(--t1)'},{label:'Proc.',color:'var(--t2)'}];
     const TOMATE_META=[{label:'CG',color:'#e34848'},{label:'M',color:'#2e9e46'},{label:'P',color:'#e0951a'}];
-    const PEPINO_META=[{label:'Não proc.',color:'var(--t1)'},{label:'Proc.',color:'var(--t2)'}];
-    const KG_FACTORS={brocolis:[10,9,9],tomate:[10,10,10],couveflor:[9,8,11],pepino:[1,.28]};
+    // Culturas personalizadas lançadas direto em KG: só Não proc./Proc.
+    const DIRECT_KG_META=[{label:'Não proc.',color:'var(--t1)'},{label:'Proc.',color:'var(--t2)'}];
+    // Pepino tem um 3º tipo: processado mas ainda não embalado, lançado em KG
+    // (tipo 2 em state.cells) — pra não ter que contar pepino por pepino.
+    const PEPINO_META=[...DIRECT_KG_META,{label:'Proc. kg',color:'var(--t0)'}];
+    const KG_FACTORS={brocolis:[10,9,9],tomate:[10,10,10],couveflor:[9,8,11],pepino:[1,.28,1]};
     // Fatores de conversão editáveis pelo painel (botão "Editar cálculos").
     // Ficam em state.factors, que é salvo junto com o resto no banco de dados.
     const FACTOR_DEFAULTS={tomateCumbucaKg:.18,tomateGranelCumbucaKg:.189,brocolisPacote200Kg:.22,brocolisPacote300Kg:.33,couveflorPacoteKg:.33,pepinoPacoteKg:.31,pepinoPacoteProcessadoKg:.31};
     function factorNum(key){const v=Number((state.factors||{})[key]);return isFinite(v)&&v>0?v:FACTOR_DEFAULTS[key]}
-    function typeMetaForCulture(id){if(id==='tomate')return TOMATE_META;if(isDirectKgCulture(id))return PEPINO_META;return TYPE_META}
+    function typeMetaForCulture(id){if(id==='tomate')return TOMATE_META;if(id==='pepino')return PEPINO_META;if(isDirectKgCulture(id))return DIRECT_KG_META;return TYPE_META}
     function kgFactorForType(id,t){
       const custom=((state.factors||{}).kg||{})[id],v=custom&&Number(custom[t]);
       if(isFinite(v)&&v>0)return v;
@@ -2015,6 +2019,13 @@
     // das linhas TOTAL e KG, explicando a conta e a unidade de cada valor.
     function pepinoTips(t,qty,fator){
       const ft=String(fator).replace('.',','),kg=qty*fator;
+      if(t===2){
+        const unFac=kgFactorForType('pepino',1),estUn=Math.round(kg/unFac);
+        return {
+          total:`Pepino PROCESSADO SEM EMBALAR — valor em KG\nSoma dos kg lançados por todos os parceiros neste dia = ${fmtDec(qty)} kg`,
+          kg:`Pepino PROCESSADO SEM EMBALAR — resultado em KG\nJá é lançado em kg: ${fmtDec(qty)} kg = ${fmt(kg)} kg\nRende ≈ ${fmt(kg)} kg ÷ ${String(unFac).replace('.',',')} kg/unidade = ${fmt(estUn)} unidades (estimativa)`
+        };
+      }
       if(t===1)return {
         total:`Pepino PROCESSADO — valor em UNIDADES (pacotes de 280 g)\nSoma das unidades lançadas por todos os parceiros neste dia = ${fmtDec(qty)} unidades`,
         kg:`Pepino PROCESSADO — resultado em KG\nCada unidade pesa ${ft} kg\n${fmtDec(qty)} unidades × ${ft} kg = ${fmt(kg)} kg`
@@ -2028,7 +2039,7 @@
       if(!days.length)return `<div style="padding:24px;color:var(--muted);text-align:center">Nenhuma data cadastrada para Pepino. Use “Adicionar data” nesta aba.</div>`;
       const partners=partnersForProduce('pepino');
       const minWidth=Math.max(900,210+days.length*110)+'px';
-      const titles=['Pepino não processado (lançar em kg)','Pepino processado (lançar em unidades)'];
+      const titles=['Pepino não processado (lançar em kg)','Pepino processado e embalado (lançar em unidades)','Pepino processado sem embalar (lançar em kg)'];
       return PEPINO_META.map((m,t)=>{
         const label=tableTypeLabel({id:'pepino'},m.label);
         let h='<thead><tr class="date-row"><th class="partner-col">DATA</th>';
@@ -2085,6 +2096,7 @@
       if(label==='Filetado')return `${nome} Filetado`;
       if(label==='Não proc.')return `${nome} Não Processado`;
       if(label==='Proc.')return `${nome} Processado`;
+      if(label==='Proc. kg')return `${nome} Processado sem embalar (kg)`;
       return label;
     }
     function tableTypeLabel(culture,label){
@@ -2095,6 +2107,7 @@
       }
       if(label==='Não proc.')return 'Não Processado';
       if(label==='Proc.')return 'Processado';
+      if(label==='Proc. kg')return 'Processado sem embalar (kg)';
       return label;
     }
     function cultureLegendHtml(culture){
@@ -2284,7 +2297,10 @@
         const pepinoPacoteFac=factorNum('pepinoPacoteKg'),pepinoPrFac=kgFactorForType('pepino',1);
         const pepinoPrUn=isPepino?Math.round(geralTypeTotal(1,'pepino')):0,pepinoNpKg=isPepino?geralTypeTotal(0,'pepino')*kgFactorForType('pepino',0):0;
         const pepinoPrKg=pepinoPrUn*pepinoPrFac;
-        const pepinoNpEstUn=Math.round(pepinoNpKg/pepinoPacoteFac),pepinoUnEstimate=pepinoPrUn+pepinoNpEstUn;
+        // Processado sem embalar (tipo 2, lançado em kg): já está processado,
+        // então rende pelo peso de 1 unidade pronta (mesmo fator do processado).
+        const pepinoLooseKg=isPepino?geralTypeTotal(2,'pepino')*kgFactorForType('pepino',2):0,pepinoLooseEstUn=Math.round(pepinoLooseKg/pepinoPrFac);
+        const pepinoNpEstUn=Math.round(pepinoNpKg/pepinoPacoteFac),pepinoUnEstimate=pepinoPrUn+pepinoLooseEstUn+pepinoNpEstUn,pepinoTotalKg=pepinoPrKg+pepinoLooseKg+pepinoNpKg;
         // Tomate: o valor grande do card é só as cumbucas já prontas (sem
         // somar a estimativa do que ainda está a granel) — o total (prontas
         // + estimativa do granel) e o granel isolado aparecem à parte, como
@@ -2294,13 +2310,16 @@
         const tomateTotalUn=x.un+estGranelUn,tomateTotalKg=prontasKg+granel;
         const ftx=v=>String(v).replace('.',',');
         const valDisplay=isPepino?fmt(pepinoPrUn):x.c.id==='tomate'?fmt(x.un):fmtUn(x);
-        const valTitle=isPepino?` title="${esc(`Unidades de pepino JÁ PROCESSADAS (valor real, lançado na tabela de baixo)\n${fmt(pepinoPrUn)} unidades × ${ftx(pepinoPrFac)} kg = ${fmt(pepinoPrKg)} kg`)}"`:'';
+        const valTitle=isPepino?` title="${esc(`Unidades de pepino JÁ PROCESSADAS (valor real, lançado na 2ª tabela)\n${fmt(pepinoPrUn)} unidades × ${ftx(pepinoPrFac)} kg = ${fmt(pepinoPrKg)} kg`)}"`:'';
         const badgeKg=x.c.id==='tomate'?prontasKg:isPepino?pepinoPrKg:x.kg;
         const totalRow=(x.un>0&&granel>0)?`<span class="valrow pcard-subrow pcard-subrow--wrap"><span class="val" title="Soma de ${fmt(x.un)} cumbucas já prontas + ${fmt(estGranelUn)} cumbucas estimadas do que ainda está a granel">Somando Estimativa de Cumbucas a Granel com Cumbucas Processadas</span><span class="kg">${fmt(tomateTotalUn)} Cumbucas e ${fmt(tomateTotalKg)} kg</span></span>`:'';
         const redVal=' style="color:var(--critical)"',redKg=' style="color:var(--critical);border-color:var(--critical)"';
-        const pepinoTotalRow=(pepinoPrUn>0&&pepinoNpKg>0)?`<span class="valrow pcard-subrow pcard-subrow--wrap"><span class="val" title="${esc(`${fmt(pepinoPrUn)} unidades já processadas + ${fmt(pepinoNpEstUn)} unidades estimadas do não processado = ${fmt(pepinoUnEstimate)} unidades\nPeso: ${fmt(pepinoPrKg)} kg + ${fmt(pepinoNpKg)} kg = ${fmt(pepinoPrKg+pepinoNpKg)} kg`)}">Somando Estimativa do Não Processado com Unidades Processadas</span><span class="kg">${fmt(pepinoUnEstimate)} Unidades e ${fmt(pepinoPrKg+pepinoNpKg)} kg</span></span>`:'';
+        const amberVal=' style="color:#d97706"',amberKg=' style="color:#d97706;border-color:#d97706"';
+        const pepinoLooseRows=pepinoLooseKg>0?`<span class="valrow pcard-subrow"><span class="val"${amberVal} title="${esc(`Pepino PROCESSADO SEM EMBALAR — valor em KG (3ª tabela)\nSoma dos kg lançados = ${fmt(pepinoLooseKg)} kg`)}">KG Processado sem Embalar</span><span class="kg"${amberKg}>${fmt(pepinoLooseKg)} kg</span></span><span class="valrow pcard-subrow"><span class="val"${amberVal} title="${esc(`Estimativa em UNIDADES do processado que ainda não foi embalado\n${fmt(pepinoLooseKg)} kg ÷ ${ftx(pepinoPrFac)} kg/unidade = ${fmt(pepinoLooseEstUn)} unidades (estimativa)`)}">Estimativa de Unidades (sem Embalar)</span><span class="kg"${amberKg}>≈ ${fmt(pepinoLooseEstUn)}</span></span>`:'';
+        const pepinoParts=[pepinoPrUn>0,pepinoLooseKg>0,pepinoNpKg>0].filter(Boolean).length;
+        const pepinoTotalRow=pepinoParts>1?`<span class="valrow pcard-subrow pcard-subrow--wrap"><span class="val" title="${esc(`Unidades: ${fmt(pepinoPrUn)} embaladas + ${fmt(pepinoLooseEstUn)} estimadas do processado sem embalar + ${fmt(pepinoNpEstUn)} estimadas do não processado = ${fmt(pepinoUnEstimate)} unidades\nPeso: ${fmt(pepinoPrKg)} kg + ${fmt(pepinoLooseKg)} kg + ${fmt(pepinoNpKg)} kg = ${fmt(pepinoTotalKg)} kg`)}">Somando Tudo (Embalado + Sem Embalar + Não Processado)</span><span class="kg">${fmt(pepinoUnEstimate)} Unidades e ${fmt(pepinoTotalKg)} kg</span></span>`:'';
         const subEst=x.c.id==='tomate'?`<span class="valrow pcard-subrow"><span class="val" style="color:var(--critical)">KG a Processar (Granel)</span><span class="kg" style="color:var(--critical);border-color:var(--critical)">${fmt(granel)} kg</span></span><span class="valrow pcard-subrow"><span class="val" style="color:var(--critical)" title="${fmt(granel)} kg a granel ÷ ${String(factorNum('tomateGranelCumbucaKg')).replace('.',',')} kg/cumbuca = ${fmt(estGranelUn)} cumbucas (estimativa)">Estimativa de Cumbucas (Granel)</span><span class="kg" style="color:var(--critical);border-color:var(--critical)">≈ ${fmt(estGranelUn)}</span></span>${totalRow}`
-          :isPepino?`<span class="valrow pcard-subrow"><span class="val"${redVal} title="${esc(`Pepino NÃO processado — valor em KG (tabela de cima)\nSoma dos kg lançados = ${fmt(pepinoNpKg)} kg`)}">KG Não Processado</span><span class="kg"${redKg}>${fmt(pepinoNpKg)} kg</span></span><span class="valrow pcard-subrow"><span class="val"${redVal} title="${esc(`Estimativa em UNIDADES do que o não processado vai render\n${fmt(pepinoNpKg)} kg ÷ ${ftx(pepinoPacoteFac)} kg/unidade = ${fmt(pepinoNpEstUn)} unidades (estimativa)`)}">Estimativa de Unidades (Não Processado)</span><span class="kg"${redKg}>≈ ${fmt(pepinoNpEstUn)}</span></span>${pepinoTotalRow}`:'';
+          :isPepino?`${pepinoLooseRows}<span class="valrow pcard-subrow"><span class="val"${redVal} title="${esc(`Pepino NÃO processado — valor em KG (1ª tabela)\nSoma dos kg lançados = ${fmt(pepinoNpKg)} kg`)}">KG Não Processado</span><span class="kg"${redKg}>${fmt(pepinoNpKg)} kg</span></span><span class="valrow pcard-subrow"><span class="val"${redVal} title="${esc(`Estimativa em UNIDADES do que o não processado vai render\n${fmt(pepinoNpKg)} kg ÷ ${ftx(pepinoPacoteFac)} kg/unidade = ${fmt(pepinoNpEstUn)} unidades (estimativa)`)}">Estimativa de Unidades (Não Processado)</span><span class="kg"${redKg}>≈ ${fmt(pepinoNpEstUn)}</span></span>${pepinoTotalRow}`:'';
         // Pepino: as linhas de detalhe antigas repetiam os mesmos números do
         // topo do card — agora só aparecem as estimativas personalizadas.
         const pepinoPacks=isPepino?packRows('pepino'):[];
@@ -2382,6 +2401,8 @@
             if(np>0)details.push([dashboardLabelValue('pepinoNaoProcessado','Não processado'),`${fmtDec(np)} kg`,meta[0]?.color,'',`Valor em KG (lançado direto em kg)\nSoma dos kg de pepino não processado deste parceiro = ${fmtDec(np)} kg`]);
             if(prUn>0)details.push([dashboardLabelValue('pepinoProcessado','Processado'),`${fmtDec(prUn)} un · ${fmtDec(prUn*prFac)} kg`,meta[1]?.color,'',`Lançado em UNIDADES (pacotes de 280 g)\nUnidades: ${fmtDec(prUn)}\nPeso: ${fmtDec(prUn)} unidades × ${ft(prFac)} kg = ${fmtDec(prUn*prFac)} kg`]);
             if(prUn>0)details.push([dashboardLabelValue('pepinoPacotes280Processado','Pacotes 280 g (processado)'),`${fmt(prUn)} pct`,c.color,'',`Resultado em UNIDADES\nSão as unidades de pepino processado lançadas por este parceiro = ${fmt(prUn)} (valor real, não é estimativa)`]);
+            const looseKg=x.types[2]*kgFactorForType(c.id,2);
+            if(looseKg>0)details.push(['Processado sem embalar',`${fmtDec(looseKg)} kg · ≈ ${fmt(Math.round(looseKg/prFac))} un`,meta[2]?.color,'rank-est',`Lançado em KG (processado, ainda sem embalar)\n${fmtDec(looseKg)} kg ÷ ${ft(prFac)} kg/unidade = ${fmt(Math.round(looseKg/prFac))} unidades (estimativa)`]);
           }else{
             x.types.forEach((v,t)=>{if(v>0)details.push([meta[t]?.label||('Tipo '+(t+1)),`${fmt(v)} ${cultureUnitLabel(c.id)}`,meta[t]?.color])});
           }
@@ -3679,8 +3700,8 @@
         {culture:'pepino',fields:[
           // "hint" é a explicação fixa (não muda ao renomear o campo), pra
           // nunca ficar ambíguo qual campo é de qual tabela do Pepino.
-          {key:'kg|pepino|0',label:'Não processado (lançado em kg)',def:1,hint:'NÃO processado (tabela de cima, lançada em kg). Deixe 1 — o valor já é kg.'},
-          {key:'kg|pepino|1',label:'KG por unidade — Processado (280 g)',def:.28,hint:'PROCESSADO (tabela de baixo, lançada em unidades). Peso de 1 unidade: 0,28 kg.'},
+          {key:'kg|pepino|0',label:'Não processado (lançado em kg)',def:1,hint:'NÃO processado (1ª tabela, lançada em kg). Deixe 1 — o valor já é kg.'},
+          {key:'kg|pepino|1',label:'KG por unidade — Processado (280 g)',def:.28,hint:'PROCESSADO (2ª tabela, em unidades). Peso de 1 unidade: 0,28 kg. Também usado pra estimar unidades do processado sem embalar (3ª tabela).'},
           {key:'pepinoPacoteKg',label:'KG por pacote — estimativa do não processado',def:.31,hint:'Quantos kg de pepino NÃO processado rendem 1 pacote. Ex.: 500 kg → 1650 un = 0,30.'},
           {key:'pepinoPacoteProcessadoKg',label:'Pacotes 280 g (processado)',labelOnly:true,hint:'Só o nome da linha que mostra as unidades PROCESSADAS (sem conta).'}
         ]}
