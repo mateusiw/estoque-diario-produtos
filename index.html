@@ -590,6 +590,8 @@
     .order-row:last-child{border-bottom:0}
     .order-row-top{display:grid;grid-template-columns:1fr auto auto 92px;min-height:42px;align-items:center}
     .order-row-top label{font-size:13.5px;font-weight:650;padding-left:14px;color:var(--ink-2);overflow-wrap:anywhere}
+    .order-unit{display:inline-block;margin-left:6px;padding:1px 6px;border-radius:999px;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.03em;background:rgba(127,127,127,.15);color:inherit;opacity:.75;vertical-align:middle}
+    .order-unit.kg{background:#f59e0b;color:#fff;opacity:.9}
     .order-link{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:999px;font-size:10.5px;font-weight:800;background:var(--c);color:#fff;opacity:.85;vertical-align:middle}
     .order-row-top .mini-edit{width:24px;height:24px;margin:0 2px;flex:none}
     .order-del{border:0;background:transparent;color:var(--muted);width:24px;height:24px;border-radius:8px;cursor:pointer;font-size:15px;line-height:1;margin:0 4px;flex:none}
@@ -1140,6 +1142,7 @@
           <div class="field"><label for="productKgPerUn">KG por unidade pedida</label><input id="productKgPerUn" type="text" inputmode="decimal" placeholder="Ex.: 0,3"></div>
           <div class="field-help">Vincule a cultura e o kg por unidade para esse produto entrar no simulador de disponibilidade (compara os pedidos com o estoque). Deixe em branco se não quiser conferir.</div>
         </div>
+        <div class="field"><label for="productUnit">Pedido / separação lançados em</label><select id="productUnit"><option value="un">Unidades (un)</option><option value="kg">Quilos (kg)</option></select><div class="field-help">Ex.: tomate a granel é pedido em kg. Em kg, o simulador desconta direto do estoque da cultura (sem usar o kg por unidade).</div></div>
       </div>
       <div class="dialog-foot"><button type="button" class="btn" onclick="this.closest('dialog').close()">Cancelar</button><button type="submit" class="btn btn-primary" value="default" id="productSave">Adicionar</button></div>
     </form>
@@ -2759,14 +2762,22 @@
       }
       return factorCurrentValue(factorKey)||0;
     }
+    // unit: 'kg' quando o pedido/separação desse produto é lançado em quilos
+    // (ex.: tomate a granel); senão unidades. Em kg, cada 1 lançado = 1 kg
+    // do estoque da cultura (kgFactor=1), sem passar pelo kg por unidade.
     function resolveProduct(prod){
+      const unit=prod.unit==='kg'?'kg':'un';
+      let info;
       if(prod.catalogId){
         const c=productCatalog().find(x=>x.id===prod.catalogId);
-        if(c)return{name:c.name,cultureId:c.cultureId||'',kgPerUn:kgForFactorRef(c.cultureId,c.factorKey)};
-        return{name:'(produto removido do catálogo)',cultureId:'',kgPerUn:0};
-      }
-      return{name:prod.name||'',cultureId:prod.cultureId||'',kgPerUn:Number(prod.kgPerUn)||0};
+        info=c?{name:c.name,cultureId:c.cultureId||'',kgPerUn:kgForFactorRef(c.cultureId,c.factorKey)}:{name:'(produto removido do catálogo)',cultureId:'',kgPerUn:0};
+      }else info={name:prod.name||'',cultureId:prod.cultureId||'',kgPerUn:Number(prod.kgPerUn)||0};
+      info.unit=unit;
+      info.kgFactor=unit==='kg'?(info.cultureId?1:0):info.kgPerUn;
+      return info;
     }
+    function productUnit(prod){return prod&&prod.unit==='kg'?'kg':'un'}
+    function fmtQty(v,unit){return unit==='kg'?fmtDec(v):fmt(v)}
     // ── Progresso de separação (pedido x já separado) ─────────────────
     // "separado" é o total acumulado já processado/entregue para aquele
     // produto do cliente. A baixa de estoque e a reversão (cliente desistiu
@@ -2779,18 +2790,29 @@
     function productProgress(client,prod){
       const pedido=orderedQty(client.id,prod.id),separado=separatedQty(client.id,prod.id);
       const pct=pedido>0?Math.min(100,Math.round(separado/pedido*100)):(separado>0?100:0);
-      return{pedido,separado,pct,restante:Math.max(pedido-separado,0)};
+      return{pedido,separado,pct,restante:Math.max(pedido-separado,0),unit:productUnit(prod)};
     }
+    // Un e kg não se somam: o percentual do cliente é a média de cada
+    // unidade ponderada pelo próprio pedido, e o "faltam" sai separado
+    // por unidade (ex.: "faltam 2.660 un + 100 kg").
     function clientProgress(client){
-      let pedido=0,separado=0;
-      clientProducts(client).forEach(prod=>{pedido+=orderedQty(client.id,prod.id);separado+=separatedQty(client.id,prod.id)});
-      const pct=pedido>0?Math.min(100,Math.round(separado/pedido*100)):(separado>0?100:0);
-      return{pedido,separado,pct,restante:Math.max(pedido-separado,0)};
+      const by={un:{pedido:0,separado:0,restante:0},kg:{pedido:0,separado:0,restante:0}};
+      clientProducts(client).forEach(prod=>{const p=productProgress(client,prod),b=by[p.unit];b.pedido+=p.pedido;b.separado+=p.separado;b.restante+=p.restante});
+      const pedido=by.un.pedido+by.kg.pedido,separado=by.un.separado+by.kg.separado;
+      const fracs=['un','kg'].filter(u=>by[u].pedido>0).map(u=>Math.min(1,by[u].separado/by[u].pedido));
+      const pct=fracs.length?Math.min(100,Math.round(fracs.reduce((a,b)=>a+b,0)/fracs.length*100)):(separado>0?100:0);
+      return{pedido,separado,pct,restante:by.un.restante+by.kg.restante,restanteUn:by.un.restante,restanteKg:by.kg.restante};
     }
     function progressText(p,{clientLevel=false}={}){
       if(!(p.pedido>0))return p.separado>0?'Sem pedido lançado (há quantidade separada)':'Sem pedido lançado';
       if(p.pct>=100)return clientLevel?'100% concluído':'100%';
-      return clientLevel?`${p.pct}% concluído • faltam ${fmt(p.restante)} un (${100-p.pct}%)`:`${p.pct}% • faltam ${fmt(p.restante)}`;
+      if(clientLevel){
+        const parts=[];
+        if(p.restanteUn>0)parts.push(`${fmt(p.restanteUn)} un`);
+        if(p.restanteKg>0)parts.push(`${fmtDec(p.restanteKg)} kg`);
+        return `${p.pct}% concluído • faltam ${parts.join(' + ')||'0'} (${100-p.pct}%)`;
+      }
+      return `${p.pct}% • faltam ${fmtQty(p.restante,p.unit)} ${p.unit}`;
     }
     // Quanto (em kg) já foi separado/entregue para clientes numa cultura —
     // é o valor que "dá baixa" no estoque disponível mostrado no simulador.
@@ -2798,8 +2820,8 @@
       let total=0;
       visibleClients().forEach(client=>clientProducts(client).forEach(prod=>{
         const info=resolveProduct(prod);
-        if(info.cultureId!==cultureId||!(info.kgPerUn>0))return;
-        total+=separatedQty(client.id,prod.id)*info.kgPerUn;
+        if(info.cultureId!==cultureId||!(info.kgFactor>0))return;
+        total+=separatedQty(client.id,prod.id)*info.kgFactor;
       }));
       return total;
     }
@@ -2829,14 +2851,18 @@
       const key=el.dataset[attr];
       document.querySelectorAll(`[data-${attr}="${key}"]`).forEach(other=>{if(other!==el)other.value=el.value});
     }
+    function clientUnitLabel(client){
+      const units=new Set(clientProducts(client).map(productUnit));
+      return units.size>1?'Pedido em unidades e kg':units.has('kg')?'Pedido em kg':'Pedido em unidades';
+    }
     function clientOrderCardHtml(client){
       const products=clientProducts(client);
       const rows=products.length?products.map(prod=>{
-        const info=resolveProduct(prod),linked=info.cultureId&&info.kgPerUn>0,c=linked?CULTURES.find(x=>x.id===info.cultureId):null;
+        const info=resolveProduct(prod),linked=info.cultureId&&info.kgFactor>0,c=linked?CULTURES.find(x=>x.id===info.cultureId):null,isKg=info.unit==='kg',im=isKg?'decimal':'numeric';
         const key=orderKey(client.id,prod.id),p=productProgress(client,prod);
         return `<div class="order-row">`+
-          `<div class="order-row-top"><label>${esc(info.name)}${c?`<span class="order-link" style="--c:${c.color}" title="Vinculado a ${esc(c.label)} • ${String(info.kgPerUn).replace('.',',')} kg/un.">${esc(c.label)}</span>`:''}</label><button type="button" class="mini-edit" data-edit-product="${client.id}|${prod.id}" title="Configurar produto" aria-label="Configurar ${esc(info.name)}">${ICON_EDIT}</button><button type="button" class="order-del" data-del-product="${client.id}|${prod.id}" title="Remover produto" aria-label="Remover ${esc(info.name)} de ${esc(client.name)}">×</button><input inputmode="numeric" data-order="${key}" value="${state.orders[key]||''}" aria-label="Pedido de ${esc(info.name)} para ${esc(client.name)}" placeholder="Pedido"></div>`+
-          `<div class="order-row-progress"><input inputmode="numeric" data-separated="${key}" value="${state.separado[key]||''}" aria-label="Já separado de ${esc(info.name)} para ${esc(client.name)}" placeholder="Separado" title="Quantidade já separada/processada deste produto para este cliente"><div class="order-progress-track"><div class="order-progress-fill${p.pct>=100&&p.pedido>0?' done':''}" data-progress-fill="${key}" style="width:${Math.min(100,p.pct)}%"></div></div><span class="order-progress-pct" data-progress-pct="${key}">${esc(progressText(p))}</span></div>`+
+          `<div class="order-row-top"><label>${esc(info.name)}${c?`<span class="order-link" style="--c:${c.color}" title="${isKg?`Vinculado a ${esc(c.label)} • pedido em kg (desconta direto do estoque)`:`Vinculado a ${esc(c.label)} • ${String(info.kgPerUn).replace('.',',')} kg/un.`}">${esc(c.label)}</span>`:''}<span class="order-unit${isKg?' kg':''}" title="${isKg?'Pedido e separação em quilos (kg)':'Pedido e separação em unidades'}">${isKg?'kg':'un'}</span></label><button type="button" class="mini-edit" data-edit-product="${client.id}|${prod.id}" title="Configurar produto" aria-label="Configurar ${esc(info.name)}">${ICON_EDIT}</button><button type="button" class="order-del" data-del-product="${client.id}|${prod.id}" title="Remover produto" aria-label="Remover ${esc(info.name)} de ${esc(client.name)}">×</button><input inputmode="${im}" data-order="${key}" value="${state.orders[key]||''}" aria-label="Pedido de ${esc(info.name)} para ${esc(client.name)} (${info.unit})" placeholder="Pedido (${info.unit})"></div>`+
+          `<div class="order-row-progress"><input inputmode="${im}" data-separated="${key}" value="${state.separado[key]||''}" aria-label="Já separado de ${esc(info.name)} para ${esc(client.name)} (${info.unit})" placeholder="Separado (${info.unit})" title="Quantidade já separada/processada deste produto para este cliente"><div class="order-progress-track"><div class="order-progress-fill${p.pct>=100&&p.pedido>0?' done':''}" data-progress-fill="${key}" style="width:${Math.min(100,p.pct)}%"></div></div><span class="order-progress-pct" data-progress-pct="${key}">${esc(progressText(p))}</span></div>`+
         `</div>`;
       }).join(''):'<div class="field-help" style="padding:10px 14px">Nenhum produto cadastrado — use o botão + acima.</div>';
       const cp=clientProgress(client);
@@ -2845,7 +2871,7 @@
       // nem o master) — excluir de vez só dá pra fazer em "Gerenciar
       // cadastros", que tem uma confirmação explícita antes de apagar.
       const hideClientBtn=hasAccess('gerenciar_cadastros')?`<button type="button" class="order-hide" data-hide-client="${client.id}" title="Ocultar cliente" aria-label="Ocultar cliente ${esc(client.name)}">${ICON_EYE_OFF}</button>`:'';
-      return `<article class="order-card"><header><span class="order-avatar">${clientAvatarHtml(client)}</span><div class="order-id"><strong>${esc(client.name)}</strong><span>Pedido em unidades</span></div><button type="button" class="mini-add" data-add-product="${client.id}" title="Adicionar produto" aria-label="Adicionar produto para ${esc(client.name)}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>${hideClientBtn}</header>${summary}${rows}</article>`;
+      return `<article class="order-card"><header><span class="order-avatar">${clientAvatarHtml(client)}</span><div class="order-id"><strong>${esc(client.name)}</strong><span>${esc(clientUnitLabel(client))}</span></div><button type="button" class="mini-add" data-add-product="${client.id}" title="Adicionar produto" aria-label="Adicionar produto para ${esc(client.name)}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>${hideClientBtn}</header>${summary}${rows}</article>`;
     }
     function clientOrderCardsHtml(){
       const clients=visibleClients();
@@ -2874,10 +2900,10 @@
       const demand={};
       visibleClients().forEach(client=>clientProducts(client).forEach(prod=>{
         const info=resolveProduct(prod);
-        if(!info.cultureId||!(info.kgPerUn>0))return;
+        if(!info.cultureId||!(info.kgFactor>0))return;
         const restante=productProgress(client,prod).restante;
         if(restante<=0)return;
-        demand[info.cultureId]=(demand[info.cultureId]||0)+restante*info.kgPerUn;
+        demand[info.cultureId]=(demand[info.cultureId]||0)+restante*info.kgFactor;
       }));
       return demand;
     }
@@ -3240,6 +3266,7 @@
       sel.innerHTML='<option value="">— não vincular —</option>'+CULTURES.map(c=>`<option value="${esc(c.id)}">${esc(c.label)}</option>`).join('');
       sel.value=(prod&&!prod.catalogId&&prod.cultureId)||'';
       document.getElementById('productKgPerUn').value=prod&&!prod.catalogId&&prod.kgPerUn?String(prod.kgPerUn).replace('.',','):'';
+      document.getElementById('productUnit').value=prod&&prod.unit==='kg'?'kg':'un';
       toggleProductAvulso();
       document.getElementById('productDialog').showModal();
       document.getElementById('productName').focus();
@@ -3263,14 +3290,18 @@
         kgPerUn=kgPerUnRaw?Number(kgPerUnRaw.replace(',','.')):0;
         if(kgPerUnRaw&&(!isFinite(kgPerUn)||kgPerUn<=0)){showAlert('productAlert','O KG por unidade deve ser maior que zero (ou deixe em branco).');return}
       }
+      const unit=document.getElementById('productUnit').value==='kg'?'kg':'un';
       if(products.some(p=>p.id!==editId&&resolveProduct(p).name.toLowerCase()===name.toLowerCase())){showAlert('productAlert','Este produto já está no cartão deste cliente.');return}
       if(editId){
         const prod=products.find(p=>p.id===editId);
-        delete prod.catalogId;delete prod.name;delete prod.cultureId;delete prod.kgPerUn;
+        delete prod.catalogId;delete prod.name;delete prod.cultureId;delete prod.kgPerUn;delete prod.unit;
         if(catalogId)prod.catalogId=catalogId;else{prod.name=name;prod.cultureId=cultureId;prod.kgPerUn=kgPerUn}
+        if(unit==='kg')prod.unit='kg';
         addLog(`editou o produto ${name} de ${client.name}`);
       }else{
-        products.push(catalogId?{id:uid('pr'),catalogId}:{id:uid('pr'),name,cultureId,kgPerUn});
+        const newProd=catalogId?{id:uid('pr'),catalogId}:{id:uid('pr'),name,cultureId,kgPerUn};
+        if(unit==='kg')newProd.unit='kg';
+        products.push(newProd);
         addLog(`adicionou o produto ${name} para ${client.name}`);
       }
       document.getElementById('productDialog').close();productTarget=null;
@@ -4606,10 +4637,10 @@
         const key=client.id+'|'+product.id;
         if(options.includeOrders&&options.orderKeys.has(key)&&quantity>0){
           const p=productProgress(client,product);
-          orderRows.push({client:client.name,product:resolveProduct(product).name,quantity,separado:p.separado,restante:p.restante,pct:p.pct});
+          orderRows.push({client:client.name,product:resolveProduct(product).name,quantity,separado:p.separado,restante:p.restante,pct:p.pct,unit:p.unit});
         }
       }));
-      const ordersHtml=orderRows.length?orderRows.map(row=>`<tr><td>${esc(row.client)}</td><td>${esc(row.product)}</td><td class="num">${fmt(row.quantity)}</td><td class="num">${fmt(row.separado)}</td><td class="num">${fmt(row.restante)}</td><td class="num">${row.pct}%</td></tr>`).join('')
+      const ordersHtml=orderRows.length?orderRows.map(row=>`<tr><td>${esc(row.client)}</td><td>${esc(row.product)}</td><td class="num">${fmtQty(row.quantity,row.unit)} ${row.unit}</td><td class="num">${fmtQty(row.separado,row.unit)} ${row.unit}</td><td class="num">${fmtQty(row.restante,row.unit)} ${row.unit}</td><td class="num">${row.pct}%</td></tr>`).join('')
         :'<tr><td class="pr-empty" colspan="6">Nenhuma separação pendente registrada.</td></tr>';
       const ordersSection=options.includeOrders?`<section class="pr-section"><div class="pr-section-title">4. Separação por cliente</div><table class="pr-table pr-orders"><thead><tr><th>Cliente</th><th>Produto</th><th>Pedido</th><th>Já separado</th><th>Restante</th><th>% concluído</th></tr></thead><tbody>${ordersHtml}</tbody><tfoot><tr><td colspan="2">TOTAL</td><td class="num">${fmt(orderRows.reduce((sum,row)=>sum+row.quantity,0))}</td><td class="num">${fmt(orderRows.reduce((sum,row)=>sum+row.separado,0))}</td><td class="num">${fmt(orderRows.reduce((sum,row)=>sum+row.restante,0))}</td><td></td></tr></tfoot></table></section>`:'';
       const logo='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="10"/><path d="M12 19V9M12 12c-3.4 0-5.8-2-5.8-4.8 3.4 0 5.8 1.3 5.8 4.8Zm0 3.2c3.4 0 5.8-2 5.8-4.8-3.4 0-5.8 1.3-5.8 4.8Z"/></svg>';
@@ -4636,10 +4667,10 @@
       const rows=[];
       visibleClients().forEach(client=>clientProducts(client).forEach(product=>{
         const quantity=num(state.orders[`${client.id}-${product.id}`]);
-        if(quantity>0)rows.push({key:client.id+'|'+product.id,client:client.name,product:resolveProduct(product).name,quantity});
+        if(quantity>0)rows.push({key:client.id+'|'+product.id,client:client.name,product:resolveProduct(product).name,quantity,unit:productUnit(product)});
       }));
       const container=document.getElementById('printOrders');
-      container.innerHTML=rows.length?rows.map(row=>`<label class="report-option"><input type="checkbox" value="${row.key}"${printOrderSelection.has(row.key)?' checked':''}><span>${esc(row.client)}<small>${esc(row.product)} • ${fmt(row.quantity)} un.</small></span></label>`).join(''):'<span class="field-help" style="padding:8px">Nenhum pedido com quantidade preenchida.</span>';
+      container.innerHTML=rows.length?rows.map(row=>`<label class="report-option"><input type="checkbox" value="${row.key}"${printOrderSelection.has(row.key)?' checked':''}><span>${esc(row.client)}<small>${esc(row.product)} • ${fmtQty(row.quantity,row.unit)} ${row.unit}</small></span></label>`).join(''):'<span class="field-help" style="padding:8px">Nenhum pedido com quantidade preenchida.</span>';
       container.querySelectorAll('input').forEach(input=>input.onchange=()=>input.checked?printOrderSelection.add(input.value):printOrderSelection.delete(input.value));
     }
     function setPrintChecks(containerId,checked,selection){
