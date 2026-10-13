@@ -388,6 +388,17 @@
     }
     .pbar{height:6px;border-radius:999px;background:var(--surface-3);overflow:hidden;margin-top:3px}
     .pbar i{display:block;height:100%;border-radius:999px;background:var(--c)}
+    .mini-resumo{position:fixed;right:16px;bottom:16px;z-index:60;width:min(380px,calc(100vw - 32px))}
+    .mini-resumo-win{background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:0 12px 32px rgba(0,0,0,.22);overflow:hidden}
+    .mini-resumo-bar{display:flex;align-items:center;gap:6px;padding:6px 8px 6px 12px;border-bottom:1px solid var(--line);background:var(--surface-2);cursor:move;user-select:none;touch-action:none}
+    .mini-resumo-bar span{flex:1;font-size:12px;font-weight:700;color:var(--muted)}
+    .mini-resumo-bar button{width:26px;height:26px;display:grid;place-items:center;border:0;border-radius:7px;background:transparent;color:var(--ink);cursor:pointer}
+    .mini-resumo-bar button:hover{background:var(--line)}
+    .mini-resumo-bar svg{width:15px;height:15px}
+    .mini-resumo-body{max-height:min(60vh,520px);overflow:auto}
+    .mini-resumo-body .pcard{border:0;border-radius:0}
+    .mini-resumo-open{position:fixed;right:16px;bottom:16px;z-index:60;display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:9px 16px;font:inherit;font-size:13px;font-weight:700;box-shadow:0 8px 22px rgba(0,0,0,.18);cursor:pointer}
+    .mini-resumo-open svg{width:16px;height:16px}
     .pcard .pct{font-size:11px;color:var(--muted);font-weight:700}
     .pdet{margin-top:8px;border-top:1px solid var(--line);padding-top:8px;display:flex;flex-direction:column;gap:4.5px}
     .pdet .dr{display:flex;align-items:baseline;justify-content:space-between;gap:8px;font-size:11.5px;color:var(--muted)}
@@ -447,7 +458,9 @@
     .geral-table{border-radius:14px;overflow:hidden;border:1px solid var(--line)}
     .tomate-grid-label{margin:18px 18px 8px;font-size:12.5px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
     .tomate-grid-label:first-of-type{margin-top:18px}
-    .tomate-summary{display:grid;grid-template-columns:1.5fr 1fr;gap:14px;margin:18px 18px 18px}
+    .pepino-section{display:table;width:100%;box-sizing:border-box;border:2px solid color-mix(in srgb,var(--bc) 40%,transparent);border-radius:14px;overflow:hidden}
+    .pepino-section+.pepino-section{margin-top:10px}
+    .pepino-label{display:inline-block;padding:6px 12px;border:2px solid var(--bc);border-radius:8px;color:var(--bc);background:color-mix(in srgb,var(--bc) 12%,transparent)}    .tomate-summary{display:grid;grid-template-columns:1.5fr 1fr;gap:14px;margin:18px 18px 18px}
     .tomate-summary-box{border:1px solid var(--line);border-radius:16px;background:var(--surface-2);padding:16px 18px}
     .tomate-summary-title{font-size:11.5px;font-weight:800;letter-spacing:.05em;color:var(--muted);text-transform:uppercase;margin-bottom:10px}
     .tomate-summary-sizes{display:flex;gap:10px;margin-bottom:14px}
@@ -1055,6 +1068,7 @@
         <button type="button" class="panel-heading-add" id="quickAddDateBtn" title="Adicionar data" aria-label="Adicionar data"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Data</button>
       </div>
       <button type="button" class="rotate-view-btn" id="rotateViewBtn" title="Girar a tabela para melhor leitura"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 0 1 14.5-4.7M20 12a8 8 0 0 1-14.5 4.7"/><path d="M18.5 3v4.3h-4.3M5.5 21v-4.3h4.3"/></svg><span>Girar tabela</span></button>
+      <div class="mini-resumo" id="miniResumo" hidden></div>
       <div class="stock-scroll" id="stockScroll">
         <table class="stock-table" id="stockTable"></table>
       </div>
@@ -2000,7 +2014,7 @@
         prontoHtml+='<tr class="total-row"><td class="partner-col">TOTAL</td>';days.forEach(day=>TOMATE_META.forEach((_,t)=>prontoHtml+=`<td${t===0?' class="day-start"':''} data-tomate-uni="${day.id}|${t}">${fmtDec(totalDayType(day.id,t,'tomate'))}</td>`));prontoHtml+='</tr>';
       }
       prontoHtml+='</tbody>';
-      let html=`<div class="tomate-grid-label">Cumbucas prontas (unidades)</div><table class="stock-table" style="min-width:${minWidth}">${prontoHtml}</table>`;
+      let html=`<div class="pepino-section" style="--bc:var(--t0)"><div class="tomate-grid-label pepino-label">Cumbucas prontas (unidades)</div><table class="stock-table" style="min-width:${minWidth}">${prontoHtml}</table></div>`;
       if(partners.length){
         let procHtml=tomateHeadHtml(days,hoje,null,false)+'<tbody>';
         partners.forEach(partner=>{
@@ -2009,7 +2023,7 @@
           procHtml+='</tr>';
         });
         procHtml+='<tr class="kg-row"><td class="partner-col">TOTAL</td>';days.forEach(day=>TOMATE_META.forEach((_,t)=>procHtml+=`<td${t===0?' class="day-start"':''} data-tomate-kg="${day.id}|${t}">${fmtDec(totalDayProcessar(day.id,t,'tomate'))}</td>`));procHtml+='</tr></tbody>';
-        html+=`<div class="tomate-grid-label">Kg a processar (a granel)</div><table class="stock-table" style="min-width:${minWidth}">${procHtml}</table>`;
+        html+=`<div class="pepino-section" style="--bc:var(--t1)"><div class="tomate-grid-label pepino-label">Kg a processar (a granel)</div><table class="stock-table" style="min-width:${minWidth}">${procHtml}</table></div>`;
       }
       return html+tomateSummaryHtml();
     }
@@ -2065,7 +2079,7 @@
           h+='</tr>';
         }
         h+='</tbody>';
-        return `<div class="tomate-grid-label">${titles[t]||esc(label)}</div><table class="stock-table" style="min-width:${minWidth}">${h}</table>`;
+        return `<div class="pepino-section" style="--bc:${m.color}"><div class="tomate-grid-label pepino-label">${titles[t]||esc(label)}</div><table class="stock-table" style="min-width:${minWidth}">${h}</table></div>`;
       }).join('');
     }
     function refreshTomateTotals(){
@@ -2219,8 +2233,10 @@
     // Painel "Estoque por Produto" — usado na aba Geral e reaproveitado tal
     // e qual (mesmos nomes, mesmos cálculos) na aba Resumo Antigo, para as
     // duas nunca ficarem dessincronizadas.
-    function estoqueProdutoPanelHtml(){
-      const geralCultures=geralActiveCultures();
+    // onlyId: devolve só o card daquela cultura (mini resumo nas abas de
+    // produto), com o mesmo cálculo — inclusive o "% do peso total".
+    function estoqueProdutoPanelHtml(onlyId){
+      const geralCultures=onlyId&&!geralActiveCultures().some(c=>c.id===onlyId)?geralActiveCultures().concat(CULTURES.filter(c=>c.id===onlyId)):geralActiveCultures();
       const porCultura=geralCultures.map(c=>({c,un:geralUnitTotal(c.id),kg:geralKgTotal(c.id)}));
       const totalKg=porCultura.reduce((s,x)=>s+x.kg,0);
       const granel=[0,1,2].reduce((s,t)=>s+geralProcessarTotal(t,'tomate'),0);
@@ -2284,7 +2300,7 @@
           return r;
         }).concat(packRows(id));
       };
-      const cardsHtml=porCultura.map(x=>{
+      const cardsHtml=porCultura.filter(x=>!onlyId||x.c.id===onlyId).map(x=>{
         const pct=totalKg?Math.round(x.kg/totalKg*100):0;
         const detailRows=cardDetails(x.c.id).sort((a,b)=>{
           const labelA=a[3]?dashboardLabelValue(a[3],a[0]):a[0],labelB=b[3]?dashboardLabelValue(b[3],b[0]):b[0];
@@ -2318,19 +2334,25 @@
         const totalRow=(x.un>0&&granel>0)?`<span class="valrow pcard-subrow pcard-subrow--wrap"><span class="val" title="Soma de ${fmt(x.un)} cumbucas já prontas + ${fmt(estGranelUn)} cumbucas estimadas do que ainda está a granel">Somando Estimativa de Cumbucas a Granel com Cumbucas Processadas</span><span class="kg">${fmt(tomateTotalUn)} Cumbucas e ${fmt(tomateTotalKg)} kg</span></span>`:'';
         const redVal=' style="color:var(--critical)"',redKg=' style="color:var(--critical);border-color:var(--critical)"';
         const amberVal=' style="color:#d97706"',amberKg=' style="color:#d97706;border-color:#d97706"';
-        const pepinoLooseRows=pepinoLooseKg>0?`<span class="valrow pcard-subrow"><span class="val"${amberVal} title="${esc(`Pepino PROCESSADO SEM EMBALAR — valor em KG (3ª tabela)\nSoma dos kg lançados = ${fmt(pepinoLooseKg)} kg`)}">KG Processado sem Embalar</span><span class="kg"${amberKg}>${fmt(pepinoLooseKg)} kg</span></span><span class="valrow pcard-subrow"><span class="val"${amberVal} title="${esc(`Estimativa em UNIDADES do processado que ainda não foi embalado\n${fmt(pepinoLooseKg)} kg ÷ ${ftx(pepinoPrFac)} kg/unidade = ${fmt(pepinoLooseEstUn)} unidades (estimativa)`)}">Estimativa de Unidades (sem Embalar)</span><span class="kg"${amberKg}>≈ ${fmt(pepinoLooseEstUn)}</span></span>`:'';
+        // Mesmo padrão da linha principal: "<unidades> <nome>" + selo com os kg.
+        // O "≈" fica sempre no selo de kg, igual à linha principal.
+        const pepinoLooseRows=pepinoLooseKg>0?`<span class="valrow pcard-subrow"><span class="val"${amberVal} title="${esc(`Pepino PROCESSADO SEM EMBALAR (3ª tabela)\nSoma dos kg lançados = ${fmt(pepinoLooseKg)} kg\nEstimativa: ${fmt(pepinoLooseKg)} kg ÷ ${ftx(pepinoPrFac)} kg/unidade = ${fmt(pepinoLooseEstUn)} unidades`)}">${fmt(pepinoLooseEstUn)} Unidades sem Embalar</span><span class="kg"${amberKg}>≈ ${fmt(pepinoLooseKg)} kg</span></span>`:'';
         const pepinoParts=[pepinoPrUn>0,pepinoLooseKg>0,pepinoNpKg>0].filter(Boolean).length;
-        const pepinoTotalRow=pepinoParts>1?`<span class="valrow pcard-subrow pcard-subrow--wrap"><span class="val" title="${esc(`Unidades: ${fmt(pepinoPrUn)} embaladas + ${fmt(pepinoLooseEstUn)} estimadas do processado sem embalar + ${fmt(pepinoNpEstUn)} estimadas do não processado = ${fmt(pepinoUnEstimate)} unidades\nPeso: ${fmt(pepinoPrKg)} kg + ${fmt(pepinoLooseKg)} kg + ${fmt(pepinoNpKg)} kg = ${fmt(pepinoTotalKg)} kg`)}">Somando Tudo (Embalado + Sem Embalar + Não Processado)</span><span class="kg">${fmt(pepinoUnEstimate)} Unidades e ${fmt(pepinoTotalKg)} kg</span></span>`:'';
+        const pepinoTotalRow=pepinoParts>1?`<span class="valrow pcard-subrow pcard-subrow--wrap"><span class="val" title="${esc(`Unidades: ${fmt(pepinoPrUn)} embaladas + ${fmt(pepinoLooseEstUn)} estimadas do processado sem embalar + ${fmt(pepinoNpEstUn)} estimadas do não processado = ${fmt(pepinoUnEstimate)} unidades\nPeso: ${fmt(pepinoPrKg)} kg + ${fmt(pepinoLooseKg)} kg + ${fmt(pepinoNpKg)} kg = ${fmt(pepinoTotalKg)} kg`)}">${fmt(pepinoUnEstimate)} Unidades no Total</span><span class="kg">≈ ${fmt(pepinoTotalKg)} kg</span></span>`:'';
         const subEst=x.c.id==='tomate'?`<span class="valrow pcard-subrow"><span class="val" style="color:var(--critical)">KG a Processar (Granel)</span><span class="kg" style="color:var(--critical);border-color:var(--critical)">${fmt(granel)} kg</span></span><span class="valrow pcard-subrow"><span class="val" style="color:var(--critical)" title="${fmt(granel)} kg a granel ÷ ${String(factorNum('tomateGranelCumbucaKg')).replace('.',',')} kg/cumbuca = ${fmt(estGranelUn)} cumbucas (estimativa)">Estimativa de Cumbucas (Granel)</span><span class="kg" style="color:var(--critical);border-color:var(--critical)">≈ ${fmt(estGranelUn)}</span></span>${totalRow}`
-          :isPepino?`${pepinoLooseRows}<span class="valrow pcard-subrow"><span class="val"${redVal} title="${esc(`Pepino NÃO processado — valor em KG (1ª tabela)\nSoma dos kg lançados = ${fmt(pepinoNpKg)} kg`)}">KG Não Processado</span><span class="kg"${redKg}>${fmt(pepinoNpKg)} kg</span></span><span class="valrow pcard-subrow"><span class="val"${redVal} title="${esc(`Estimativa em UNIDADES do que o não processado vai render\n${fmt(pepinoNpKg)} kg ÷ ${ftx(pepinoPacoteFac)} kg/unidade = ${fmt(pepinoNpEstUn)} unidades (estimativa)`)}">Estimativa de Unidades (Não Processado)</span><span class="kg"${redKg}>≈ ${fmt(pepinoNpEstUn)}</span></span>${pepinoTotalRow}`:'';
+          :isPepino?`${pepinoLooseRows}<span class="valrow pcard-subrow"><span class="val"${redVal} title="${esc(`Pepino NÃO processado (1ª tabela)\nSoma dos kg lançados = ${fmt(pepinoNpKg)} kg\nEstimativa: ${fmt(pepinoNpKg)} kg ÷ ${ftx(pepinoPacoteFac)} kg/unidade = ${fmt(pepinoNpEstUn)} unidades`)}">${fmt(pepinoNpEstUn)} Unidades Não Processadas</span><span class="kg"${redKg}>≈ ${fmt(pepinoNpKg)} kg</span></span>${pepinoTotalRow}`:'';
         // Pepino: as linhas de detalhe antigas repetiam os mesmos números do
         // topo do card — agora só aparecem as estimativas personalizadas.
         const pepinoPacks=isPepino?packRows('pepino'):[];
         const detBlock=x.c.id==='tomate'?'':isPepino?(pepinoPacks.length?`<div class="pdet">${pepinoPacks.map(r=>`<span class="dr" title="${esc(r[5])}">${r[0]}<b>${r[1]}</b></span>`).join('')}</div>`:''):`<div class="pdet">${det}</div>`;
         const valStyle=splitCard?' style="color:var(--good)"':'';
         const kgStyle=splitCard?' style="color:var(--good);border-color:var(--good)"':'';
-        return `<div class="pcard${splitCard?' pcard--tomate':''}" style="--c:${x.c.color}"><span class="pic">${CULTURE_EMOJI[x.c.id]||genericCultureSvg(x.c.color)}</span><b><i></i>${esc(x.c.label)}</b><span class="valrow"><span class="val"${valTitle}${valStyle}>${valDisplay} ${esc(valLabel)}</span><span class="kg"${kgStyle}>≈ ${fmt(badgeKg)} kg</span></span>${subEst}<div class="pbar"><i style="width:${pct}%"></i></div><span class="pct">${pct}% do peso total</span>${detBlock}</div>`;
+        // Aba Resumo: o card do Pepino mostra só as unidades processadas e o
+        // kg; o detalhamento completo fica no mini resumo da aba Pepino.
+        const pepinoCompacto=isPepino&&!onlyId&&activeProduce()==='resumoantigo';
+        return `<div class="pcard${splitCard?' pcard--tomate':''}" style="--c:${x.c.color}"><span class="pic">${CULTURE_EMOJI[x.c.id]||genericCultureSvg(x.c.color)}</span><b><i></i>${esc(x.c.label)}</b><span class="valrow"><span class="val"${valTitle}${valStyle}>${valDisplay} ${esc(valLabel)}</span><span class="kg"${kgStyle}>≈ ${fmt(badgeKg)} kg</span></span>${pepinoCompacto?'':subEst}<div class="pbar"><i style="width:${pct}%"></i></div><span class="pct">${pct}% do peso total</span>${pepinoCompacto?'':detBlock}</div>`;
       }).join('');
+      if(onlyId)return cardsHtml;
       return `<section class="dash-panel" style="grid-column:1/-1"><h4>Estoque por Produto<small>Unidades e Peso Estimado.</small></h4><div class="produce-cards">${cardsHtml}</div></section>`;
     }
     function renderGeralTables(scroll){
@@ -2523,9 +2545,58 @@
         addDateBtn.dataset.forceProduce=produce==='resumoantigo'?'brocolis':'';
       }
     }
+    // Mini resumo: janelinha flutuante (tipo mini player) com o card
+    // "Estoque por Produto" da cultura aberta, para quem está lançando não
+    // precisar ir na aba Resumo conferir. Pode arrastar pela barra; aberto/
+    // fechado e posição ficam salvos só neste navegador.
+    function miniResumoOpen(){try{return localStorage.getItem('miniResumoOpen')!=='0'}catch(e){return true}}
+    function miniResumoPos(){try{return JSON.parse(localStorage.getItem('miniResumoPos')||'null')}catch(e){return null}}
+    function placeMiniResumo(box,pos){
+      if(!pos){box.style.left=box.style.top='';box.style.right=box.style.bottom='';return}
+      const w=box.offsetWidth,h=box.offsetHeight;
+      box.style.right=box.style.bottom='auto';
+      box.style.left=Math.max(8,Math.min(window.innerWidth-w-8,pos.x))+'px';
+      box.style.top=Math.max(8,Math.min(window.innerHeight-h-8,pos.y))+'px';
+    }
+    function renderMiniResumo(){
+      const box=document.getElementById('miniResumo');
+      if(!box)return;
+      if(box.parentElement!==document.body)document.body.appendChild(box);
+      const produce=activeProduce();
+      if(!CULTURES.some(c=>c.id===produce)){box.hidden=true;box.innerHTML='';delete box.dataset.produce;return}
+      box.hidden=false;
+      // Enquanto digita, só troca o conteúdo (não recria a janela nem perde o scroll).
+      const body=box.querySelector('.mini-resumo-body');
+      if(body&&box.dataset.produce===produce&&miniResumoOpen()){body.innerHTML=estoqueProdutoPanelHtml(produce);return}
+      box.dataset.produce=produce;
+      if(!miniResumoOpen()){
+        box.innerHTML=`<button type="button" class="mini-resumo-open" title="Mostrar resumo do estoque"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Resumo</button>`;
+        placeMiniResumo(box,null);
+        box.querySelector('.mini-resumo-open').addEventListener('click',()=>{try{localStorage.setItem('miniResumoOpen','1')}catch(e){}renderMiniResumo()});
+        return;
+      }
+      box.innerHTML=`<div class="mini-resumo-win"><div class="mini-resumo-bar" title="Arraste para mover"><span>Resumo — ${esc(produceLabel(produce))}</span><button type="button" data-act="reset" title="Voltar para o canto"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M21 3l-7 7M9 21H3v-6M3 21l7-7"/></svg></button><button type="button" data-act="close" title="Ocultar resumo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div><div class="mini-resumo-body">${estoqueProdutoPanelHtml(produce)}</div></div>`;
+      placeMiniResumo(box,miniResumoPos());
+      box.querySelector('[data-act="close"]').addEventListener('click',()=>{try{localStorage.setItem('miniResumoOpen','0')}catch(e){}renderMiniResumo()});
+      box.querySelector('[data-act="reset"]').addEventListener('click',()=>{try{localStorage.removeItem('miniResumoPos')}catch(e){}placeMiniResumo(box,null)});
+      const bar=box.querySelector('.mini-resumo-bar');
+      bar.addEventListener('pointerdown',e=>{
+        if(e.target.closest('button'))return;
+        const r=box.getBoundingClientRect(),dx=e.clientX-r.left,dy=e.clientY-r.top;
+        bar.setPointerCapture(e.pointerId);
+        const move=ev=>placeMiniResumo(box,{x:ev.clientX-dx,y:ev.clientY-dy});
+        const up=()=>{
+          bar.removeEventListener('pointermove',move);bar.removeEventListener('pointerup',up);bar.removeEventListener('pointercancel',up);
+          const r2=box.getBoundingClientRect();
+          try{localStorage.setItem('miniResumoPos',JSON.stringify({x:r2.left,y:r2.top}))}catch(e){}
+        };
+        bar.addEventListener('pointermove',move);bar.addEventListener('pointerup',up);bar.addEventListener('pointercancel',up);
+      });
+    }
     function renderTable(){
       const scroll=document.querySelector('.stock-scroll');
       const produce=activeProduce();
+      renderMiniResumo();
       updateRotateButtonVisibility(produce);
       resetTableZoom();
       const simPanel=document.getElementById('simStandalone');
@@ -2688,6 +2759,7 @@
     function updateTotals(){
       const produce=activeProduce();
       if(produce==='simulacao')return;
+      renderMiniResumo();
       if(produce==='geral'){
         CULTURES.forEach(c=>{
           if(c.id==='tomate'){refreshTomateTotals();return}
