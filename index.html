@@ -593,6 +593,10 @@
     .order-avatar{width:64px;height:40px;flex:none;border-radius:10px;display:grid;place-items:center;position:relative;overflow:hidden;
       background:linear-gradient(145deg,var(--brand-light),var(--brand-dark));color:#fff;font-size:13.5px;font-weight:800;letter-spacing:.02em}
     .order-avatar img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;padding:3px;box-sizing:border-box;background:var(--surface);cursor:pointer}
+    /* Com logo: miniatura maior, fundo branco e borda leve pra logo aparecer bem */
+    .order-avatar:has(img){width:96px;height:60px;border-radius:12px;background:#fff;box-shadow:0 0 0 1px var(--line),0 2px 8px rgba(9,40,25,.08)}
+    .order-avatar:has(img) img{padding:4px;background:#fff;transition:transform .15s}
+    .order-avatar:has(img):hover img{transform:scale(1.06)}
     .logo-preview-dialog{width:min(560px,calc(100% - 28px))}
     .logo-preview-body{display:flex;align-items:center;justify-content:center;padding:28px}
     .logo-preview-body img{max-width:100%;max-height:60vh;border-radius:12px;display:block}
