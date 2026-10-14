@@ -599,10 +599,10 @@
     .order-id{min-width:0}
     .order-id strong{display:block;font-size:14px;font-weight:800;color:var(--ink);line-height:1.25;overflow-wrap:break-word}
     .order-id span{display:block;margin-top:1px;font-size:11.5px;color:var(--muted)}
-    .order-row{border-bottom:1px solid var(--line)}
+    .order-row{border-bottom:1px solid var(--line);padding:11px 14px 12px;display:flex;flex-direction:column;gap:9px}
     .order-row:last-child{border-bottom:0}
-    .order-row-top{display:grid;grid-template-columns:1fr auto auto 92px;min-height:42px;align-items:center}
-    .order-row-top label{font-size:13.5px;font-weight:650;padding-left:14px;color:var(--ink-2);overflow-wrap:anywhere}
+    .order-row-top{display:flex;align-items:center;gap:2px;min-height:26px}
+    .order-row-top label{flex:1;min-width:0;font-size:13.5px;font-weight:700;color:var(--ink-2);overflow-wrap:anywhere}
     .order-unit{display:inline-block;margin-left:6px;padding:1px 6px;border-radius:999px;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.03em;background:rgba(127,127,127,.15);color:inherit;opacity:.75;vertical-align:middle}
     .order-unit.kg{background:#f59e0b;color:#fff;opacity:.9}
     .order-link{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:999px;font-size:10.5px;font-weight:800;background:var(--c);color:#fff;opacity:.85;vertical-align:middle}
@@ -614,18 +614,50 @@
     .order-hide:hover{background:var(--brand-soft);color:var(--brand-dark)}
     .order-card header .mini-add{margin-left:auto}
     #clientProducts{display:flex;flex-direction:column;gap:8px;margin-bottom:10px}
-    .order-row-top input{height:41px;width:100%;border:0;border-left:1px solid var(--line);background:transparent;
-      text-align:center;font-weight:800;font-size:15px;color:var(--ink);outline:none;font-variant-numeric:tabular-nums;
-      transition:background .15s,box-shadow .15s}
-    .order-row-top input:hover{background:var(--brand-soft)}
-    .order-row-top input:focus{background:var(--brand-soft);box-shadow:inset 0 0 0 2px var(--brand)}
-    /* Linha de "já separado" (baixa de estoque) + barra de progresso */
-    .order-row-progress{display:flex;align-items:center;gap:9px;padding:6px 14px 9px;background:var(--surface-2)}
-    .order-row-progress input{width:80px;height:29px;flex:none;border:1px solid var(--line);border-radius:8px;
-      background:var(--surface);text-align:center;font-weight:700;font-size:12.5px;color:var(--ink);outline:none;
-      font-variant-numeric:tabular-nums;transition:border-color .15s,box-shadow .15s}
-    .order-row-progress input:hover{border-color:var(--brand)}
-    .order-row-progress input:focus{border-color:var(--brand);box-shadow:0 0 0 2px var(--brand-soft)}
+    /* Pedido x Já pronto: duas caixas lado a lado, cada uma com a sua etiqueta */
+    .order-row-fields{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    .order-field{display:flex;flex-direction:column;gap:2px;min-width:0;padding:7px 11px 6px;border:1px solid var(--line);border-radius:11px;background:var(--surface);cursor:text;transition:border-color .15s,box-shadow .15s}
+    .order-field:hover{border-color:var(--brand)}
+    .order-field:focus-within{border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-soft)}
+    .order-field small{font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);line-height:1.1}
+    .order-field input{width:100%;height:24px;padding:0;border:0;background:transparent;font:inherit;font-size:18px;font-weight:800;color:var(--ink);outline:none;font-variant-numeric:tabular-nums}
+    .order-field input::placeholder{color:var(--muted);opacity:.45;font-weight:700}
+    .order-field--done{background:var(--surface-2)}
+    .order-field--done small{color:var(--good)}
+    /* Etiqueta dinâmica: A separar (âmbar) / Separando (azul) */
+    .order-field--done[data-status="empty"]{display:none}
+    .order-row-fields:has(.order-field--done[data-status="empty"]){grid-template-columns:1fr}
+    .order-field--done[data-status="pending"]{--st:#d97706}
+    .order-field--done[data-status="progress"]{--st:#2563eb}
+    .order-field--done[data-status="pending"],.order-field--done[data-status="progress"]{background:color-mix(in srgb,var(--st) 6%,var(--surface));border-color:color-mix(in srgb,var(--st) 28%,var(--line))}
+    .order-field--done[data-status="pending"]:hover,.order-field--done[data-status="progress"]:hover{border-color:color-mix(in srgb,var(--st) 60%,transparent)}
+    .order-field--done[data-status="pending"] small,.order-field--done[data-status="progress"] small{display:flex;align-items:center;gap:6px;color:var(--st)}
+    .order-field--done[data-status="pending"] small::before,.order-field--done[data-status="progress"] small::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--st);flex:none}
+    .order-field--done[data-status="progress"] small::before{box-shadow:0 0 0 0 color-mix(in srgb,var(--st) 45%,transparent);animation:stPulse 1.8s ease-out infinite}
+    @keyframes stPulse{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--st) 45%,transparent)}100%{box-shadow:0 0 0 6px transparent}}
+    @media(prefers-reduced-motion:reduce){.order-field--done[data-status="progress"] small::before{animation:none}}
+    :root[data-theme="dark"] .order-field--done[data-status="pending"]{--st:#fbbf24}:root[data-theme="dark"] .order-field--done[data-status="pending"] small{color:#fbbf24}
+    :root[data-theme="dark"] .order-field--done[data-status="progress"]{--st:#60a5fa}:root[data-theme="dark"] .order-field--done[data-status="progress"] small{color:#60a5fa}
+    @media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .order-field--done[data-status="pending"]{--st:#fbbf24}:root:not([data-theme="light"]) .order-field--done[data-status="progress"]{--st:#60a5fa}:root:not([data-theme="light"]) .order-field--done[data-status="pending"] small{color:#fbbf24}:root:not([data-theme="light"]) .order-field--done[data-status="progress"] small{color:#60a5fa}}
+    /* Já pronto ACIMA do pedido: alerta vermelho (caixa, barra e texto) */
+    .order-field--done.is-over{background:var(--critical-soft);border-color:var(--critical)}
+    .order-field--done.is-over small{color:var(--critical)}    .order-field--done.is-over input{color:var(--critical)}
+    .is-over .order-progress-fill{background:var(--critical)!important}
+    .is-over .order-progress-pct,.is-over .order-summary-text{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:999px;background:var(--critical-soft);color:var(--critical);border:1px solid var(--critical);font-weight:800;white-space:normal;flex:0 1 auto;min-width:0;max-width:100%;line-height:1.3;box-sizing:border-box}
+    .is-over .order-progress-pct::before,.is-over .order-summary-text::before{content:"⚠"}
+    .is-over .order-progress-track{display:none}
+    /* Pedido 100% pronto: em vez de repetir o número, mostra "✓ Concluído".
+       Clicando na caixa o número volta pra poder editar. */
+    .order-field--done{position:relative}
+    .order-done-badge{display:none}
+    .order-field--done.is-complete:not(:focus-within){background:color-mix(in srgb,var(--good) 10%,var(--surface));border-color:color-mix(in srgb,var(--good) 35%,transparent)}
+    .order-field--done.is-complete:not(:focus-within) small{display:none}
+    .order-field--done.is-complete:not(:focus-within) input{position:absolute;opacity:0;width:1px;height:1px;pointer-events:none}
+    .order-field--done.is-complete:not(:focus-within) .order-done-badge{display:flex;align-items:center;gap:7px;min-height:39px;font-size:15px;font-weight:800;color:var(--good)}
+    .order-done-badge i{display:grid;place-items:center;width:22px;height:22px;border-radius:50%;background:color-mix(in srgb,var(--good) 22%,transparent);flex:none}
+    .order-done-badge svg{width:13px;height:13px}
+    /* Barra de progresso (quanto do pedido já está pronto) */
+    .order-row-progress{display:flex;align-items:center;gap:9px}
     .order-progress-track{flex:1;min-width:32px;height:6px;border-radius:999px;background:var(--line);overflow:hidden}
     .order-progress-fill{height:100%;border-radius:999px;background:var(--brand);transition:width .2s}
     .order-progress-fill.done{background:var(--good)}
@@ -633,6 +665,12 @@
     .order-summary{display:flex;align-items:center;gap:9px;padding:9px 14px;border-bottom:1px solid var(--line);background:var(--surface)}
     .order-summary .order-progress-track{height:7px}
     .order-summary-text{flex:none;font-size:11.5px;font-weight:750;color:var(--muted);white-space:nowrap}
+    /* Sem quantidade pedida ainda: some a barra vazia e aparece o selo "Aguardando pedido" */
+    .is-waiting .order-progress-track{display:none}
+    .is-waiting .order-progress-pct,.is-waiting .order-summary-text{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:999px;background:#fef3c7;color:#92400e;border:1px solid #fcd34d;font-weight:800;white-space:normal;flex:0 1 auto;min-width:0;max-width:100%;line-height:1.3;box-sizing:border-box}
+    .is-waiting .order-progress-pct::before,.is-waiting .order-summary-text::before{content:"⏳"}
+    :root[data-theme="dark"] .is-waiting .order-progress-pct,:root[data-theme="dark"] .is-waiting .order-summary-text{background:rgba(251,191,36,.14);color:#fcd34d;border-color:rgba(251,191,36,.4)}
+    @media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .is-waiting .order-progress-pct,:root:not([data-theme="light"]) .is-waiting .order-summary-text{background:rgba(251,191,36,.14);color:#fcd34d;border-color:rgba(251,191,36,.4)}}
 
     /* Simulador de disponibilidade (pedidos x estoque) */
     .avail-row{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;padding:10px 14px;border-radius:12px;border:1px solid var(--line);background:var(--surface)}
@@ -970,15 +1008,7 @@
     }
     /* ── Telas pequenas: empilha os controles em vez de cortar texto ──── */
     @media(max-width:640px){
-      .order-row-top{grid-template-columns:1fr auto auto;grid-template-areas:"label edit del" "input input input";row-gap:6px;padding:8px 0}
-      .order-row-top label{grid-area:label;padding-left:10px}
-      .order-row-top .mini-edit{grid-area:edit}
-      .order-row-top .order-del{grid-area:del}
-      .order-row-top input{grid-area:input;border-left:1px solid var(--line);border-radius:8px}
-      .order-row-progress{flex-wrap:wrap}
-      .order-row-progress input{width:100%;order:1}
-      .order-progress-track{order:2}
-      .order-progress-pct{order:3}
+      .order-row{padding:10px 10px 12px}
       .catalog-row{grid-template-columns:1fr;gap:6px}
       .catalog-row select,.catalog-row input{width:100%}
       .catalog-row .mini-remove{justify-self:end}
@@ -1873,7 +1903,30 @@
       const detailEl=document.getElementById('headerUpdateStampDetail');if(detailEl)detailEl.textContent=recentActivityText();
     }
     function esc(v){return String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
-    function num(v){return Math.max(0,Number(String(v).replace(',','.'))||0)}
+    // Lê número no formato brasileiro: "5.000" = 5000, "1,5" = 1.5,
+    // "1.234,5" = 1234.5. Um ponto só seguido de 1–2 casas ("1.5") ainda
+    // vale como decimal, pra não quebrar o que já se digitava assim.
+    function num(v){
+      let s=String(v??'').trim();
+      if(s.includes(','))s=s.replace(/\./g,'').replace(',','.');
+      else if(/^\d{1,3}(\.\d{3})+$/.test(s))s=s.replace(/\./g,'');
+      return Math.max(0,Number(s)||0);
+    }
+    // Valor de um campo de pedido já formatado: 5000 → "5.000", 2,5 kg → "2,5".
+    function fmtOrderInput(v,unit){return v>0?(unit==='kg'?(Math.round(v*1000)/1000).toLocaleString('pt-BR',{maximumFractionDigits:3}):fmt(v)):''}
+    // Formata ao vivo enquanto digita (campos em unidades): mantém o cursor
+    // no mesmo dígito mesmo com os pontos de milhar entrando/saindo.
+    function liveFormatIntInput(el){
+      const caret=el.selectionStart??el.value.length;
+      const digitsBefore=el.value.slice(0,caret).replace(/\D/g,'').length;
+      const digits=el.value.replace(/\D/g,'').replace(/^0+(?=\d)/,'');
+      const out=digits?Number(digits).toLocaleString('pt-BR'):'';
+      if(out===el.value)return;
+      el.value=out;
+      let pos=0,seen=0;
+      while(pos<out.length&&seen<digitsBefore){if(/\d/.test(out[pos]))seen++;pos++}
+      try{el.setSelectionRange(pos,pos)}catch(e){}
+    }
     function fmt(v){return Math.round(v).toLocaleString('pt-BR')}
     function formatDate(iso){const [y,m,d]=iso.split('-').map(Number);return `${String(d).padStart(2,'0')}/${String(m).padStart(2,'0')}`}
     function weekDay(iso){const [y,m,d]=iso.split('-').map(Number);return new Date(y,m-1,d).toLocaleDateString('pt-BR',{weekday:'long'}).replace('-feira','').toUpperCase()}
@@ -2723,8 +2776,9 @@
       saveState();
     }
     function onOrderChange(e){
+      if(e.target.inputMode==='decimal'&&e.target.value.trim())e.target.value=fmtOrderInput(num(e.target.value),'kg');
       const el=e.target,oldV=String(el.defaultValue??'').trim(),newV=String(el.value??'').trim();
-      if(oldV===newV)return;
+      if(oldV===newV||num(oldV)===num(newV)){el.defaultValue=el.value;return}
       const key=el.dataset.order,i=key.indexOf('-'),client=state.clients.find(c=>c.id===key.slice(0,i));
       const prod=client?clientProducts(client).find(p=>p.id===key.slice(i+1)):null;
       const desc=`o pedido de ${client?client.name:'?'} — ${prod?resolveProduct(prod).name:'?'}`;
@@ -2735,8 +2789,9 @@
       saveState();
     }
     function onSeparatedChange(e){
+      if(e.target.inputMode==='decimal'&&e.target.value.trim())e.target.value=fmtOrderInput(num(e.target.value),'kg');
       const el=e.target,oldV=String(el.defaultValue??'').trim(),newV=String(el.value??'').trim();
-      if(oldV===newV)return;
+      if(oldV===newV||num(oldV)===num(newV)){el.defaultValue=el.value;return}
       const key=el.dataset.separated,i=key.indexOf('-'),client=state.clients.find(c=>c.id===key.slice(0,i));
       const prod=client?clientProducts(client).find(p=>p.id===key.slice(i+1)):null;
       const desc=`a separação de ${client?client.name:'?'} — ${prod?resolveProduct(prod).name:'?'}`;
@@ -2865,21 +2920,35 @@
     function productProgress(client,prod){
       const pedido=orderedQty(client.id,prod.id),separado=separatedQty(client.id,prod.id);
       const pct=pedido>0?Math.min(100,Math.round(separado/pedido*100)):(separado>0?100:0);
-      return{pedido,separado,pct,restante:Math.max(pedido-separado,0),unit:productUnit(prod)};
+      // excesso: pronto acima do pedido (provável erro de digitação) — vira alerta, não "Concluído".
+      return{pedido,separado,pct,restante:Math.max(pedido-separado,0),excesso:pedido>0?Math.max(separado-pedido,0):0,unit:productUnit(prod)};
     }
     // Un e kg não se somam: o percentual do cliente é a média de cada
     // unidade ponderada pelo próprio pedido, e o "faltam" sai separado
     // por unidade (ex.: "faltam 2.660 un + 100 kg").
     function clientProgress(client){
       const by={un:{pedido:0,separado:0,restante:0},kg:{pedido:0,separado:0,restante:0}};
-      clientProducts(client).forEach(prod=>{const p=productProgress(client,prod),b=by[p.unit];b.pedido+=p.pedido;b.separado+=p.separado;b.restante+=p.restante});
+      let overCount=0;
+      clientProducts(client).forEach(prod=>{const p=productProgress(client,prod),b=by[p.unit];b.pedido+=p.pedido;b.separado+=p.separado;b.restante+=p.restante;if(p.excesso>0)overCount++});
       const pedido=by.un.pedido+by.kg.pedido,separado=by.un.separado+by.kg.separado;
       const fracs=['un','kg'].filter(u=>by[u].pedido>0).map(u=>Math.min(1,by[u].separado/by[u].pedido));
       const pct=fracs.length?Math.min(100,Math.round(fracs.reduce((a,b)=>a+b,0)/fracs.length*100)):(separado>0?100:0);
-      return{pedido,separado,pct,restante:by.un.restante+by.kg.restante,restanteUn:by.un.restante,restanteKg:by.kg.restante};
+      return{pedido,separado,pct,restante:by.un.restante+by.kg.restante,restanteUn:by.un.restante,restanteKg:by.kg.restante,overCount};
     }
+    // Etiqueta da caixa de baixo, conforme o andamento do produto:
+    // A separar (nada pronto) → Separando → Pedido pronto (ou alerta se passar do pedido).
+    function doneStatus(p){
+      // 'empty': sem pedido e nada pronto → a caixa fica oculta até lançar o pedido.
+      if(!(p.pedido>0))return p.separado>0?'':'empty';
+      if(p.excesso>0)return 'over';
+      if(p.separado<=0)return 'pending';
+      return p.pct>=100?'complete':'progress';
+    }
+    function doneLabel(p){return {pending:'A separar',progress:'Separando',over:'Acima do pedido'}[doneStatus(p)]||'Já pronto'}
     function progressText(p,{clientLevel=false}={}){
-      if(!(p.pedido>0))return p.separado>0?'Sem pedido lançado (há quantidade separada)':'Sem pedido lançado';
+      if(!(p.pedido>0))return p.separado>0?'Aguardando pedido (já tem quantidade pronta)':'Aguardando pedido';
+      if(clientLevel&&p.overCount>0)return `${p.overCount===1?'1 produto':p.overCount+' produtos'} acima do pedido — confira`;
+      if(!clientLevel&&p.excesso>0)return `${fmtQty(p.excesso,p.unit)} ${p.unit} acima do pedido`;
       if(p.pct>=100)return clientLevel?'100% concluído':'100%';
       if(clientLevel){
         const parts=[];
@@ -2913,10 +2982,11 @@
       const prod=clientProducts(client).find(p=>p.id===prodId);if(!prod)return;
       const p=productProgress(client,prod);
       document.querySelectorAll(`[data-progress-fill="${orderKey(clientId,prodId)}"]`).forEach(fill=>{fill.style.width=Math.min(100,p.pct)+'%';fill.classList.toggle('done',p.pct>=100&&p.pedido>0)});
-      document.querySelectorAll(`[data-progress-pct="${orderKey(clientId,prodId)}"]`).forEach(pctEl=>pctEl.textContent=progressText(p));
+      document.querySelectorAll(`[data-done-box="${orderKey(clientId,prodId)}"]`).forEach(box=>{box.classList.toggle('is-complete',p.pct>=100&&p.pedido>0&&!p.excesso);box.classList.toggle('is-over',p.excesso>0);box.dataset.status=doneStatus(p);const lbl=box.querySelector('small');if(lbl)lbl.textContent=doneLabel(p)});
+      document.querySelectorAll(`[data-progress-pct="${orderKey(clientId,prodId)}"]`).forEach(pctEl=>{pctEl.textContent=progressText(p);pctEl.parentElement.classList.toggle('is-waiting',!(p.pedido>0));pctEl.parentElement.classList.toggle('is-over',p.excesso>0)});
       const cp=clientProgress(client);
       document.querySelectorAll(`[data-summary-fill="${clientId}"]`).forEach(sfill=>{sfill.style.width=Math.min(100,cp.pct)+'%';sfill.classList.toggle('done',cp.pct>=100&&cp.pedido>0)});
-      document.querySelectorAll(`[data-summary-text="${clientId}"]`).forEach(stext=>stext.textContent=progressText(cp,{clientLevel:true}));
+      document.querySelectorAll(`[data-summary-text="${clientId}"]`).forEach(stext=>{stext.textContent=progressText(cp,{clientLevel:true});stext.parentElement.classList.toggle('is-waiting',!(cp.pedido>0));stext.parentElement.classList.toggle('is-over',cp.pedido>0&&cp.overCount>0)});
       refreshAllOrderDetails();
     }
     // Quando um campo Pedido/Separado é editado, replica o valor digitado
@@ -2936,12 +3006,14 @@
         const info=resolveProduct(prod),linked=info.cultureId&&info.kgFactor>0,c=linked?CULTURES.find(x=>x.id===info.cultureId):null,isKg=info.unit==='kg',im=isKg?'decimal':'numeric';
         const key=orderKey(client.id,prod.id),p=productProgress(client,prod);
         return `<div class="order-row">`+
-          `<div class="order-row-top"><label>${esc(info.name)}${c?`<span class="order-link" style="--c:${c.color}" title="${isKg?`Vinculado a ${esc(c.label)} • pedido em kg (desconta direto do estoque)`:`Vinculado a ${esc(c.label)} • ${String(info.kgPerUn).replace('.',',')} kg/un.`}">${esc(c.label)}</span>`:''}<span class="order-unit${isKg?' kg':''}" title="${isKg?'Pedido e separação em quilos (kg)':'Pedido e separação em unidades'}">${isKg?'kg':'un'}</span></label><button type="button" class="mini-edit" data-edit-product="${client.id}|${prod.id}" title="Configurar produto" aria-label="Configurar ${esc(info.name)}">${ICON_EDIT}</button><button type="button" class="order-del" data-del-product="${client.id}|${prod.id}" title="Remover produto" aria-label="Remover ${esc(info.name)} de ${esc(client.name)}">×</button><input inputmode="${im}" data-order="${key}" value="${state.orders[key]||''}" aria-label="Pedido de ${esc(info.name)} para ${esc(client.name)} (${info.unit})" placeholder="Pedido (${info.unit})"></div>`+
-          `<div class="order-row-progress"><input inputmode="${im}" data-separated="${key}" value="${state.separado[key]||''}" aria-label="Já separado de ${esc(info.name)} para ${esc(client.name)} (${info.unit})" placeholder="Separado (${info.unit})" title="Quantidade já separada/processada deste produto para este cliente"><div class="order-progress-track"><div class="order-progress-fill${p.pct>=100&&p.pedido>0?' done':''}" data-progress-fill="${key}" style="width:${Math.min(100,p.pct)}%"></div></div><span class="order-progress-pct" data-progress-pct="${key}">${esc(progressText(p))}</span></div>`+
+          `<div class="order-row-top"><label>${esc(info.name)}<span class="order-unit${isKg?' kg':''}" title="${isKg?'Pedido e separação em quilos (kg)':'Pedido e separação em unidades'}">${isKg?'kg':'un'}</span></label><button type="button" class="mini-edit" data-edit-product="${client.id}|${prod.id}" title="Configurar produto" aria-label="Configurar ${esc(info.name)}">${ICON_EDIT}</button><button type="button" class="order-del" data-del-product="${client.id}|${prod.id}" title="Remover produto" aria-label="Remover ${esc(info.name)} de ${esc(client.name)}">×</button></div>`+
+          `<div class="order-row-fields"><label class="order-field" title="Quantidade que o cliente pediu"><small>Pedido</small><input inputmode="${im}" data-order="${key}" value="${fmtOrderInput(state.orders[key],info.unit)}" aria-label="Pedido de ${esc(info.name)} para ${esc(client.name)} (${info.unit})" placeholder="0 ${info.unit}"></label>
+          <label class="order-field order-field--done${p.pct>=100&&p.pedido>0&&!p.excesso?' is-complete':''}${p.excesso>0?' is-over':''}" data-done-box="${key}" data-status="${doneStatus(p)}" title="Quantidade já separada/pronta deste produto para este cliente"><small>${doneLabel(p)}</small><input inputmode="${im}" data-separated="${key}" value="${fmtOrderInput(state.separado[key],info.unit)}" aria-label="Já pronto de ${esc(info.name)} para ${esc(client.name)} (${info.unit})" placeholder="0 ${info.unit}"><span class="order-done-badge" aria-hidden="true"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></i>Pedido pronto</span></label></div>`+
+          `<div class="order-row-progress${p.pedido>0?'':' is-waiting'}${p.excesso>0?' is-over':''}"><div class="order-progress-track"><div class="order-progress-fill${p.pct>=100&&p.pedido>0?' done':''}" data-progress-fill="${key}" style="width:${Math.min(100,p.pct)}%"></div></div><span class="order-progress-pct" data-progress-pct="${key}">${esc(progressText(p))}</span></div>`+
         `</div>`;
       }).join(''):'<div class="field-help" style="padding:10px 14px">Nenhum produto cadastrado — use o botão + acima.</div>';
       const cp=clientProgress(client);
-      const summary=products.length?`<div class="order-summary"><div class="order-progress-track"><div class="order-progress-fill${cp.pct>=100&&cp.pedido>0?' done':''}" data-summary-fill="${client.id}" style="width:${Math.min(100,cp.pct)}%"></div></div><span class="order-summary-text" data-summary-text="${client.id}">${esc(progressText(cp,{clientLevel:true}))}</span></div>`:'';
+      const summary=products.length?`<div class="order-summary${cp.pedido>0?'':' is-waiting'}${cp.pedido>0&&cp.overCount>0?' is-over':''}"><div class="order-progress-track"><div class="order-progress-fill${cp.pct>=100&&cp.pedido>0?' done':''}" data-summary-fill="${client.id}" style="width:${Math.min(100,cp.pct)}%"></div></div><span class="order-summary-text" data-summary-text="${client.id}">${esc(progressText(cp,{clientLevel:true}))}</span></div>`:'';
       // O atalho rápido no cartão só oculta (pra ninguém excluir sem querer,
       // nem o master) — excluir de vez só dá pra fazer em "Gerenciar
       // cadastros", que tem uma confirmação explícita antes de apagar.
@@ -2953,8 +3025,8 @@
       return clients.length?clients.map(clientOrderCardHtml).join(''):'<div class="field-help" style="padding:6px 4px">Nenhum cliente cadastrado ou visível. Use “Adicionar cliente” ou reative um cliente oculto.</div>';
     }
     function wireOrderCardEvents(container){
-      container.querySelectorAll('[data-order]').forEach(input=>{input.addEventListener('input',e=>{const value=num(e.target.value);if(value)state.orders[e.target.dataset.order]=value;else delete state.orders[e.target.dataset.order];recordOp('orders',e.target.dataset.order,value||null);syncDuplicateOrderInputs(e.target,'order');saveState();const i=e.target.dataset.order.indexOf('-');refreshOrderProgress(e.target.dataset.order.slice(0,i),e.target.dataset.order.slice(i+1))});input.addEventListener('change',onOrderChange)});
-      container.querySelectorAll('[data-separated]').forEach(input=>{input.addEventListener('input',e=>{const value=num(e.target.value);if(value)state.separado[e.target.dataset.separated]=value;else delete state.separado[e.target.dataset.separated];recordOp('separado',e.target.dataset.separated,value||null);syncDuplicateOrderInputs(e.target,'separated');saveState();const i=e.target.dataset.separated.indexOf('-');refreshOrderProgress(e.target.dataset.separated.slice(0,i),e.target.dataset.separated.slice(i+1))});input.addEventListener('change',onSeparatedChange)});
+      container.querySelectorAll('[data-order]').forEach(input=>{input.addEventListener('input',e=>{if(e.target.inputMode==='numeric')liveFormatIntInput(e.target);const value=num(e.target.value);if(value)state.orders[e.target.dataset.order]=value;else delete state.orders[e.target.dataset.order];recordOp('orders',e.target.dataset.order,value||null);syncDuplicateOrderInputs(e.target,'order');saveState();const i=e.target.dataset.order.indexOf('-');refreshOrderProgress(e.target.dataset.order.slice(0,i),e.target.dataset.order.slice(i+1))});input.addEventListener('change',onOrderChange)});
+      container.querySelectorAll('[data-separated]').forEach(input=>{input.addEventListener('input',e=>{if(e.target.inputMode==='numeric')liveFormatIntInput(e.target);const value=num(e.target.value);if(value)state.separado[e.target.dataset.separated]=value;else delete state.separado[e.target.dataset.separated];recordOp('separado',e.target.dataset.separated,value||null);syncDuplicateOrderInputs(e.target,'separated');saveState();const i=e.target.dataset.separated.indexOf('-');refreshOrderProgress(e.target.dataset.separated.slice(0,i),e.target.dataset.separated.slice(i+1))});input.addEventListener('change',onSeparatedChange)});
       container.querySelectorAll('[data-add-product]').forEach(btn=>btn.onclick=()=>openProductDialog(btn.dataset.addProduct));
       container.querySelectorAll('[data-del-product]').forEach(btn=>btn.onclick=()=>{const parts=btn.dataset.delProduct.split('|');removeClientProduct(parts[0],parts[1])});
       container.querySelectorAll('[data-edit-product]').forEach(btn=>btn.onclick=()=>{const parts=btn.dataset.editProduct.split('|');openProductDialog(parts[0],parts[1])});
