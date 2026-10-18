@@ -339,6 +339,10 @@
     .dash-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px}
     .dash-head h3{margin:0;font-size:19px;font-weight:800;letter-spacing:-.01em;color:var(--ink)}
     .dash-head p{margin:3px 0 0;font-size:13px;color:var(--muted)}
+    /* Título da aba Resumo centralizado e maior (destaque na foto enviada) */
+    .dash-head--center{justify-content:center;text-align:center}
+    .dash-head--center h3{font-size:26px}
+    .dash-head--center p{font-size:13.5px}
     .dash-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
     .dash-filter{position:relative;display:flex;flex-direction:column;gap:3px;font-size:10.5px;font-weight:750;color:var(--muted)}
     .partner-filter-trigger{min-width:220px;height:40px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 12px;border:1px solid var(--line-strong);border-radius:12px;background:var(--surface);color:var(--ink);font-size:12.5px;font-weight:700;cursor:pointer}
@@ -588,6 +592,9 @@
     .orders-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(265px,1fr));gap:14px}
     .order-card{border:1px solid var(--line);border-radius:16px;background:var(--surface);overflow:hidden;
       box-shadow:var(--shadow-sm);transition:transform .15s,box-shadow .15s}
+    .orders-empty{grid-column:1/-1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:26px 16px;border:1.5px dashed var(--line);border-radius:16px;text-align:center}
+    .orders-empty strong{font-size:14px;color:var(--ink-2)}
+    .orders-empty span{font-size:12.5px;color:var(--muted)}
     .order-card:hover{transform:translateY(-1px);box-shadow:var(--shadow-md)}
     .order-card header{display:flex;align-items:center;gap:11px;padding:13px 14px;background:var(--surface-2);border-bottom:1px solid var(--line)}
     .order-avatar{width:64px;height:40px;flex:none;border-radius:10px;display:grid;place-items:center;position:relative;overflow:hidden;
@@ -629,8 +636,19 @@
     .order-field--done{background:var(--surface-2)}
     .order-field--done small{color:var(--good)}
     /* Etiqueta dinâmica: A separar (âmbar) / Separando (azul) */
-    .order-field--done[data-status="empty"]{display:none}
-    .order-row-fields:has(.order-field--done[data-status="empty"]){grid-template-columns:1fr}
+    /* Sem o total do pedido: caixa "Adiantado" pra ir lançando o que já foi feito */
+    .order-field--done[data-status="empty"]:not(.show-advance){display:none}
+    .order-advance-btn{display:none;align-items:center;justify-content:center;border:1.5px dashed var(--line-strong);border-radius:11px;background:transparent;color:var(--muted);font:inherit;font-size:12px;font-weight:700;cursor:pointer;padding:6px 8px;transition:border-color .15s,color .15s,background .15s}
+    .order-advance-btn:hover{border-color:#7c3aed;color:#7c3aed;background:color-mix(in srgb,#7c3aed 6%,transparent)}
+    .order-row-fields:has(.order-field--done[data-status="empty"]:not(.show-advance)) .order-advance-btn{display:flex}
+    .order-field--done[data-status="empty"].show-advance{--st:#7c3aed;background:color-mix(in srgb,var(--st) 6%,var(--surface));border-color:color-mix(in srgb,var(--st) 28%,var(--line))}
+    .order-field--done[data-status="empty"].show-advance small{display:flex;align-items:center;gap:6px;color:var(--st)}
+    .order-field--done[data-status="advance"]{--st:#7c3aed}
+    .order-field--done[data-status="advance"]{background:color-mix(in srgb,var(--st) 6%,var(--surface));border-color:color-mix(in srgb,var(--st) 28%,var(--line))}
+    .order-field--done[data-status="advance"] small{display:flex;align-items:center;gap:6px;color:var(--st)}
+    .order-field--done[data-status="advance"] small::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--st);flex:none}
+    :root[data-theme="dark"] .order-field--done[data-status="advance"]{--st:#a78bfa}
+    @media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .order-field--done[data-status="advance"]{--st:#a78bfa}}
     .order-field--done[data-status="pending"]{--st:#d97706}
     .order-field--done[data-status="progress"]{--st:#2563eb}
     .order-field--done[data-status="pending"],.order-field--done[data-status="progress"]{background:color-mix(in srgb,var(--st) 6%,var(--surface));border-color:color-mix(in srgb,var(--st) 28%,var(--line))}
@@ -671,6 +689,8 @@
     .order-summary-text{flex:none;font-size:11.5px;font-weight:750;color:var(--muted);white-space:nowrap}
     /* Sem quantidade pedida ainda: some a barra vazia e aparece o selo "Aguardando pedido" */
     .is-waiting .order-progress-track{display:none}
+    /* No topo do cartão não repete o "Aguardando pedido" — ele já aparece em cada produto */
+    .order-summary.is-waiting{display:none}
     .is-waiting .order-progress-pct,.is-waiting .order-summary-text{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:999px;background:#fef3c7;color:#92400e;border:1px solid #fcd34d;font-weight:800;white-space:normal;flex:0 1 auto;min-width:0;max-width:100%;line-height:1.3;box-sizing:border-box}
     .is-waiting .order-progress-pct::before,.is-waiting .order-summary-text::before{content:"⏳"}
     :root[data-theme="dark"] .is-waiting .order-progress-pct,:root[data-theme="dark"] .is-waiting .order-summary-text{background:rgba(251,191,36,.14);color:#fcd34d;border-color:rgba(251,191,36,.4)}
@@ -858,6 +878,7 @@
       #manageDialog .list-col+.list-col{margin-top:20px;padding-top:20px;border-top:1px solid var(--line);border-left:0;padding-left:0}
       #manageDialog .list-manager{max-height:280px}
     }
+    .share-text-box{padding:14px 16px;border-radius:12px;background:var(--surface-2);border:1px solid var(--line);font-size:14.5px;line-height:1.55;color:var(--ink);white-space:pre-line}
     #confirmMessage{margin:0;font-size:15px;color:var(--ink-2);line-height:1.6}
 
     /* ── Ajuda: como ler os cards e gráficos ────────────── */
@@ -1496,6 +1517,12 @@
       </div>
     </div>
     <div class="dialog-foot"><button type="button" class="btn btn-primary" onclick="this.closest('dialog').close()">Entendi</button></div>
+  </dialog>
+
+  <dialog id="shareTextDialog">
+    <div class="dialog-head"><div><h3>Imagem baixada ✅</h3><p id="shareTextStatus">A mensagem abaixo já foi copiada. No WhatsApp, anexe a imagem e cole o texto com <strong>Ctrl + V</strong>.</p></div><button type="button" class="dialog-close" onclick="this.closest('dialog').close()" aria-label="Fechar">×</button></div>
+    <div class="dialog-body"><div class="share-text-box" id="shareTextBox"></div></div>
+    <div class="dialog-foot"><button type="button" class="btn" id="shareTextCopyBtn">Copiar de novo</button><button type="button" class="btn btn-primary" onclick="this.closest('dialog').close()">Entendi</button></div>
   </dialog>
 
   <dialog id="confirmDialog">
@@ -2363,7 +2390,14 @@
           const labelA=a[3]?dashboardLabelValue(a[3],a[0]):a[0],labelB=b[3]?dashboardLabelValue(b[3],b[0]):b[0];
           return String(labelA).localeCompare(String(labelB),'pt-BR',{sensitivity:'base'});
         });
-        const det=detailRows.map(r=>`<span class="dr ${r[2]||''}"${r[5]?` title="${esc(r[5])}"`:''}>${r[3]?dashboardLabelText(r[3],r[0]):r[0]}<b>${r[1]}</b></span>`).join('');
+        // Linha zerada ("0 kg", "0") não acrescenta nada — fica fora do card.
+        const nonZeroRows=detailRows.filter(r=>!/^0(\s|$)/.test(String(r[1]).trim()));
+        // Brócolis: os KG (Filetado / Não proc. / Proc.) saem da lista miúda e
+        // viram linhas destacadas com selo, no mesmo estilo do Tomate/Pepino.
+        const kgHighlightKeys=x.c.id==='brocolis'?['kg|brocolis|0','kg|brocolis|1','kg|brocolis|2']:[];
+        const kgHighlightColor={'kg|brocolis|0':'var(--t0)','kg|brocolis|1':'var(--t1)','kg|brocolis|2':'var(--t2)'};
+        const kgHighlight=kgHighlightKeys.map(k=>nonZeroRows.find(r=>r[4]===k)).filter(Boolean).map(r=>{const cl=kgHighlightColor[r[4]];return `<span class="valrow pcard-subrow"><span class="val" style="color:${cl}"${r[5]?` title="${esc(r[5])}"`:''}>${r[3]?dashboardLabelText(r[3],r[0]):r[0]}</span><span class="kg" style="color:${cl};border-color:${cl}">${r[1]}</span></span>`}).join('');
+        const det=nonZeroRows.filter(r=>!kgHighlightKeys.includes(r[4])).map(r=>`<span class="dr ${r[2]||''}"${r[5]?` title="${esc(r[5])}"`:''}>${r[3]?dashboardLabelText(r[3],r[0]):r[0]}<b>${r[1]}</b></span>`).join('');
         const isPepino=x.c.id==='pepino',splitCard=x.c.id==='tomate'||isPepino;
         const valLabel=x.c.id==='tomate'?'Cumbucas Processada':isPepino?'Unidades Processadas':cultureUnitLabel(x.c.id);
         // Pepino segue o mesmo formato do Tomate: o valor grande é só o que
@@ -2401,7 +2435,7 @@
         // Pepino: as linhas de detalhe antigas repetiam os mesmos números do
         // topo do card — agora só aparecem as estimativas personalizadas.
         const pepinoPacks=isPepino?packRows('pepino'):[];
-        const detBlock=x.c.id==='tomate'?'':isPepino?(pepinoPacks.length?`<div class="pdet">${pepinoPacks.map(r=>`<span class="dr" title="${esc(r[5])}">${r[0]}<b>${r[1]}</b></span>`).join('')}</div>`:''):`<div class="pdet">${det}</div>`;
+        const detBlock=x.c.id==='tomate'?'':isPepino?(pepinoPacks.length?`<div class="pdet">${pepinoPacks.map(r=>`<span class="dr" title="${esc(r[5])}">${r[0]}<b>${r[1]}</b></span>`).join('')}</div>`:''):(det?`<div class="pdet">${det}</div>`:'');
         const valStyle=splitCard?' style="color:var(--good)"':'';
         const kgStyle=splitCard?' style="color:var(--good);border-color:var(--good)"':'';
         // Aba Resumo: o card do Pepino mostra só as unidades processadas e o
@@ -2410,7 +2444,12 @@
         const pepinoCompacto=isPepino&&!onlyId&&activeProduce()==='resumoantigo';
         const pepinoGranelKg=pepinoLooseKg+pepinoNpKg;
         const pepinoGranelRow=pepinoCompacto?`<span class="valrow pcard-subrow"><span class="val"${redVal} title="${esc(`KG a Granel = sem embalar + não processado\n${fmt(pepinoLooseKg)} kg + ${fmt(pepinoNpKg)} kg = ${fmt(pepinoGranelKg)} kg`)}">KG a Granel</span><span class="kg"${redKg}>${fmt(pepinoGranelKg)} kg</span></span>`:'';
-        return `<div class="pcard${splitCard?' pcard--tomate':''}" style="--c:${x.c.color}"><span class="pic">${CULTURE_EMOJI[x.c.id]||genericCultureSvg(x.c.color)}</span><b><i></i>${esc(x.c.label)}</b><span class="valrow"><span class="val"${valTitle}${valStyle}>${valDisplay} ${esc(valLabel)}</span>${pepinoCompacto?'':`<span class="kg"${kgStyle}>≈ ${fmt(badgeKg)} kg</span>`}</span>${pepinoCompacto?pepinoGranelRow:subEst}<div class="pbar"><i style="width:${pct}%"></i></div><span class="pct">${pct}% do peso total</span>${pepinoCompacto?'':detBlock}</div>`;
+        // Tomate na aba Resumo segue o mesmo formato compacto: só as cumbucas
+        // processadas (sem kg) e o "KG a Granel".
+        const tomateCompacto=x.c.id==='tomate'&&!onlyId&&activeProduce()==='resumoantigo';
+        const tomateGranelRow=tomateCompacto?`<span class="valrow pcard-subrow"><span class="val"${redVal} title="${esc(`KG a Granel (a processar)\nSoma dos kg lançados na tabela "Kg a processar" = ${fmt(granel)} kg`)}">KG a Granel</span><span class="kg"${redKg}>${fmt(granel)} kg</span></span>`:'';
+        const compacto=pepinoCompacto||tomateCompacto;
+        return `<div class="pcard${splitCard||kgHighlight?' pcard--tomate':''}" style="--c:${x.c.color}"><span class="pic">${CULTURE_EMOJI[x.c.id]||genericCultureSvg(x.c.color)}</span><b><i></i>${esc(x.c.label)}</b><span class="valrow"><span class="val"${valTitle}${valStyle}>${valDisplay} ${esc(valLabel)}</span>${compacto?'':`<span class="kg"${kgStyle}>≈ ${fmt(badgeKg)} kg</span>`}</span>${pepinoCompacto?pepinoGranelRow:tomateCompacto?tomateGranelRow:subEst}${kgHighlight}<div class="pbar"><i style="width:${pct}%"></i></div><span class="pct">${pct}% do peso total</span>${compacto?'':detBlock}</div>`;
       }).join('');
       if(onlyId)return cardsHtml;
       return `<section class="dash-panel" style="grid-column:1/-1"><h4>Estoque por Produto<small>Unidades e Peso Estimado.</small></h4><div class="produce-cards">${cardsHtml}</div></section>`;
@@ -2558,7 +2597,7 @@
         ?'<div class="ra-table-scroll"><table class="stock-table" id="stockTable"></table></div>'
         :'<div style="padding:24px;color:var(--muted);text-align:center">Nenhuma data cadastrada para Brócolis. Use "Adicionar data" na aba Brócolis.</div>';
       scroll.innerHTML=`<div class="dash">
-        <div class="dash-head"><div><h3>Resumo</h3><p>Tabela do Brócolis, Estimativas e Separação por Cliente.</p></div></div>
+        <div class="dash-head dash-head--center"><div><h3>Resumo</h3><p>Tabela do Brócolis, Estimativas e Separação por Cliente.</p></div></div>
         <div class="ra-grid">
           <div class="ra-col">
             ${tableHtml}
@@ -2942,15 +2981,18 @@
     // Etiqueta da caixa de baixo, conforme o andamento do produto:
     // A separar (nada pronto) → Separando → Pedido pronto (ou alerta se passar do pedido).
     function doneStatus(p){
-      // 'empty': sem pedido e nada pronto → a caixa fica oculta até lançar o pedido.
-      if(!(p.pedido>0))return p.separado>0?'':'empty';
+      // Sem pedido: 'advance' se já tem adiantado; 'empty' (caixa oculta, com botão "+ Lançar adiantado") se não.
+      if(!(p.pedido>0))return p.separado>0?'advance':'empty';
       if(p.excesso>0)return 'over';
       if(p.separado<=0)return 'pending';
       return p.pct>=100?'complete':'progress';
     }
-    function doneLabel(p){return {pending:'A separar',progress:'Separando',over:'Acima do pedido'}[doneStatus(p)]||'Já pronto'}
+    function doneLabel(p){return {pending:'A separar',progress:'Separando',over:'Acima do pedido',advance:'Adiantado',empty:'Adiantado'}[doneStatus(p)]||'Já pronto'}
     function progressText(p,{clientLevel=false}={}){
-      if(!(p.pedido>0))return p.separado>0?'Aguardando pedido (já tem quantidade pronta)':'Aguardando pedido';
+      if(!(p.pedido>0)){
+        if(clientLevel)return p.separado>0?'Aguardando total do pedido • já tem adiantado':'Aguardando pedido';
+        return p.separado>0?`${fmtQty(p.separado,p.unit)} ${p.unit} adiantado • aguardando total do pedido`:'Aguardando pedido';
+      }
       if(clientLevel&&p.overCount>0)return `${p.overCount===1?'1 produto':p.overCount+' produtos'} acima do pedido — confira`;
       if(!clientLevel&&p.excesso>0)return `${fmtQty(p.excesso,p.unit)} ${p.unit} acima do pedido`;
       if(p.pct>=100)return clientLevel?'100% concluído':'100%';
@@ -3012,7 +3054,7 @@
         return `<div class="order-row">`+
           `<div class="order-row-top"><label>${esc(info.name)}<span class="order-unit${isKg?' kg':''}" title="${isKg?'Pedido e separação em quilos (kg)':'Pedido e separação em unidades'}">${isKg?'kg':'un'}</span></label><button type="button" class="mini-edit" data-edit-product="${client.id}|${prod.id}" title="Configurar produto" aria-label="Configurar ${esc(info.name)}">${ICON_EDIT}</button><button type="button" class="order-del" data-del-product="${client.id}|${prod.id}" title="Remover produto" aria-label="Remover ${esc(info.name)} de ${esc(client.name)}">×</button></div>`+
           `<div class="order-row-fields"><label class="order-field" title="Quantidade que o cliente pediu"><small>Pedido</small><input inputmode="${im}" data-order="${key}" value="${fmtOrderInput(state.orders[key],info.unit)}" aria-label="Pedido de ${esc(info.name)} para ${esc(client.name)} (${info.unit})" placeholder="0 ${info.unit}"></label>
-          <label class="order-field order-field--done${p.pct>=100&&p.pedido>0&&!p.excesso?' is-complete':''}${p.excesso>0?' is-over':''}" data-done-box="${key}" data-status="${doneStatus(p)}" title="Quantidade já separada/pronta deste produto para este cliente"><small>${doneLabel(p)}</small><input inputmode="${im}" data-separated="${key}" value="${fmtOrderInput(state.separado[key],info.unit)}" aria-label="Já pronto de ${esc(info.name)} para ${esc(client.name)} (${info.unit})" placeholder="0 ${info.unit}"><span class="order-done-badge" aria-hidden="true"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></i>Pedido pronto</span></label></div>`+
+          <label class="order-field order-field--done${p.pct>=100&&p.pedido>0&&!p.excesso?' is-complete':''}${p.excesso>0?' is-over':''}" data-done-box="${key}" data-status="${doneStatus(p)}" title="Quantidade já separada/pronta deste produto para este cliente"><small>${doneLabel(p)}</small><input inputmode="${im}" data-separated="${key}" value="${fmtOrderInput(state.separado[key],info.unit)}" aria-label="Já pronto de ${esc(info.name)} para ${esc(client.name)} (${info.unit})" placeholder="0 ${info.unit}"><span class="order-done-badge" aria-hidden="true"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></i>Pedido pronto</span></label><button type="button" class="order-advance-btn" data-advance-btn="${key}" title="Lançar o que já foi feito antes de saber o total do pedido">+ Lançar adiantado</button></div>`+
           `<div class="order-row-progress${p.pedido>0?'':' is-waiting'}${p.excesso>0?' is-over':''}"><div class="order-progress-track"><div class="order-progress-fill${p.pct>=100&&p.pedido>0?' done':''}" data-progress-fill="${key}" style="width:${Math.min(100,p.pct)}%"></div></div><span class="order-progress-pct" data-progress-pct="${key}">${esc(progressText(p))}</span></div>`+
         `</div>`;
       }).join(''):'<div class="field-help" style="padding:10px 14px">Nenhum produto cadastrado — use o botão + acima.</div>';
@@ -3026,11 +3068,14 @@
     }
     function clientOrderCardsHtml(){
       const clients=visibleClients();
-      return clients.length?clients.map(clientOrderCardHtml).join(''):'<div class="field-help" style="padding:6px 4px">Nenhum cliente cadastrado ou visível. Use “Adicionar cliente” ou reative um cliente oculto.</div>';
+      return clients.length?clients.map(clientOrderCardHtml).join(''):'<div class="orders-empty"><strong>Nenhuma separação no momento</strong><span>Quando chegar um pedido, toque em “+ Cliente” para começar.</span></div>';
     }
     function wireOrderCardEvents(container){
       container.querySelectorAll('[data-order]').forEach(input=>{input.addEventListener('input',e=>{if(e.target.inputMode==='numeric')liveFormatIntInput(e.target);const value=num(e.target.value);if(value)state.orders[e.target.dataset.order]=value;else delete state.orders[e.target.dataset.order];recordOp('orders',e.target.dataset.order,value||null);syncDuplicateOrderInputs(e.target,'order');saveState();const i=e.target.dataset.order.indexOf('-');refreshOrderProgress(e.target.dataset.order.slice(0,i),e.target.dataset.order.slice(i+1))});input.addEventListener('change',onOrderChange)});
       container.querySelectorAll('[data-separated]').forEach(input=>{input.addEventListener('input',e=>{if(e.target.inputMode==='numeric')liveFormatIntInput(e.target);const value=num(e.target.value);if(value)state.separado[e.target.dataset.separated]=value;else delete state.separado[e.target.dataset.separated];recordOp('separado',e.target.dataset.separated,value||null);syncDuplicateOrderInputs(e.target,'separated');saveState();const i=e.target.dataset.separated.indexOf('-');refreshOrderProgress(e.target.dataset.separated.slice(0,i),e.target.dataset.separated.slice(i+1))});input.addEventListener('change',onSeparatedChange)});
+      // "+ Lançar adiantado": mostra a caixa e já põe o cursor nela; se sair sem digitar nada, ela volta a ficar oculta.
+      container.querySelectorAll('[data-advance-btn]').forEach(btn=>btn.onclick=()=>{const box=btn.parentElement.querySelector('.order-field--done');if(!box)return;box.classList.add('show-advance');const inp=box.querySelector('input');if(inp)inp.focus()});
+      container.querySelectorAll('[data-separated]').forEach(input=>input.addEventListener('blur',()=>{const box=input.closest('.order-field--done');if(box&&!input.value.trim())box.classList.remove('show-advance')}));
       container.querySelectorAll('[data-add-product]').forEach(btn=>btn.onclick=()=>openProductDialog(btn.dataset.addProduct));
       container.querySelectorAll('[data-del-product]').forEach(btn=>btn.onclick=()=>{const parts=btn.dataset.delProduct.split('|');removeClientProduct(parts[0],parts[1])});
       container.querySelectorAll('[data-edit-product]').forEach(btn=>btn.onclick=()=>{const parts=btn.dataset.editProduct.split('|');openProductDialog(parts[0],parts[1])});
@@ -4879,6 +4924,40 @@
       }
       return htmlToImagePromise;
     }
+    // Só na foto: tira os parceiros sem nenhum valor lançado e as colunas de
+    // tipo (Filetado / Não proc. / Proc. …) que ficaram vazias em todos os
+    // parceiros. A tela continua completa, pra dar pra lançar.
+    function compactSnapshotTable(table){
+      const cellVal=td=>{const inp=td&&td.querySelector('input.cell');return inp?num(inp.getAttribute('value')):0};
+      const bodyRows=[...table.querySelectorAll('tbody tr')];
+      const partnerRows=bodyRows.filter(tr=>tr.querySelector('input.cell'));
+      if(!partnerRows.length)return;
+      partnerRows.forEach(tr=>{if(![...tr.children].slice(1).some(td=>cellVal(td)>0))tr.remove()});
+      const keptRows=partnerRows.filter(tr=>tr.parentNode); // (isConnected não serve: a cópia da foto ainda não está na página)
+      const subhead=table.querySelector('.subhead');
+      const dateRow=table.querySelector('.date-row');
+      if(!subhead||!dateRow||!keptRows.length)return;
+      // Mapa coluna → cabeçalho da data (que agrupa as colunas com colspan).
+      const colDate=[];
+      [...dateRow.querySelectorAll('th[data-day-col]')].forEach(th=>{for(let i=0;i<(Number(th.colSpan)||1);i++)colDate.push(th)});
+      const dataCols=subhead.children.length-1;
+      if(colDate.length!==dataCols)return; // estrutura diferente (ex.: colunas extras) — não mexe
+      const allRows=[...table.querySelectorAll('tbody tr')];
+      for(let j=dataCols-1;j>=0;j--){
+        if(keptRows.some(tr=>cellVal(tr.children[j+1])>0))continue;
+        const head=colDate[j];
+        if((Number(head.colSpan)||1)<=1)continue; // não some com a data inteira
+        [subhead,...allRows].forEach(tr=>{
+          const cell=tr.children[j+1];if(!cell)return;
+          const next=cell.nextElementSibling;
+          if(cell.classList.contains('day-start')&&next&&colDate[j+1]===head)next.classList.add('day-start');
+          cell.remove();
+        });
+        head.colSpan=(Number(head.colSpan)||1)-1;
+        colDate.splice(j,1);
+      }
+      table.style.minWidth=Math.max(900,210+colDate.length*58)+'px';
+    }
     function buildSnapshot(){
       const report=document.querySelector('.report');
       const clone=report.cloneNode(true);
@@ -4911,6 +4990,7 @@
         });
         const remaining=dates.filter(date=>date.hasContent).length;
         if(dates.length)clonedTable.style.minWidth=Math.max(900,210+remaining*(dates[0].span||1)*58)+'px';
+        compactSnapshotTable(clonedTable);
       });
       // A captura é para compartilhar o relatório: oculta o cabeçalho verde,
       // as abas de cultura, os controles de atualização e os atalhos da
@@ -4923,6 +5003,18 @@
       // rótulo do produto (quebrava letra por letra). Em vez de remover, só
       // tornam-se invisíveis, preservando a célula da grade e o layout.
       clone.querySelectorAll('.mini-edit,.order-del').forEach(el=>{el.style.visibility='hidden'});
+      // Sem pedido e sem adiantado: tira da foto o botão "+ Lançar adiantado"
+      // e a caixa vazia — o Pedido ocupa a linha inteira.
+      clone.querySelectorAll('.order-row-fields').forEach(row=>{
+        const box=row.querySelector('.order-field--done[data-status="empty"]');
+        if(!box)return;
+        box.remove();
+        row.querySelectorAll('.order-advance-btn').forEach(el=>el.remove());
+        row.style.gridTemplateColumns='1fr';
+      });
+      clone.querySelectorAll('.order-advance-btn').forEach(el=>el.remove());
+      // A foto vai pra diretoria: sem instrução de uso, só o status.
+      clone.querySelectorAll('.orders-empty span').forEach(el=>el.remove());
       clone.querySelectorAll('.stock-scroll').forEach(el=>{el.style.overflow='visible';el.style.boxShadow='none'});
       const widestTable=Math.max(0,...clonedTables.map(table=>parseFloat(table.style.minWidth)||0));
       const contentWidth=Math.max(report.offsetWidth,widestTable+4);
@@ -4953,6 +5045,33 @@
       const ctx=canvas.getContext('2d');ctx.scale(scale,scale);ctx.drawImage(img,0,0);
       return canvas.toDataURL('image/png');
     }
+    // Mensagem pronta pra acompanhar a foto no WhatsApp: saudação conforme o
+    // horário + data do resumo. Vai direto pra área de transferência.
+    function shareMessageText(){
+      const now=new Date(),h=now.getHours();
+      const saudacao=h<12?'Bom dia':h<18?'Boa tarde':'Boa noite';
+      // *...* = negrito no WhatsApp.
+      const quem=currentUser(); // usuário logado neste dispositivo
+      return `*${saudacao}, Pessoal!*\n\nSegue o Resumo do Estoque do Dia ${now.toLocaleDateString('pt-BR')}.`+(quem?`\n\nEnviado por: ${quem}`:'');
+    }
+    async function copyText(text){
+      try{await navigator.clipboard.writeText(text);return true}catch(e){}
+      // Plano B (navegador sem permissão / página aberta como arquivo local).
+      try{
+        const ta=document.createElement('textarea');ta.value=text;ta.style.cssText='position:fixed;left:-9999px;top:0';
+        document.body.appendChild(ta);ta.select();const ok=document.execCommand('copy');ta.remove();return ok;
+      }catch(e){return false}
+    }
+    async function showShareText(){
+      const text=shareMessageText();
+      const ok=await copyText(text);
+      document.getElementById('shareTextBox').textContent=text;
+      document.getElementById('shareTextStatus').innerHTML=ok
+        ?'A mensagem abaixo já foi copiada. No WhatsApp, anexe a imagem e cole o texto com <strong>Ctrl + V</strong>.'
+        :'Não consegui copiar sozinho — toque em <strong>Copiar de novo</strong> e depois cole no WhatsApp com <strong>Ctrl + V</strong>.';
+      document.getElementById('shareTextCopyBtn').onclick=async()=>{const copied=await copyText(text);toast(copied?'Mensagem copiada.':'Não foi possível copiar.',!copied)};
+      document.getElementById('shareTextDialog').showModal();
+    }
     async function captureImage(){
       const btn=document.getElementById('imgBtn');btn.disabled=true;
       toast('Gerando imagem do painel…');
@@ -4969,7 +5088,7 @@
         a.href=dataUrl;
         a.download=`estoque-spg-${todayIso()}.png`;
         a.click();
-        toast('Imagem salva com sucesso.');
+        showShareText();
       }catch(e){toast('Não foi possível gerar a imagem: '+e.message,true)}
       finally{snap.cleanup();btn.disabled=false}
     }
