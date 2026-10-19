@@ -2438,15 +2438,15 @@
         const detBlock=x.c.id==='tomate'?'':isPepino?(pepinoPacks.length?`<div class="pdet">${pepinoPacks.map(r=>`<span class="dr" title="${esc(r[5])}">${r[0]}<b>${r[1]}</b></span>`).join('')}</div>`:''):(det?`<div class="pdet">${det}</div>`:'');
         const valStyle=splitCard?' style="color:var(--good)"':'';
         const kgStyle=splitCard?' style="color:var(--good);border-color:var(--good)"':'';
-        // Aba Resumo: o card do Pepino mostra só as unidades processadas e o
-        // kg; o detalhamento completo fica no mini resumo da aba Pepino.
+        // Abas Geral e Resumo: o card do Pepino mostra só as unidades processadas e o
+        // kg; o detalhamento completo fica no mini resumo da aba Pepino (onlyId).
         // Aí o sem embalar e o não processado aparecem somados como "KG a Granel".
-        const pepinoCompacto=isPepino&&!onlyId&&activeProduce()==='resumoantigo';
+        const pepinoCompacto=isPepino&&!onlyId;
         const pepinoGranelKg=pepinoLooseKg+pepinoNpKg;
         const pepinoGranelRow=pepinoCompacto?`<span class="valrow pcard-subrow"><span class="val"${redVal} title="${esc(`KG a Granel = sem embalar + não processado\n${fmt(pepinoLooseKg)} kg + ${fmt(pepinoNpKg)} kg = ${fmt(pepinoGranelKg)} kg`)}">KG a Granel</span><span class="kg"${redKg}>${fmt(pepinoGranelKg)} kg</span></span>`:'';
-        // Tomate na aba Resumo segue o mesmo formato compacto: só as cumbucas
-        // processadas (sem kg) e o "KG a Granel".
-        const tomateCompacto=x.c.id==='tomate'&&!onlyId&&activeProduce()==='resumoantigo';
+        // Tomate nas abas Geral e Resumo segue o mesmo formato compacto: só as
+        // cumbucas processadas (sem kg) e o "KG a Granel".
+        const tomateCompacto=x.c.id==='tomate'&&!onlyId;
         const tomateGranelRow=tomateCompacto?`<span class="valrow pcard-subrow"><span class="val"${redVal} title="${esc(`KG a Granel (a processar)\nSoma dos kg lançados na tabela "Kg a processar" = ${fmt(granel)} kg`)}">KG a Granel</span><span class="kg"${redKg}>${fmt(granel)} kg</span></span>`:'';
         const compacto=pepinoCompacto||tomateCompacto;
         return `<div class="pcard${splitCard||kgHighlight?' pcard--tomate':''}" style="--c:${x.c.color}"><span class="pic">${CULTURE_EMOJI[x.c.id]||genericCultureSvg(x.c.color)}</span><b><i></i>${esc(x.c.label)}</b><span class="valrow"><span class="val"${valTitle}${valStyle}>${valDisplay} ${esc(valLabel)}</span>${compacto?'':`<span class="kg"${kgStyle}>≈ ${fmt(badgeKg)} kg</span>`}</span>${pepinoCompacto?pepinoGranelRow:tomateCompacto?tomateGranelRow:subEst}${kgHighlight}<div class="pbar"><i style="width:${pct}%"></i></div><span class="pct">${pct}% do peso total</span>${compacto?'':detBlock}</div>`;
